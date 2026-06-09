@@ -1,0 +1,1462 @@
+<!doctype html>
+<html lang="en" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0"
+    />
+    <title>Guitar Charts</title>
+
+    <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="shortcut icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-title" content="Guitar Charts" />
+
+    <!-- TailwindCSS -->
+    <script src="static/js/tailwind-browser@4.min.js"></script>
+
+    <!-- Basecoat -->
+    <link rel="stylesheet" href="static/css/basecoat.cdn.min.css" />
+    <script src="static/js/basecoat-css@0.3.10.all.min.js"></script>
+
+    <!-- Cairo Font -->
+    <link rel="stylesheet" href="static/css/font-cairo-online.css" />
+
+    <script src="static/js/jquery-3.7.1.min.js"></script>
+
+    <script src="static/js/ChordSheetJS-bundle.js"></script>
+
+    <link rel="stylesheet" href="static/css/app.css" />
+  </head>
+
+  <body class="h-screen overflow-hidden bg-background">
+    <!-- SETTINGS -->
+    <dialog
+      id="settings"
+      class="dialog w-full sm:max-w-[425px] max-h-[612px]"
+      onclick="if (event.target === this) this.close();"
+    >
+      <div>
+        <header>
+          <h2 id="">Settings</h2>
+        </header>
+
+        <section>
+          <div class="tabs w-full" id="settings-tabs">
+            <nav role="tablist" aria-orientation="horizontal" class="w-full">
+              <button
+                type="button"
+                role="tab"
+                id="settings-tabs-tab-1"
+                aria-controls="settings-tabs-panel-1"
+                aria-selected="true"
+                tabindex="0"
+              >
+                Interface
+              </button>
+              <button
+                type="button"
+                role="tab"
+                id="settings-tabs-tab-2"
+                aria-controls="settings-tabs-panel-2"
+                aria-selected="false"
+                tabindex="0"
+              >
+                Utilities
+              </button>
+              <button
+                type="button"
+                role="tab"
+                id="settings-tabs-tab-3"
+                aria-controls="settings-tabs-panel-3"
+                aria-selected="false"
+                tabindex="0"
+              >
+                About / Roadmap
+              </button>
+            </nav>
+
+            <div
+              role="tabpanel"
+              id="settings-tabs-panel-1"
+              aria-labelledby="settings-tabs-tab-1"
+              tabindex="-1"
+              aria-selected="true"
+            >
+              <div class="card">
+                <header>
+                  <h2>Interface</h2>
+                  <p>Make changes to the user interface here.</p>
+                </header>
+                <section class="flex flex-col gap-6">
+                  <div>
+                    <p>Theme</p>
+                    <label class="label mt-2">
+                      <input
+                        id="themeSwitch"
+                        type="checkbox"
+                        role="switch"
+                        class="input"
+                        onchange="
+                          document.dispatchEvent(
+                            new CustomEvent('basecoat:theme'),
+                          )
+                        "
+                      />
+                      Let it be light!
+                    </label>
+                  </div>
+                  <div>
+                    <p>3 String Fret Cover</p>
+                    <label class="label mt-2">
+                      <input
+                        id="kidSwitch"
+                        type="checkbox"
+                        name="switch"
+                        role="switch"
+                        class="input"
+                        onchange="toggleKidFretCover()"
+                      />
+                      For kids!
+                    </label>
+                  </div>
+                  <div>
+                    <p>Scaling</p>
+                    <div class="flex items-center gap-2">
+                      <div role="group" class="button-group mt-2">
+                        <button
+                          class="btn-icon-outline"
+                          onclick="
+                            document.dispatchEvent(
+                              new CustomEvent('basecoat:scale', {
+                                detail: { step: -5 },
+                              }),
+                            )
+                          "
+                        >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                          >
+                            <path d="M5 12h14" />
+                          </svg>
+                        </button>
+                        <button
+                          id="scaling-display"
+                          class="btn-outline"
+                          disabled
+                          style="opacity: 1; min-width: 4rem"
+                        >
+                          Scale
+                        </button>
+                        <button
+                          class="btn-icon-outline"
+                          onclick="
+                            document.dispatchEvent(
+                              new CustomEvent('basecoat:scale', {
+                                detail: { step: +5 },
+                              }),
+                            )
+                          "
+                        >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                          >
+                            <path d="M5 12h14" />
+                            <path d="M12 5v14" />
+                          </svg>
+                        </button>
+                      </div>
+                      <button
+                        onclick="
+                          document.dispatchEvent(
+                            new CustomEvent('basecoat:scale', {
+                              detail: { value: 100 },
+                            }),
+                          )
+                        "
+                        class="btn-icon-outline mt-2"
+                        style="width: 3rem"
+                      >
+                        100%
+                      </button>
+                    </div>
+                  </div>
+                </section>
+              </div>
+            </div>
+
+            <div
+              role="tabpanel"
+              id="settings-tabs-panel-2"
+              aria-labelledby="settings-tabs-tab-2"
+              tabindex="-1"
+              aria-selected="false"
+              hidden
+            >
+              <div class="card">
+                <header>
+                  <h2>Utilities</h2>
+                </header>
+                <section class="flex flex-col gap-6">
+                  <div>
+                    <button
+                      onclick="location.reload()"
+                      class="btn-outline h-9 p-3"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          stroke="currentColor"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M17.651 7.65a7.131 7.131 0 0 0-12.68 3.15M18.001 4v4h-4m-7.652 8.35a7.13 7.13 0 0 0 12.68-3.15M6 20v-4h4"
+                        />
+                      </svg>
+                      Refresh Page
+                    </button>
+                  </div>
+
+                  <div>
+                    <button
+                      onclick="
+                        spotifyLogout();
+                        location.reload();
+                      "
+                      class="btn-destructive h-9 p-3"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 168 168"
+                      >
+                        <g>
+                          <path
+                            fill="currentColor"
+                            d="M84,0.3C37.7,0.3,0.3,37.8,0.3,84c0,46.3,37.5,83.7,83.7,83.7c46.3,0,83.7-37.5,83.7-83.7
+                          C167.7,37.8,130.2,0.3,84,0.3C84,0.3,84,0.3,84,0.3z M122.4,121.1c-1.5,2.5-4.7,3.2-7.2,1.7c-19.7-12-44.4-14.7-73.6-8.1
+                          c-2.8,0.6-5.6-1.1-6.2-3.9c-0.6-2.8,1.1-5.6,3.9-6.2c31.9-7.3,59.3-4.2,81.3,9.3C123.1,115.4,123.9,118.6,122.4,121.1z M132.6,98.3
+                          c-1.9,3.1-5.9,4-9,2.2c-22.5-13.8-56.8-17.8-83.4-9.8c-3.5,1-7.1-0.9-8.1-4.3c-1-3.5,0.9-7.1,4.4-8.1c30.4-9.2,68.2-4.8,94.1,11.1
+                          C133.6,91.2,134.5,95.2,132.6,98.3L132.6,98.3z M133.5,74.5c-27-16-71.5-17.5-97.3-9.7c-4.1,1.3-8.5-1.1-9.8-5.2
+                          c-1.3-4.1,1.1-8.5,5.2-9.8c29.6-9,78.8-7.2,109.8,11.2c3.7,2.2,4.9,7,2.7,10.7C142.1,75.5,137.2,76.7,133.5,74.5L133.5,74.5z"
+                          />
+                        </g>
+                      </svg>
+                      Logout of Spotify</button
+                    ><span class="" id="spotify-user"></span>
+                    <div>
+                      <small>
+                        <span class="" id="spotify-song-match"></span><br />
+                        <span class="" id="spotify-song-id"></span><br />
+                        <span class="" id="spotify-device"></span>
+                      </small>
+                    </div>
+                  </div>
+
+                  <div>
+                    <button
+                      onclick="
+                        localStorage.clear();
+                        location.reload();
+                      "
+                      class="btn-destructive h-9 p-3"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      >
+                        <path d="M3 6h18" />
+                        <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
+                        <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
+                      </svg>
+                      Clear Non-Volatile Settings
+                    </button>
+                  </div>
+
+                  <div id="viewport-display">
+                    Current Viewport<br /><small
+                      >Width: <span id="width">0</span>px | Height:
+                      <span id="height">0</span>px</small
+                    >
+                  </div>
+                </section>
+              </div>
+            </div>
+
+            <div
+              role="tabpanel"
+              id="settings-tabs-panel-3"
+              aria-labelledby="settings-tabs-tab-3"
+              tabindex="-1"
+              aria-selected="false"
+              hidden
+            >
+              <div class="card">
+                <header>
+                  <h2>About / Roadmap</h2>
+                </header>
+                <section class="flex flex-col gap-6">
+                  <div class="flex gap-3 items-center">
+                    <div>
+                      <svg
+                        class="size-10"
+                        id="logo"
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="50"
+                        height="50"
+                        viewBox="0 0 50 50"
+                        style="fill: var(--primary)"
+                      >
+                        <path
+                          d="M15.94,49.85C8.48,47.85,1.59,21.4,5.07,8.47c2.52-9.39,15-9.38,23.86-7s19.66,8.64,17.14,18C42.6,32.41,23.39,51.85,15.94,49.85Z"
+                        ></path>
+                      </svg>
+                    </div>
+                    <div>
+                      <h1 class="font-bold text-lg leading-none">
+                        Guitar Chords <small class="ms-2">v1.0</small>
+                      </h1>
+                      <p class="text-sm text-base-content/70">by danricho</p>
+                    </div>
+                  </div>
+
+                  <div class="flex-none">
+                    <a
+                      href="https://github.com/danricho/guitar-chords"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      class="btn btn-sm gap-2"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 24 24"
+                        fill="currentColor"
+                        class="size-5"
+                      >
+                        <path
+                          d="M12 .5C5.65.5.5 5.65.5 12a11.5 11.5 0 0 0 7.86 10.92c.58.11.79-.25.79-.56v-2.2c-3.2.7-3.88-1.54-3.88-1.54-.52-1.33-1.28-1.68-1.28-1.68-1.05-.72.08-.71.08-.71 1.16.08 1.77 1.2 1.77 1.2 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.56-.29-5.25-1.28-5.25-5.71 0-1.26.45-2.28 1.19-3.09-.12-.29-.52-1.46.11-3.04 0 0 .97-.31 3.18 1.18a10.97 10.97 0 0 1 5.8 0c2.21-1.49 3.18-1.18 3.18-1.18.63 1.58.23 2.75.11 3.04.74.81 1.19 1.83 1.19 3.09 0 4.44-2.69 5.42-5.26 5.7.41.36.78 1.08.78 2.17v3.22c0 .31.21.68.8.56A11.5 11.5 0 0 0 23.5 12C23.5 5.65 18.35.5 12 .5z"
+                        />
+                      </svg>
+                      GitHub
+                    </a>
+                  </div>
+
+                  <div>
+                    <h2>Roadmap</h2>
+                    <small>
+                      <ul class="list-disc ms-5">
+                        <li>Add more fretboard chart definitions</li>
+                        <li>Localstorage of each song's Capo setting</li>
+                        <li>
+                          New settings for:
+                          <ul class="list-disc ms-5">
+                            <li>
+                              Visibility of position indication (current always
+                              on with Spotify mode)
+                            </li>
+                            <li>
+                              Pause on song change (currently commented out)
+                            </li>
+                          </ul>
+                        </li>
+                        <li>
+                          Option to copy/download the current ChordPro markdown
+                          (eg. post transpose)
+                        </li>
+                      </ul>
+                    </small>
+                  </div>
+                </section>
+              </div>
+            </div>
+          </div>
+        </section>
+        <button
+          type="button"
+          aria-label="Close dialog"
+          onclick="this.closest('dialog').close()"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            class="lucide lucide-x-icon lucide-x"
+          >
+            <path d="M18 6 6 18" />
+            <path d="m6 6 12 12" />
+          </svg>
+        </button>
+      </div>
+    </dialog>
+
+    <!-- CONTENT -->
+    <main id="content" class="relative h-full overflow-auto">
+      <!-- SONG INFO PANEL -->
+      <div
+        id="song-info"
+        class="fixed top-0 left-0 p-4 z-30 normalise-bg w-full"
+      >
+        <h1 id="song-title" class="text-2xl font-semibold mb-2"></h1>
+        <p id="song-data" class="text-sm">
+          <span id="spotify-ident" style="display: none"></span>
+          <span id="song-artist" class="me-2"></span>|<span
+            class="mx-2"
+            id="song-key"
+          ></span
+          >|<span class="mx-2" id="song-tempo"></span>
+        </p>
+        <div role="group" class="button-group mt-3">
+          <button id="capo-down" class="btn-icon-outline">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M5 12h14" />
+            </svg>
+          </button>
+          <button
+            id="capo-display"
+            class="btn-outline"
+            disabled
+            style="opacity: 1; min-width: 7rem"
+          >
+            Capo:
+          </button>
+          <button id="capo-up" class="btn-icon-outline">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M5 12h14" />
+              <path d="M12 5v14" />
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- PAGE CONTENT -->
+      <div id="main-content" class="min-h-full p-4 z-20">
+        <div id="song" class="song-sheet flex-grow"></div>
+      </div>
+
+      <!-- ALBUM ART -->
+      <div id="spotify-album-art" class="fixed top-4 z-30">
+        <img id="albumArt" class="size-27" style="display: none" />
+      </div>
+
+      <!-- PROGRESS -->
+      <div
+        id="spotify-progress"
+        class="fixed top-1/2 -translate-y-1/2 z-30 text-xl"
+        style="display: none"
+      >
+        <span id="spotify-percent-played">0%</span>
+      </div>
+
+      <!-- LOGO -->
+      <div
+        id="logo-pane"
+        class="fixed bottom-4 z-30 flex items-center gap-2 items-center"
+        onclick="
+          window.open('https://github.com/danricho/guitar-chords', '_blank')
+        "
+      >
+        <div class="text text-right">
+          <h1 class="font-bold leading-none">Guitar Chords</h1>
+          <p class="text-xs text-base-content/70">by danricho</p>
+        </div>
+        <svg
+          class="size-10"
+          id="logo"
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 50 50"
+          style="fill: var(--primary)"
+        >
+          <path
+            d="M15.94,49.85C8.48,47.85,1.59,21.4,5.07,8.47c2.52-9.39,15-9.38,23.86-7s19.66,8.64,17.14,18C42.6,32.41,23.39,51.85,15.94,49.85Z"
+          ></path>
+        </svg>
+      </div>
+    </main>
+
+    <!-- FRETBOARD PANEL -->
+    <aside
+      id="fretboard-chart-panel"
+      class="normalise-bg fixed top-0 right-[var(--menu-width)] z-30 h-full"
+    >
+      <div class="h-full overflow-auto py-4">
+        <!-- FRETBOARD HOLDER -->
+        <div id="fretboards" class="p-3 flex flex-col items-end"></div>
+        <!-- FRETBOARD TEMPLATE -->
+        <div
+          class="fretboard flex mb-4 gap-2"
+          id="fretboard-template"
+          style="display: none"
+        >
+          <div
+            class="chord-name self-center text-center text-xl primary tracking-tight"
+            style="color: var(--primary)"
+          ></div>
+          <div class="self-center w-3/4">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="-3 -3 118 120"
+              class="size-25"
+            >
+              <g class="fretboard-base">
+                <line
+                  x1="25.91"
+                  y1="17.41"
+                  x2="25.91"
+                  y2="114.95"
+                  style="fill: none; stroke: currentColor; stroke-width: 2px"
+                ></line>
+                <line
+                  x1="45.91"
+                  y1="17.41"
+                  x2="45.91"
+                  y2="114.95"
+                  style="fill: none; stroke: currentColor; stroke-width: 2px"
+                ></line>
+                <line
+                  x1="5.91"
+                  y1="13.8"
+                  x2="5.91"
+                  y2="114.95"
+                  style="fill: none; stroke: currentColor; stroke-width: 2px"
+                ></line>
+                <line
+                  x1="65.91"
+                  y1="17.41"
+                  x2="65.91"
+                  y2="114.95"
+                  style="fill: none; stroke: currentColor"
+                ></line>
+                <line
+                  x1="85.91"
+                  y1="17.41"
+                  x2="85.91"
+                  y2="114.95"
+                  style="fill: none; stroke: currentColor"
+                ></line>
+                <line
+                  x1="105.91"
+                  y1="17.41"
+                  x2="105.91"
+                  y2="114.95"
+                  style="fill: none; stroke: currentColor"
+                ></line>
+                <line
+                  x1="5.41"
+                  y1="17.41"
+                  x2="106.41"
+                  y2="17.41"
+                  style="fill: none; stroke: currentColor"
+                ></line>
+                <line
+                  x1="5.41"
+                  y1="40.41"
+                  x2="106.41"
+                  y2="40.41"
+                  style="fill: none; stroke: currentColor"
+                ></line>
+                <line
+                  x1="5.41"
+                  y1="63.41"
+                  x2="106.41"
+                  y2="63.41"
+                  style="fill: none; stroke: currentColor"
+                ></line>
+                <line
+                  x1="5.41"
+                  y1="86.41"
+                  x2="106.41"
+                  y2="86.41"
+                  style="fill: none; stroke: currentColor"
+                ></line>
+                <line
+                  x1="5.41"
+                  y1="109.41"
+                  x2="106.41"
+                  y2="109.41"
+                  style="fill: none; stroke: currentColor"
+                ></line>
+                <line
+                  x1="5.41"
+                  y1="15.89"
+                  x2="106.41"
+                  y2="15.89"
+                  style="fill: none; stroke: currentColor; stroke-width: 5px"
+                ></line>
+              </g>
+              <g class="string string-6">
+                <circle
+                  class="fret fret-4"
+                  cx="105.91"
+                  cy="97.91"
+                  r="5.41"
+                  style="
+                    fill: var(--primary);
+                    stroke: currentcolor;
+                    stroke-width: 2px;
+                    display: none;
+                  "
+                ></circle>
+                <circle
+                  class="fret fret-3"
+                  cx="105.91"
+                  cy="74.91"
+                  r="5.41"
+                  style="
+                    fill: var(--primary);
+                    stroke: currentcolor;
+                    stroke-width: 2px;
+                    display: none;
+                  "
+                ></circle>
+                <circle
+                  class="fret fret-2"
+                  cx="105.91"
+                  cy="51.91"
+                  r="5.41"
+                  style="
+                    fill: var(--primary);
+                    stroke: currentcolor;
+                    stroke-width: 2px;
+                    display: none;
+                  "
+                ></circle>
+                <circle
+                  class="fret fret-1"
+                  cx="105.91"
+                  cy="28.91"
+                  r="5.41"
+                  style="
+                    fill: var(--primary);
+                    stroke: currentcolor;
+                    stroke-width: 2px;
+                    display: none;
+                  "
+                ></circle>
+                <g class="mute" style="display: none">
+                  <line
+                    x1="100.78"
+                    y1="0.78"
+                    x2="111.05"
+                    y2="11.05"
+                    style="fill: none; stroke: var(--primary)"
+                  ></line>
+                  <line
+                    x1="100.78"
+                    y1="11.05"
+                    x2="111.05"
+                    y2="0.78"
+                    style="fill: none; stroke: var(--primary)"
+                  ></line>
+                </g>
+                <circle
+                  class="open"
+                  cx="105.91"
+                  cy="5.91"
+                  r="5.41"
+                  style="
+                    fill: none;
+                    stroke: var(--primary);
+                    stroke-width: 2px;
+                    display: none;
+                  "
+                ></circle>
+              </g>
+              <g class="string string-5">
+                <circle
+                  class="fret fret-4"
+                  cx="85.91"
+                  cy="97.91"
+                  r="5.41"
+                  style="
+                    fill: var(--primary);
+                    stroke: currentcolor;
+                    stroke-width: 2px;
+                    display: none;
+                  "
+                ></circle>
+                <circle
+                  class="fret fret-3"
+                  cx="85.91"
+                  cy="74.91"
+                  r="5.41"
+                  style="
+                    fill: var(--primary);
+                    stroke: currentcolor;
+                    stroke-width: 2px;
+                    display: none;
+                  "
+                ></circle>
+                <circle
+                  class="fret fret-2"
+                  cx="85.91"
+                  cy="51.91"
+                  r="5.41"
+                  style="
+                    fill: var(--primary);
+                    stroke: currentcolor;
+                    stroke-width: 2px;
+                    display: none;
+                  "
+                ></circle>
+                <circle
+                  class="fret fret-1"
+                  cx="85.91"
+                  cy="28.91"
+                  r="5.41"
+                  style="
+                    fill: var(--primary);
+                    stroke: currentcolor;
+                    stroke-width: 2px;
+                    display: none;
+                  "
+                ></circle>
+                <g class="mute" style="display: none">
+                  <line
+                    x1="80.78"
+                    y1="0.78"
+                    x2="91.05"
+                    y2="11.05"
+                    style="fill: none; stroke: var(--primary)"
+                  ></line>
+                  <line
+                    x1="80.78"
+                    y1="11.05"
+                    x2="91.05"
+                    y2="0.78"
+                    style="fill: none; stroke: var(--primary)"
+                  ></line>
+                </g>
+                <circle
+                  class="open"
+                  cx="85.91"
+                  cy="5.91"
+                  r="5.41"
+                  style="
+                    fill: none;
+                    stroke: var(--primary);
+                    stroke-width: 2px;
+                    display: none;
+                  "
+                ></circle>
+              </g>
+              <g class="string string-4">
+                <circle
+                  class="fret fret-4"
+                  cx="65.91"
+                  cy="97.91"
+                  r="5.41"
+                  style="
+                    fill: var(--primary);
+                    stroke: currentcolor;
+                    stroke-width: 2px;
+                    display: none;
+                  "
+                ></circle>
+                <circle
+                  class="fret fret-3"
+                  cx="65.91"
+                  cy="74.91"
+                  r="5.41"
+                  style="
+                    fill: var(--primary);
+                    stroke: currentcolor;
+                    stroke-width: 2px;
+                    display: none;
+                  "
+                ></circle>
+                <circle
+                  class="fret fret-2"
+                  cx="65.91"
+                  cy="51.91"
+                  r="5.41"
+                  style="
+                    fill: var(--primary);
+                    stroke: currentcolor;
+                    stroke-width: 2px;
+                    display: none;
+                  "
+                ></circle>
+                <circle
+                  class="fret fret-1"
+                  cx="65.91"
+                  cy="28.91"
+                  r="5.41"
+                  style="
+                    fill: var(--primary);
+                    stroke: currentcolor;
+                    stroke-width: 2px;
+                    display: none;
+                  "
+                ></circle>
+                <g class="mute" style="display: none">
+                  <line
+                    x1="60.78"
+                    y1="0.78"
+                    x2="71.05"
+                    y2="11.05"
+                    style="
+                      fill: none;
+                      stroke: var(--primary);
+                      stroke-width: 2px;
+                    "
+                  ></line>
+                  <line
+                    x1="60.78"
+                    y1="11.05"
+                    x2="71.05"
+                    y2="0.78"
+                    style="
+                      fill: none;
+                      stroke: var(--primary);
+                      stroke-width: 2px;
+                    "
+                  ></line>
+                </g>
+                <circle
+                  class="open"
+                  cx="65.91"
+                  cy="5.91"
+                  r="5.41"
+                  style="
+                    fill: none;
+                    stroke: var(--primary);
+                    stroke-width: 2px;
+                    display: none;
+                  "
+                ></circle>
+              </g>
+              <g class="string string-3">
+                <circle
+                  class="fret fret-4"
+                  cx="45.91"
+                  cy="97.91"
+                  r="5.41"
+                  style="
+                    fill: var(--primary);
+                    stroke: currentcolor;
+                    stroke-width: 2px;
+                    display: none;
+                  "
+                ></circle>
+                <circle
+                  class="fret fret-3"
+                  cx="45.91"
+                  cy="74.91"
+                  r="5.41"
+                  style="
+                    fill: var(--primary);
+                    stroke: currentcolor;
+                    stroke-width: 2px;
+                    display: none;
+                  "
+                ></circle>
+                <circle
+                  class="fret fret-2"
+                  cx="45.91"
+                  cy="51.91"
+                  r="5.41"
+                  style="
+                    fill: var(--primary);
+                    stroke: currentcolor;
+                    stroke-width: 2px;
+                    display: none;
+                  "
+                ></circle>
+                <circle
+                  class="fret fret-1"
+                  cx="45.91"
+                  cy="28.91"
+                  r="5.41"
+                  style="
+                    fill: var(--primary);
+                    stroke: currentcolor;
+                    stroke-width: 2px;
+                    display: none;
+                  "
+                ></circle>
+                <g class="mute" style="display: none">
+                  <line
+                    x1="40.78"
+                    y1="0.78"
+                    x2="51.05"
+                    y2="11.05"
+                    style="
+                      fill: none;
+                      stroke: var(--primary);
+                      stroke-width: 2px;
+                    "
+                  ></line>
+                  <line
+                    x1="40.78"
+                    y1="11.05"
+                    x2="51.05"
+                    y2="0.78"
+                    style="
+                      fill: none;
+                      stroke: var(--primary);
+                      stroke-width: 2px;
+                    "
+                  ></line>
+                </g>
+                <circle
+                  class="open"
+                  cx="45.91"
+                  cy="5.91"
+                  r="5.41"
+                  style="
+                    fill: none;
+                    stroke: var(--primary);
+                    stroke-width: 2px;
+                    display: none;
+                  "
+                ></circle>
+              </g>
+              <g class="string string-2">
+                <circle
+                  class="fret fret-4"
+                  cx="25.91"
+                  cy="97.91"
+                  r="5.41"
+                  style="
+                    fill: var(--primary);
+                    stroke: currentcolor;
+                    stroke-width: 2px;
+                    display: none;
+                  "
+                ></circle>
+                <circle
+                  class="fret fret-3"
+                  cx="25.91"
+                  cy="74.91"
+                  r="5.41"
+                  style="
+                    fill: var(--primary);
+                    stroke: currentcolor;
+                    stroke-width: 2px;
+                    display: none;
+                  "
+                ></circle>
+                <circle
+                  class="fret fret-2"
+                  cx="25.91"
+                  cy="51.91"
+                  r="5.41"
+                  style="
+                    fill: var(--primary);
+                    stroke: currentcolor;
+                    stroke-width: 2px;
+                    display: none;
+                  "
+                ></circle>
+                <circle
+                  class="fret fret-1"
+                  cx="25.91"
+                  cy="28.91"
+                  r="5.41"
+                  style="
+                    fill: var(--primary);
+                    stroke: currentcolor;
+                    stroke-width: 2px;
+                    display: none;
+                  "
+                ></circle>
+                <g class="mute" style="display: none">
+                  <line
+                    x1="20.78"
+                    y1="0.78"
+                    x2="31.05"
+                    y2="11.05"
+                    style="
+                      fill: none;
+                      stroke: var(--primary);
+                      stroke-width: 2px;
+                    "
+                  ></line>
+                  <line
+                    x1="20.78"
+                    y1="11.05"
+                    x2="31.05"
+                    y2="0.78"
+                    style="
+                      fill: none;
+                      stroke: var(--primary);
+                      stroke-width: 2px;
+                    "
+                  ></line>
+                </g>
+                <circle
+                  class="open"
+                  cx="25.91"
+                  cy="5.91"
+                  r="5.41"
+                  style="
+                    fill: none;
+                    stroke: var(--primary);
+                    stroke-width: 2px;
+                    display: none;
+                  "
+                ></circle>
+              </g>
+              <g class="string string-1">
+                <circle
+                  class="fret fret-4"
+                  cx="5.91"
+                  cy="97.91"
+                  r="5.41"
+                  style="
+                    fill: var(--primary);
+                    stroke: currentcolor;
+                    stroke-width: 2px;
+                    display: none;
+                  "
+                ></circle>
+                <circle
+                  class="fret fret-3"
+                  cx="5.91"
+                  cy="74.91"
+                  r="5.41"
+                  style="
+                    fill: var(--primary);
+                    stroke: currentcolor;
+                    stroke-width: 2px;
+                    display: none;
+                  "
+                ></circle>
+                <circle
+                  class="fret fret-2"
+                  cx="5.91"
+                  cy="51.91"
+                  r="5.41"
+                  style="
+                    fill: var(--primary);
+                    stroke: currentcolor;
+                    stroke-width: 2px;
+                    display: none;
+                  "
+                ></circle>
+                <circle
+                  class="fret fret-1"
+                  cx="5.91"
+                  cy="28.91"
+                  r="5.41"
+                  style="
+                    fill: var(--primary);
+                    stroke: currentcolor;
+                    stroke-width: 2px;
+                    display: none;
+                  "
+                ></circle>
+                <g class="mute" style="display: none">
+                  <line
+                    x1="0.78"
+                    y1="0.78"
+                    x2="11.05"
+                    y2="11.05"
+                    style="
+                      fill: none;
+                      stroke: var(--primary);
+                      stroke-width: 2px;
+                    "
+                  ></line>
+                  <line
+                    x1="0.78"
+                    y1="11.05"
+                    x2="11.05"
+                    y2="0.78"
+                    style="
+                      fill: none;
+                      stroke: var(--primary);
+                      stroke-width: 2px;
+                    "
+                  ></line>
+                </g>
+                <circle
+                  class="open"
+                  cx="5.91"
+                  cy="5.91"
+                  r="5.41"
+                  style="
+                    fill: none;
+                    stroke: var(--primary);
+                    stroke-width: 2px;
+                    display: none;
+                  "
+                ></circle>
+              </g>
+              <rect
+                class="fret-kid-cover"
+                y="-3"
+                x="-2"
+                style="fill: var(--background); opacity: 0.9; display: none"
+                width="59"
+                height="118.3"
+              />
+              <g class="unknown" style="opacity: 0.9; display: none">
+                <path
+                  style="fill: var(--primary)"
+                  d="M52,74.3c-0.3-0.6-0.6-1.3-0.9-2.4c-0.3-1-0.5-2.1-0.5-3.3c0-1.3,0.3-2.5,0.8-3.6c0.6-1.1,1.4-2.2,2.5-3.4
+                c1.1-1.1,2.5-2.4,4.1-3.7c1.7-1.4,3-2.5,3.9-3.4c0.9-0.9,1.5-1.8,1.8-2.7c0.3-0.9,0.5-1.9,0.5-3.2c0-2.2-0.7-3.7-2-4.6
+                c-1.4-0.9-3.5-1.4-6.6-1.4c-1.2,0-2.6,0.1-4.1,0.2c-1.5,0.2-3,0.4-4.5,0.7c-1.5,0.3-2.7,0.5-3.9,0.7l-0.5-8.2
+                c1.3-0.4,2.8-0.8,4.6-1.2c1.8-0.4,3.6-0.8,5.6-1.1c1.9-0.3,3.7-0.4,5.3-0.4c3.9,0,7.2,0.5,9.7,1.4c2.6,1,4.5,2.5,5.8,4.7
+                c1.3,2.2,1.9,5,1.9,8.6c0,2.6-0.2,4.7-0.6,6.3c-0.4,1.6-1.2,3-2.3,4.3c-1.1,1.3-2.7,2.7-4.6,4.3c-2.5,2-4.3,3.6-5.3,4.9
+                c-1.1,1.3-1.6,2.6-1.7,4v2.4H52z M50.6,91.4V79.9h11.5v11.5H50.6z"
+                />
+              </g>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- SIDE MENU -->
+    <aside
+      id="side-menu"
+      class="normalise-bg fixed top-0 right-0 z-40 flex h-full flex-col justify-between z-40"
+    >
+      <!-- TOP BUTTONS -->
+      <div class="flex flex-col items-center gap-2 p-2">
+        <button
+          id="panel-button"
+          class="btn-outline size-9 p-1"
+          onclick="togglePanel()"
+        >
+          <svg
+            class="w-full h-full"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              d="M5 13.17a3.001 3.001 0 0 0 0 5.66V20a1 1 0 1 0 2 0v-1.17a3.001 3.001 0 0 0 0-5.66V4a1 1 0 0 0-2 0v9.17ZM11 20v-9.17a3.001 3.001 0 0 1 0-5.66V4a1 1 0 1 1 2 0v1.17a3.001 3.001 0 0 1 0 5.66V20a1 1 0 1 1-2 0Zm6-1.17V20a1 1 0 1 0 2 0v-1.17a3.001 3.001 0 0 0 0-5.66V4a1 1 0 1 0-2 0v9.17a3.001 3.001 0 0 0 0 5.66Z"
+            ></path>
+          </svg>
+        </button>
+
+        <button class="btn-outline size-9 p-1" onclick="settings.showModal()">
+          <svg
+            class="w-full h-full"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M21 13v-2a1 1 0 0 0-1-1h-.757l-.707-1.707.535-.536a1 1 0 0 0 0-1.414l-1.414-1.414a1 1 0 0 0-1.414 0l-.536.535L14 4.757V4a1 1 0 0 0-1-1h-2a1 1 0 0 0-1 1v.757l-1.707.707-.536-.535a1 1 0 0 0-1.414 0L4.929 6.343a1 1 0 0 0 0 1.414l.536.536L4.757 10H4a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h.757l.707 1.707-.535.536a1 1 0 0 0 0 1.414l1.414 1.414a1 1 0 0 0 1.414 0l.536-.535 1.707.707V20a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1v-.757l1.707-.708.536.536a1 1 0 0 0 1.414 0l1.414-1.414a1 1 0 0 0 0-1.414l-.535-.536.707-1.707H20a1 1 0 0 0 1-1Z"
+            />
+            <path
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"
+            />
+          </svg>
+        </button>
+
+        <div id="chart-timesynced" class="size-9 p-1" style="display: none">
+          <svg
+            class="w-full h-full opacity-50"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              fill-rule="evenodd"
+              d="M10 5a2 2 0 0 0-2 2v3h2.4A7.48 7.48 0 0 0 8 15.5a7.48 7.48 0 0 0 2.4 5.5H5a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h1V7a4 4 0 1 1 8 0v1.15a7.446 7.446 0 0 0-1.943.685A.999.999 0 0 1 12 8.5V7a2 2 0 0 0-2-2Z"
+              clip-rule="evenodd"
+            />
+            <path
+              fill-rule="evenodd"
+              d="M10 15.5a5.5 5.5 0 1 1 11 0 5.5 5.5 0 0 1-11 0Zm6.5-1.5a1 1 0 1 0-2 0v1.5a1 1 0 0 0 .293.707l1 1a1 1 0 0 0 1.414-1.414l-.707-.707V14Z"
+              clip-rule="evenodd"
+            />
+          </svg>
+        </div>
+      </div>
+
+      <!-- MIDDLE BUTTONS -->
+      <div class="flex flex-col items-center gap-2 p-2">
+        <button
+          id="prev-song"
+          class="btn-outline manual-nav-buttons size-9 p-1"
+          disabled
+        >
+          <svg
+            class="w-full h-full"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="m5 15 7-7 7 7"
+            />
+          </svg>
+        </button>
+        <div class="opacity-50 manual-nav-buttons" style="font-size: 0.75rem">
+          <span id="chart-index"></span> of <span id="charts-available"></span>
+        </div>
+        <button
+          id="next-song"
+          class="btn-outline manual-nav-buttons size-9 p-1"
+        >
+          <svg
+            class="w-full h-full"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="m19 9-7 7-7-7"
+            />
+          </svg>
+        </button>
+      </div>
+
+      <!-- BOTTOM BUTTONS -->
+      <div class="flex flex-col items-center gap-2 p-2">
+        <div
+          class="spotify-controls flex flex-col items-center gap-2"
+          style="display: none"
+        >
+          <button
+            id="spotify-play"
+            class="btn-outline size-9 p-1"
+            onclick="spotifyPlay()"
+            style="display: none"
+          >
+            <svg
+              class="w-full h-full"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M8.6 5.2A1 1 0 0 0 7 6v12a1 1 0 0 0 1.6.8l8-6a1 1 0 0 0 0-1.6l-8-6Z"
+                clip-rule="evenodd"
+              />
+            </svg>
+          </button>
+          <button
+            id="spotify-pause"
+            class="btn-outline size-9 p-1"
+            onclick="spotifyPause()"
+            style="display: none"
+          >
+            <svg
+              class="w-full h-full"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M8 5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2H8Zm7 0a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-1Z"
+                clip-rule="evenodd"
+              />
+            </svg>
+          </button>
+
+          <button
+            id="spotify-song-restart"
+            class="btn-outline size-9 p-1"
+            onclick="spotifyRestartTrack()"
+          >
+            <svg
+              class="w-full h-full"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M14.5 8.046H11V6.119c0-.921-.9-1.446-1.524-.894l-5.108 4.49a1.2 1.2 0 0 0 0 1.739l5.108 4.49c.624.556 1.524.027 1.524-.893v-1.928h2a3.023 3.023 0 0 1 3 3.046V19a5.593 5.593 0 0 0-1.5-10.954Z"
+              />
+            </svg>
+          </button>
+          <button
+            id="spotify-prev"
+            class="btn-outline size-9 p-1"
+            onclick="spotifyPrevious()"
+          >
+            <svg
+              class="w-full h-full"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M7 6a1 1 0 0 1 2 0v4l6.4-4.8A1 1 0 0 1 17 6v12a1 1 0 0 1-1.6.8L9 14v4a1 1 0 1 1-2 0V6Z"
+                clip-rule="evenodd"
+              />
+            </svg>
+          </button>
+          <button
+            id="spotify-next"
+            class="btn-outline size-9 p-1"
+            onclick="spotifyNext()"
+          >
+            <svg
+              class="w-full h-full"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M17 6a1 1 0 1 0-2 0v4L8.6 5.2A1 1 0 0 0 7 6v12a1 1 0 0 0 1.6.8L15 14v4a1 1 0 1 0 2 0V6Z"
+                clip-rule="evenodd"
+              />
+            </svg>
+          </button>
+
+          <a
+            id="spotify-playlist-link"
+            href=""
+            target="_blank"
+            class="opacity-50 hover:opacity-100 hover:underline"
+            style="font-size: 0.75rem; display: none"
+            >Playlist</a
+          >
+        </div>
+
+        <button
+          id="spotify-enable"
+          class="btn-outline size-9 p-1"
+          onclick="start_spotify()"
+        >
+          <svg
+            class="w-full h-full"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 168 168"
+          >
+            <g>
+              <path
+                fill="currentColor"
+                d="M84,0.3C37.7,0.3,0.3,37.8,0.3,84c0,46.3,37.5,83.7,83.7,83.7c46.3,0,83.7-37.5,83.7-83.7
+              C167.7,37.8,130.2,0.3,84,0.3C84,0.3,84,0.3,84,0.3z M122.4,121.1c-1.5,2.5-4.7,3.2-7.2,1.7c-19.7-12-44.4-14.7-73.6-8.1
+              c-2.8,0.6-5.6-1.1-6.2-3.9c-0.6-2.8,1.1-5.6,3.9-6.2c31.9-7.3,59.3-4.2,81.3,9.3C123.1,115.4,123.9,118.6,122.4,121.1z M132.6,98.3
+              c-1.9,3.1-5.9,4-9,2.2c-22.5-13.8-56.8-17.8-83.4-9.8c-3.5,1-7.1-0.9-8.1-4.3c-1-3.5,0.9-7.1,4.4-8.1c30.4-9.2,68.2-4.8,94.1,11.1
+              C133.6,91.2,134.5,95.2,132.6,98.3L132.6,98.3z M133.5,74.5c-27-16-71.5-17.5-97.3-9.7c-4.1,1.3-8.5-1.1-9.8-5.2
+              c-1.3-4.1,1.1-8.5,5.2-9.8c29.6-9,78.8-7.2,109.8,11.2c3.7,2.2,4.9,7,2.7,10.7C142.1,75.5,137.2,76.7,133.5,74.5L133.5,74.5z"
+              />
+            </g>
+          </svg>
+        </button>
+        <button
+          id="spotify-disable"
+          class="btn-outline size-9 p-1"
+          onclick="stop_spotify()"
+          style="display: none"
+        >
+          <svg
+            class="w-full h-full"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 168 168"
+          >
+            <g>
+              <path
+                style="fill: #1ed760"
+                d="M84,0.3C37.7,0.3,0.3,37.8,0.3,84c0,46.3,37.5,83.7,83.7,83.7c46.3,0,83.7-37.5,83.7-83.7
+              C167.7,37.8,130.2,0.3,84,0.3C84,0.3,84,0.3,84,0.3z M122.4,121.1c-1.5,2.5-4.7,3.2-7.2,1.7c-19.7-12-44.4-14.7-73.6-8.1
+              c-2.8,0.6-5.6-1.1-6.2-3.9c-0.6-2.8,1.1-5.6,3.9-6.2c31.9-7.3,59.3-4.2,81.3,9.3C123.1,115.4,123.9,118.6,122.4,121.1z M132.6,98.3
+              c-1.9,3.1-5.9,4-9,2.2c-22.5-13.8-56.8-17.8-83.4-9.8c-3.5,1-7.1-0.9-8.1-4.3c-1-3.5,0.9-7.1,4.4-8.1c30.4-9.2,68.2-4.8,94.1,11.1
+              C133.6,91.2,134.5,95.2,132.6,98.3L132.6,98.3z M133.5,74.5c-27-16-71.5-17.5-97.3-9.7c-4.1,1.3-8.5-1.1-9.8-5.2
+              c-1.3-4.1,1.1-8.5,5.2-9.8c29.6-9,78.8-7.2,109.8,11.2c3.7,2.2,4.9,7,2.7,10.7C142.1,75.5,137.2,76.7,133.5,74.5L133.5,74.5z"
+              />
+            </g>
+            <g id="spotify-no-player">
+              <circle
+                style="fill: none; stroke: #ff0000; stroke-width: 17"
+                cx="84"
+                cy="84"
+                r="70.3"
+              />
+              <line
+                style="fill: none; stroke: #ff0000; stroke-width: 17"
+                x1="132"
+                y1="32.6"
+                x2="32.7"
+                y2="132"
+              />
+            </g>
+          </svg>
+        </button>
+      </div>
+    </aside>
+
+    <script src="static/js/fretboard.js"></script>
+    <script src="static/js/timestamp-scroll.js"></script>
+    <script src="static/js/load-charts.js"></script>
+    <script src="static/js/charts.js"></script>
+    <script src="static/js/spotify-settings.js"></script>
+    <script src="static/js/spotify.js"></script>
+    <script src="static/js/app.js"></script>
+  </body>
+</html>
