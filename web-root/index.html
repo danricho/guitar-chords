@@ -54,7 +54,7 @@
                 aria-selected="true"
                 tabindex="0"
               >
-                Interface
+                Chart / Spotify
               </button>
               <button
                 type="button"
@@ -64,13 +64,23 @@
                 aria-selected="false"
                 tabindex="0"
               >
-                Utilities
+                Interface
               </button>
               <button
                 type="button"
                 role="tab"
                 id="settings-tabs-tab-3"
                 aria-controls="settings-tabs-panel-3"
+                aria-selected="false"
+                tabindex="0"
+              >
+                Utilities
+              </button>
+              <button
+                type="button"
+                role="tab"
+                id="settings-tabs-tab-4"
+                aria-controls="settings-tabs-panel-4"
                 aria-selected="false"
                 tabindex="0"
               >
@@ -85,15 +95,140 @@
               tabindex="-1"
               aria-selected="true"
             >
-              <div class="card">
-                <header>
-                  <h2>Interface</h2>
-                  <p>Make changes to the user interface here.</p>
-                </header>
-                <section class="flex flex-col gap-6">
+              <div class="card gap-8">
+                <section class="flex flex-col gap-4">
+                  <h2 class="font-bold">Chord Chart</h2>
+                  <label class="label">
+                    <input
+                      id="kidSwitch"
+                      type="checkbox"
+                      name="switch"
+                      role="switch"
+                      class="input"
+                      onchange="toggleKidFretCover()"
+                    />
+                    3 String Fret Cover
+                  </label>
                   <div>
-                    <p>Theme</p>
+                    <button
+                      onclick="copyCurrentChart()"
+                      class="btn-outline h-9 p-3"
+                    >
+                      <svg
+                        aria-hidden="true"
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="24"
+                        height="24"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          stroke="currentColor"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M15 4h3a1 1 0 0 1 1 1v15a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h3m0 3h6m-6 5h6m-6 4h6M10 3v4h4V3h-4Z"
+                        />
+                      </svg>
+                      Copy Current Chart
+                    </button>
+                  </div>
+                </section>
+
+                <section class="flex flex-col gap-4">
+                  <h2 class="font-bold">Spotify</h2>
+                  <div>
+                    <button
+                      onclick="
+                        spotifyLogout();
+                        location.reload();
+                      "
+                      class="btn-destructive h-9 p-3"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 168 168"
+                      >
+                        <g>
+                          <path
+                            fill="currentColor"
+                            d="M84,0.3C37.7,0.3,0.3,37.8,0.3,84c0,46.3,37.5,83.7,83.7,83.7c46.3,0,83.7-37.5,83.7-83.7
+                          C167.7,37.8,130.2,0.3,84,0.3C84,0.3,84,0.3,84,0.3z M122.4,121.1c-1.5,2.5-4.7,3.2-7.2,1.7c-19.7-12-44.4-14.7-73.6-8.1
+                          c-2.8,0.6-5.6-1.1-6.2-3.9c-0.6-2.8,1.1-5.6,3.9-6.2c31.9-7.3,59.3-4.2,81.3,9.3C123.1,115.4,123.9,118.6,122.4,121.1z M132.6,98.3
+                          c-1.9,3.1-5.9,4-9,2.2c-22.5-13.8-56.8-17.8-83.4-9.8c-3.5,1-7.1-0.9-8.1-4.3c-1-3.5,0.9-7.1,4.4-8.1c30.4-9.2,68.2-4.8,94.1,11.1
+                          C133.6,91.2,134.5,95.2,132.6,98.3L132.6,98.3z M133.5,74.5c-27-16-71.5-17.5-97.3-9.7c-4.1,1.3-8.5-1.1-9.8-5.2
+                          c-1.3-4.1,1.1-8.5,5.2-9.8c29.6-9,78.8-7.2,109.8,11.2c3.7,2.2,4.9,7,2.7,10.7C142.1,75.5,137.2,76.7,133.5,74.5L133.5,74.5z"
+                          />
+                        </g>
+                      </svg>
+                      Logout of Spotify
+                    </button>
+                    <div>
+                      <small>
+                        <div class="my-2 italic" id="spotify-user"></div>
+                        <div
+                          class="spotify-controls italic"
+                          id="spotify-device"
+                          style="display: none"
+                        ></div>
+                        <div
+                          class="spotify-controls italic"
+                          id="spotify-song-id"
+                          style="display: none"
+                        ></div>
+                        <div
+                          class="spotify-controls italic"
+                          id="spotify-song-match"
+                          style="display: none"
+                        >
+                          "<span></span>"
+                          <div class="mt-2">
+                            <button
+                              onclick="copyCurrentChart()"
+                              class="btn-outline h-9 p-3"
+                            >
+                              <svg
+                                aria-hidden="true"
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="24"
+                                height="24"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  stroke="currentColor"
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                  stroke-width="2"
+                                  d="M15 4h3a1 1 0 0 1 1 1v15a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h3m0 3h6m-6 5h6m-6 4h6M10 3v4h4V3h-4Z"
+                                />
+                              </svg>
+                              Copy Current 'Song - Artist'
+                            </button>
+                          </div>
+                        </div>
+                      </small>
+                    </div>
+                  </div>
+                </section>
+              </div>
+            </div>
+
+            <div
+              role="tabpanel"
+              id="settings-tabs-panel-2"
+              aria-labelledby="settings-tabs-tab-2"
+              tabindex="-1"
+              aria-selected="false"
+              hidden
+            >
+              <div class="card gap-8">
+                <section class="flex flex-col gap-4">
+                  <h2 class="font-bold">Interface</h2>
+                  <div>
+                    <p></p>
                     <label class="label mt-2">
+                      Dark
                       <input
                         id="themeSwitch"
                         type="checkbox"
@@ -105,26 +240,12 @@
                           )
                         "
                       />
-                      Let it be light!
+                      Light
                     </label>
                   </div>
                   <div>
-                    <p>3 String Fret Cover</p>
-                    <label class="label mt-2">
-                      <input
-                        id="kidSwitch"
-                        type="checkbox"
-                        name="switch"
-                        role="switch"
-                        class="input"
-                        onchange="toggleKidFretCover()"
-                      />
-                      For kids!
-                    </label>
-                  </div>
-                  <div>
-                    <p>Scaling</p>
                     <div class="flex items-center gap-2">
+                      Scale
                       <div role="group" class="button-group mt-2">
                         <button
                           class="btn-icon-outline"
@@ -199,23 +320,27 @@
                       </button>
                     </div>
                   </div>
+                  <div id="viewport-display">
+                    <small
+                      >Current Viewport<br />Width: <span id="width">0</span>px
+                      | Height: <span id="height">0</span>px</small
+                    >
+                  </div>
                 </section>
               </div>
             </div>
 
             <div
               role="tabpanel"
-              id="settings-tabs-panel-2"
-              aria-labelledby="settings-tabs-tab-2"
+              id="settings-tabs-panel-3"
+              aria-labelledby="settings-tabs-tab-3"
               tabindex="-1"
               aria-selected="false"
               hidden
             >
-              <div class="card">
-                <header>
-                  <h2>Utilities</h2>
-                </header>
-                <section class="flex flex-col gap-6">
+              <div class="card gap-8">
+                <section class="flex flex-col gap-4">
+                  <h2 class="font-bold">Utilities</h2>
                   <div>
                     <button
                       onclick="location.reload()"
@@ -236,55 +361,6 @@
                       </svg>
                       Refresh Page
                     </button>
-                  </div>
-
-                  <div>
-                    <button
-                      onclick="
-                        spotifyLogout();
-                        location.reload();
-                      "
-                      class="btn-destructive h-9 p-3"
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 168 168"
-                      >
-                        <g>
-                          <path
-                            fill="currentColor"
-                            d="M84,0.3C37.7,0.3,0.3,37.8,0.3,84c0,46.3,37.5,83.7,83.7,83.7c46.3,0,83.7-37.5,83.7-83.7
-                          C167.7,37.8,130.2,0.3,84,0.3C84,0.3,84,0.3,84,0.3z M122.4,121.1c-1.5,2.5-4.7,3.2-7.2,1.7c-19.7-12-44.4-14.7-73.6-8.1
-                          c-2.8,0.6-5.6-1.1-6.2-3.9c-0.6-2.8,1.1-5.6,3.9-6.2c31.9-7.3,59.3-4.2,81.3,9.3C123.1,115.4,123.9,118.6,122.4,121.1z M132.6,98.3
-                          c-1.9,3.1-5.9,4-9,2.2c-22.5-13.8-56.8-17.8-83.4-9.8c-3.5,1-7.1-0.9-8.1-4.3c-1-3.5,0.9-7.1,4.4-8.1c30.4-9.2,68.2-4.8,94.1,11.1
-                          C133.6,91.2,134.5,95.2,132.6,98.3L132.6,98.3z M133.5,74.5c-27-16-71.5-17.5-97.3-9.7c-4.1,1.3-8.5-1.1-9.8-5.2
-                          c-1.3-4.1,1.1-8.5,5.2-9.8c29.6-9,78.8-7.2,109.8,11.2c3.7,2.2,4.9,7,2.7,10.7C142.1,75.5,137.2,76.7,133.5,74.5L133.5,74.5z"
-                          />
-                        </g>
-                      </svg>
-                      Logout of Spotify
-                    </button>
-                    <div>
-                      <small>
-                        <div class="my-2 italic" id="spotify-user"></div>
-
-                        <div
-                          class="spotify-controls italic"
-                          id="spotify-song-id"
-                          style="display: none"
-                        ></div>
-                        <div
-                          class="spotify-controls italic"
-                          id="spotify-song-match"
-                          style="display: none"
-                        ></div>
-                        <div
-                          class="spotify-controls italic"
-                          id="spotify-device"
-                          style="display: none"
-                        ></div>
-                      </small>
-                    </div>
                   </div>
 
                   <div>
@@ -311,30 +387,21 @@
                       Clear All Non-Volatile Settings
                     </button>
                   </div>
-
-                  <div id="viewport-display">
-                    Current Viewport<br /><small
-                      >Width: <span id="width">0</span>px | Height:
-                      <span id="height">0</span>px</small
-                    >
-                  </div>
                 </section>
               </div>
             </div>
 
             <div
               role="tabpanel"
-              id="settings-tabs-panel-3"
-              aria-labelledby="settings-tabs-tab-3"
+              id="settings-tabs-panel-4"
+              aria-labelledby="settings-tabs-tab-4"
               tabindex="-1"
               aria-selected="false"
               hidden
             >
-              <div class="card">
-                <header>
-                  <h2>About / Roadmap</h2>
-                </header>
+              <div class="card gap-8">
                 <section class="flex flex-col gap-6">
+                  <h2 class="font-bold">About</h2>
                   <div class="flex gap-3 items-center">
                     <div>
                       <svg
@@ -380,8 +447,8 @@
                     </a>
                   </div>
 
-                  <div>
-                    <h2>Roadmap</h2>
+                  <div class="flex flex-col gap-3">
+                    <h2 class="font-bold">Roadmap</h2>
                     <small>
                       <ul class="list-disc ms-5">
                         <li>Add more fretboard chart definitions</li>
@@ -1386,16 +1453,16 @@
               />
             </svg>
           </button>
-
-          <a
-            id="spotify-playlist-link"
-            href=""
-            target="_blank"
-            class="opacity-50 hover:opacity-100 hover:underline"
-            style="font-size: 0.75rem; display: none"
-            >Playlist</a
-          >
         </div>
+
+        <a
+          id="spotify-playlist-link"
+          href=""
+          target="_blank"
+          class="opacity-50 hover:opacity-100 hover:underline"
+          style="font-size: 0.75rem; display: none"
+          >Playlist</a
+        >
 
         <button
           id="spotify-enable"

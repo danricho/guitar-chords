@@ -63,8 +63,8 @@ async function fetchSpotifyState() {
 
   $("#spotify-device").text(`Playing on '${data.device.name}'`);
   $("#spotify-song-id").text(`Song ID: ${data.item.id}`);
-  $("#spotify-song-match").text(
-    `"${data.item.name} - ${data.item.artists[0].name}"`,
+  $("#spotify-song-match span").text(
+    `${data.item.name} - ${data.item.artists[0].name}`,
   );
   spotify_capo_change_song;
 
@@ -113,6 +113,7 @@ async function fetchSpotifyState() {
       $("#chart-index").text(song_index + 1);
       $("#charts-available").text(charts.length);
       renderSongChart(charts[song_index].chordProChart, charts[index].name);
+      $("#content").animate({ scrollTop: 0 }, 10);
       $("#heading-title").text(charts[song_index].name);
       // delay on track change
       // spotifyPause(); setTimeout(spotifyPlay, 5000); // disabled for now
@@ -177,7 +178,7 @@ async function pollingLoop() {
   }
 
   if (spotifySync.stopSpotifyMode) return;
-  spotifySync.loopTimeOut = setTimeout(pollingLoop, 2000);
+  spotifySync.loopTimeOut = setTimeout(pollingLoop, 1000);
 }
 function startSpotifyScrollSync(accessToken) {
   spotifySync.accessToken = accessToken;
@@ -447,6 +448,7 @@ async function stop_spotify() {
     $("#chart-index").text(song_index + 1);
     $("#charts-available").text(charts.length);
     renderSongChart(charts[song_index].chordProChart);
+    $("#content").animate({ scrollTop: 0 }, 10);
     $("#heading-title").text(charts[song_index].name);
   }
 }

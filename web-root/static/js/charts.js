@@ -60,6 +60,10 @@ function updateManualButtonStates() {
   $("#next-song").prop("disabled", song_index >= charts.length - 1);
 }
 
+function copyCurrentChart() {
+  navigator.clipboard.writeText(currentlyShownChart);
+}
+
 function renderSongChart(chartproStr, spotify_ident = "", capoFret = -1) {
   console.log("renderSongChart()");
 
@@ -92,7 +96,7 @@ function renderSongChart(chartproStr, spotify_ident = "", capoFret = -1) {
 
   const chordProFormatter = new ChordSheetJS.ChordProFormatter();
 
-  // console.log(chordProFormatter.format(song)); // I use this to get a transposed version of the chordpro chart
+  currentlyShownChart = chordProFormatter.format(song);
 
   document.getElementById("song").innerHTML = html;
 
