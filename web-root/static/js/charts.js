@@ -39,6 +39,7 @@ $("#prev-song").on("click", function () {
   if (song_index > 0) {
     song_index--;
     renderSongChart(charts[song_index].chordProChart);
+    $("#content").animate({ scrollTop: 0 }, 10);
     $("#chart-index").text(song_index + 1);
     $("#charts-available").text(charts.length);
   }
@@ -48,6 +49,7 @@ $("#next-song").on("click", function () {
   if (song_index < charts.length - 1) {
     song_index++;
     renderSongChart(charts[song_index].chordProChart);
+    $("#content").animate({ scrollTop: 0 }, 10);
     $("#chart-index").text(song_index + 1);
     $("#charts-available").text(charts.length);
   }
@@ -60,13 +62,6 @@ function updateManualButtonStates() {
 
 function renderSongChart(chartproStr, spotify_ident = "", capoFret = -1) {
   console.log("renderSongChart()");
-
-  $("#content").animate(
-    {
-      scrollTop: 0,
-    },
-    10,
-  );
 
   const parser = new ChordSheetJS.ChordProParser();
   let song = parser.parse(chartproStr.trim());

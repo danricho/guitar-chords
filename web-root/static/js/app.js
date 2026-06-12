@@ -134,6 +134,7 @@ $(document).ready(function () {
   $("#chart-index").text(song_index + 1);
   $("#charts-available").text(charts.length);
   renderSongChart(charts[song_index].chordProChart);
+  $("#content").animate({ scrollTop: 0 }, 10);
   $("#heading-title").text(charts[song_index].name);
 
   // development
