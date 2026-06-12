@@ -262,13 +262,27 @@
                           />
                         </g>
                       </svg>
-                      Logout of Spotify</button
-                    ><span class="" id="spotify-user"></span>
+                      Logout of Spotify
+                    </button>
                     <div>
                       <small>
-                        <span class="" id="spotify-song-match"></span><br />
-                        <span class="" id="spotify-song-id"></span><br />
-                        <span class="" id="spotify-device"></span>
+                        <div class="my-2 italic" id="spotify-user"></div>
+
+                        <div
+                          class="spotify-controls italic"
+                          id="spotify-song-id"
+                          style="display: none"
+                        ></div>
+                        <div
+                          class="spotify-controls italic"
+                          id="spotify-song-match"
+                          style="display: none"
+                        ></div>
+                        <div
+                          class="spotify-controls italic"
+                          id="spotify-device"
+                          style="display: none"
+                        ></div>
                       </small>
                     </div>
                   </div>
@@ -294,7 +308,7 @@
                         <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
                         <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
                       </svg>
-                      Clear Non-Volatile Settings
+                      Clear All Non-Volatile Settings
                     </button>
                   </div>
 
@@ -382,6 +396,7 @@
                             <li>
                               Pause on song change (currently commented out)
                             </li>
+                            <li>Autoconnect Spotify on-load</li>
                           </ul>
                         </li>
                         <li>
