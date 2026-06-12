@@ -6,6 +6,12 @@
     var(--spacing) * (25 + 20)
   ); /* 25 is the width of the svg, 10 allows for most labels */
   --primary: #ff9900;
+  --currentScale: 100;
+}
+
+html {
+  font-size: calc(1rem * var(--current-scale) / 100);
+  /* document.documentElement.style.setProperty('--current-scale', '200'); */
 }
 
 html,
@@ -15,6 +21,12 @@ body {
 
 body {
   touch-action: manipulation;
+}
+
+* {
+  /* disable-highlight */
+  -webkit-user-select: none; /* Safari */
+  user-select: none; /* Standard syntax */
 }
 
 #side-menu,
@@ -32,6 +44,10 @@ body {
 }
 #logo-pane:hover {
   opacity: 1;
+}
+#logo-pane {
+  transform: scale(calc(100 / var(--current-scale)));
+  transform-origin: bottom right;
 }
 
 #fretboard-chart-panel {

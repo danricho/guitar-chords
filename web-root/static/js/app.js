@@ -28,8 +28,8 @@ function themeChanger() {
 function scaleChanger() {
   const DEFAULT = 100; // your baseline
   const STEP = 5; // increments/decrements
-  const MIN = 60; // adjust as you like
-  const MAX = 140; // adjust as you like
+  const MIN = 80; // adjust as you like
+  const MAX = 200; // adjust as you like
 
   const clamp = (n) => Math.min(MAX, Math.max(MIN, n));
 
@@ -45,7 +45,8 @@ function scaleChanger() {
 
   const apply = (pct) => {
     const value = clamp(Math.round(pct)); // keep it clean
-    document.documentElement.style.fontSize = value + "%";
+    // document.documentElement.style.fontSize = value + "%";
+    document.documentElement.style.setProperty("--current-scale", value);
     $("#scaling-display").text(value + "%");
     try {
       localStorage.setItem("ui_scale", String(value));
