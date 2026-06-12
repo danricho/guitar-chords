@@ -3,8 +3,9 @@ function showChord(name, positions) {
   // https://jguitar.com/chordsearch
   const lookup = {
     A: "x02220",
-    Am: "x02210",
     A7: "x02020",
+    Am: "x02210",
+    Am7: "x02010",
     Ab5: "xxx144",
     B: "x24442",
     Bm: "xx3321",
@@ -18,6 +19,7 @@ function showChord(name, positions) {
     Dm: "xx0231",
     E: "022100",
     Em: "022000",
+    Em7: "022033",
     Eb5: "xx134x",
     F: "133211",
     Fmaj7: "xx3210",
