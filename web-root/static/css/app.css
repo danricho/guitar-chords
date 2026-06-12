@@ -102,6 +102,9 @@ body.panel-open #song-info {
 }
 
 /* Chord Chart Styles */
+.song-sheet {
+  margin: 1rem 0;
+}
 .song-sheet .title {
   font-size: 2rem;
   font-weight: 700;
@@ -116,6 +119,10 @@ body.panel-open #song-info {
 
 .song-sheet .paragraph {
   margin: 1rem 0;
+}
+
+.song-sheet .row:first-of-type {
+  margin-top: 2rem;
 }
 
 .song-sheet .row {
@@ -150,6 +157,7 @@ body.panel-open #song-info {
 .song-sheet .comment {
   font-style: italic;
   opacity: 0.5;
+  min-height: 1.25rem;
 }
 
 .song-sheet .label {
