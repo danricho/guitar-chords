@@ -1,0 +1,243 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>ChordPro Timestamp Tool</title>
+
+    <style>
+      body {
+        font-family: sans-serif;
+        display: flex;
+        gap: 20px;
+        padding: 20px;
+      }
+
+      textarea {
+        width: 45%;
+        height: 90vh;
+      }
+
+      pre {
+        width: 45%;
+        height: 90vh;
+        overflow: auto;
+        padding: 0 10px;
+        font-family: monospace;
+        white-space: pre-wrap;
+      }
+
+      .hint {
+        position: fixed;
+        bottom: 10px;
+        left: 10px;
+        font-size: 12px;
+        opacity: 0.7;
+      }
+
+      #current-line {
+        background: rgb(60, 255, 0);
+        font-weight: bold;
+        min-width: 200px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <textarea id="input" disabled placeholder="Loading Spotify..."></textarea>
+    <pre id="output"></pre>
+
+    <div class="hint">
+      ArrowRight = Toggle input lock | Arrow Up/Down = move up/down | T = add
+      timestamp | R = remove timestamp | C = copy output to clipboard
+    </div>
+    <script src="../static/js/jquery-3.7.1.min.js"></script>
+    <script src="../static/js/spotify-settings.js"></script>
+    <script src="../static/js/spotify.js"></script>
+
+    <script>
+      let lines = [];
+      let currentLine = 0;
+
+      /**
+       * =========================
+       * WAIT FOR SPOTIFY READY
+       * =========================
+       */
+      async function waitForSpotify() {
+        // call your auth flow
+        spotifySync.accessToken = await ensureValidSpotifyToken();
+        document.getElementById("input").value = "Spotify connected!";
+        console.log("Spotify connected!");
+        document.getElementById("input").disabled = false;
+      }
+
+      /**
+       * =========================
+       * INIT
+       * =========================
+       */
+      window.addEventListener("load", async () => {
+        await waitForSpotify();
+      });
+
+      /**
+       * =========================
+       * TEXT HANDLING
+       * =========================
+       */
+      function loadText() {
+        lines = document.getElementById("input").value.split("\n");
+        render();
+      }
+
+      function render() {
+        const output = document.getElementById("output");
+
+        output.innerHTML = lines
+          .map((l, i) =>
+            i === currentLine
+              ? `<span id="current-line">➤${escapeHtml(l)}</span>`
+              : escapeHtml(l),
+          )
+          .join("\n");
+
+        centerCurrentLine();
+      }
+
+      function escapeHtml(text) {
+        const div = document.createElement("div");
+        div.textContent = text;
+        return div.innerHTML;
+      }
+
+      function centerCurrentLine() {
+        const output = document.getElementById("output");
+        const current = document.getElementById("current-line");
+
+        if (!current) return;
+
+        output.scrollTo({
+          top:
+            current.offsetTop -
+            output.clientHeight / 2 +
+            current.offsetHeight / 2,
+          behavior: "smooth",
+        });
+      }
+
+      /**
+       * =========================
+       * FORMAT
+       * =========================
+       */
+      function formatChordProTimestamp(ms) {
+        const totalSec = Math.floor(ms / 1000);
+        const m = Math.floor(totalSec / 60);
+        const s = totalSec % 60;
+        return `{c:${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}}`;
+      }
+
+      /**
+       * =========================
+       * LIVE POSITION FETCH
+       * =========================
+       */
+      async function getLivePosition() {
+        const token = spotifySync?.accessToken;
+        if (!token) return null;
+
+        const res = await fetch("https://api.spotify.com/v1/me/player", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (!res.ok) return null;
+
+        const data = await res.json();
+        return data?.progress_ms ?? null;
+      }
+
+      /**
+       * =========================
+       * INSERT TIMESTAMP
+       * =========================
+       */
+      async function insertTimestamp() {
+        const ms = await getLivePosition();
+        if (ms == null) return;
+
+        const tag = formatChordProTimestamp(ms);
+        lines[currentLine] += " " + tag;
+
+        render();
+      }
+
+      /**
+       * =========================
+       * REMOVE TIMESTAMP
+       * =========================
+       */
+      function removeTimestamp() {
+        lines[currentLine] = lines[currentLine].replace(
+          /\s*\{c:\d{2}:\d{2}\}\s*$/,
+          "",
+        );
+
+        render();
+      }
+
+      function toggleInputLock() {
+        const input = document.getElementById("input");
+        input.disabled = !input.disabled;
+      }
+
+      /**
+       * =========================
+       * KEY CONTROLS
+       * =========================
+       */
+      document.addEventListener("keydown", async (e) => {
+        // console.log(e.key);
+        if (e.key === "ArrowRight") {
+          e.preventDefault();
+          toggleInputLock();
+        }
+        if (document.getElementById("input").disabled) {
+          if (e.key === "ArrowUp") {
+            e.preventDefault();
+            currentLine = Math.max(0, currentLine - 1);
+            render();
+          }
+          if (e.key === "ArrowDown") {
+            e.preventDefault();
+            currentLine = Math.min(lines.length - 1, currentLine + 1);
+            render();
+          }
+
+          if (e.key === "r") {
+            e.preventDefault();
+            removeTimestamp();
+          }
+
+          if (e.key === "t") {
+            e.preventDefault();
+            await insertTimestamp();
+          }
+
+          if (e.key === "c") {
+            e.preventDefault();
+            await navigator.clipboard.writeText(lines.join("\n"));
+          }
+        }
+      });
+
+      /**
+       * =========================
+       * INPUT
+       * =========================
+       */
+      document.getElementById("input").addEventListener("input", loadText);
+    </script>
+  </body>
+</html>
