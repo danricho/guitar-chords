@@ -5,6 +5,12 @@ if (spotify_clientId == "") {
   $("#spotify-enable").hide();
 }
 
+let isTabActive = true;
+
+document.addEventListener("visibilitychange", () => {
+  isTabActive = document.visibilityState === "visible";
+});
+
 const spotifySync = {
   accessToken: null,
   duration: 0,
@@ -159,12 +165,14 @@ async function pollingLoop() {
       // Calculate the pixel position and apply it
       var scrollTarget =
         maxScroll * (spotifySync.percent / 100) + $("#song-info").outerHeight();
-      $elem.animate(
-        {
-          scrollTop: scrollTarget,
-        },
-        1000,
-      );
+      if (isTabActive) {
+        $elem.animate(
+          {
+            scrollTop: scrollTarget,
+          },
+          1200,
+        );
+      }
     }
   }
 
