@@ -1,7 +1,7 @@
 @media print {
   @page {
     size: A4; /* Sets the page size to standard A4 */
-    margin: 100mm; /* Sets the margins for the printed page */
+    margin: 2cm;
   }
   html {
     color-scheme: light;
