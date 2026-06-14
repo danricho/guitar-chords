@@ -73,6 +73,27 @@ function renderSongChart(chartproStr, spotify_ident = "", capoFret = -1) {
   // Store original (concert) key before any transposition
   const originalKey = song.metadata.get("key");
 
+  if (song.metadata.get("youtube")) {
+    $("#youtube-link")
+      .attr(
+        "onclick",
+        `window.open('${song.metadata.get("youtube")}','_blank',)`,
+      )
+      .show();
+  } else {
+    $("#youtube-link").hide();
+  }
+  if (song.metadata.get("spotify")) {
+    $("#spotify-link")
+      .attr(
+        "onclick",
+        `window.open('${song.metadata.get("spotify")}','_blank',)`,
+      )
+      .show();
+  } else {
+    $("#spotify-link").hide();
+  }
+
   // Read capo metadata safely
   const capoMeta = song.metadata.get("capo");
   const originalCapo = Number.isFinite(Number(capoMeta)) ? Number(capoMeta) : 0;
