@@ -1,0 +1,100 @@
+@media print {
+  @page {
+    size: A4; /* Sets the page size to standard A4 */
+    margin: 100mm; /* Sets the margins for the printed page */
+  }
+  html {
+    color-scheme: light;
+    font-size: 1cm;
+  }
+  :root {
+    --background: white;
+    --foreground: black;
+    --color-border: #ddd;
+  }
+  body {
+    background: white !important;
+    color: black !important;
+  }
+
+  html,
+  body {
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  #content {
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  main {
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  #side-menu {
+    display: none !important;
+  }
+
+  #song-info {
+    display: none !important;
+    border-bottom: none !important;
+  }
+
+  #song-info-clone {
+    opacity: 1 !important;
+  }
+
+  #capo-display {
+    box-shadow: none !important;
+    padding: 0 !important;
+    min-width: unset !important;
+  }
+
+  #fretboard-chart-panel {
+    display: block !important;
+    transform: none !important;
+    position: absolute !important;
+    right: 0;
+    top: 0;
+    width: 15cm;
+    border-left: none !important;
+  }
+
+  #content {
+    margin-right: 0 !important;
+  }
+
+  #song-info {
+    margin-right: 0 !important;
+  }
+
+  #spotify-album-art,
+  #spotify-progress,
+  #logo-pane,
+  #youtube-link,
+  #spotify-link,
+  #capo-up,
+  #capo-down,
+  #settings,
+  #panel-button {
+    display: none !important;
+  }
+
+  .song-sheet {
+    margin: 0;
+  }
+
+  .label {
+    page-break-after: avoid;
+  }
+
+  .row {
+    page-break-inside: avoid;
+  }
+
+  .fretboard {
+    page-break-inside: avoid;
+  }
+}
