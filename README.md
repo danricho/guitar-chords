@@ -79,11 +79,11 @@ This mode reduces the complexity of displayed chord diagrams by presenting a sim
 
 - HTML5
 - JavaScript (ES6)
-- jQuery
-- Tailwind CSS
-- Basecoat CSS
-- ChordSheetJS
-- Spotify Web API
+- [jQuery](https://github.com/jquery/jquery)
+- [Tailwind CSS](https://github.com/tailwindlabs/tailwindcss)
+- [Basecoat](https://github.com/hunvreus/basecoat)
+- [ChordSheetJS](https://github.com/martijnversluis/ChordSheetJS)
+- [Spotify Web API](https://developer.spotify.com/documentation/web-api)
 
 ## Setup
 
