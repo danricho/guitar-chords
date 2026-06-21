@@ -171,14 +171,14 @@ async function pollingLoop() {
           {
             scrollTop: scrollTarget,
           },
-          1200,
+          1000,
         );
       }
     }
   }
 
   if (spotifySync.stopSpotifyMode) return;
-  spotifySync.loopTimeOut = setTimeout(pollingLoop, 1000);
+  spotifySync.loopTimeOut = setTimeout(pollingLoop, 2000);
 }
 function startSpotifyScrollSync(accessToken) {
   spotifySync.accessToken = accessToken;
