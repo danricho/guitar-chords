@@ -141,7 +141,7 @@ To allow additional users:
 
 ## Adding Charts
 
-Charts are registered manually in `load-charts.js`.
+Charts are registered manually in `charts/load-charts.js`.
 
 Example:
 
