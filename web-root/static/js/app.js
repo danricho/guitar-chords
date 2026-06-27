@@ -87,6 +87,136 @@ function toggleKidFretCover() {
   kidSwitch.checked = localStorage.getItem("fret_kidmode") === "on";
 }
 
+function loadChart(index) {
+  song_index = index;
+  $("#chart-index").text(song_index + 1);
+  renderSongChart(charts[song_index].chordProChart);
+  $("#content").animate({ scrollTop: 0 }, 10);
+}
+
+function createChartList() {
+  const grouped = {};
+  charts.forEach((chart, index) => {
+    const capo = chart.defaultCapo ?? 0;
+    if (!grouped[capo]) {
+      grouped[capo] = [];
+    }
+    grouped[capo].push({ chart, index });
+  });
+
+  let html = `<section class="accordion">`;
+
+  Object.keys(grouped)
+    .sort((a, b) => Number(a) - Number(b))
+    .forEach((capo) => {
+      html += `
+      <details
+        class="group border-b last:border-b-0"
+      >
+        <summary
+          class="w-full
+                transition-all
+                outline-none
+                rounded-md"
+        >
+          <h2
+            class="flex flex-1 items-center justify-between
+                  gap-4 py-2 text-left"
+          >
+            <span style='color: var(--primary);'>
+              ${capo == 0 ? "No Capo" : `Capo ${capo}`}
+            </span>
+
+            <div class="flex items-center gap-2">
+              <span class="badge-secondary">
+                ${grouped[capo].length}
+              </span>
+
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="size-4 shrink-0 transition-transform duration-200 group-open:rotate-180"
+              >
+                <path d="m6 9 6 6 6-6"/>
+              </svg>
+            </div>
+          </h2>
+        </summary>
+
+        <section class="pb-4
+                border-t">
+          <ul class="space-y-1">
+      `;
+
+      grouped[capo].forEach(({ chart, index }) => {
+        const active = index === song_index;
+
+        html += `
+          <li>
+            <button
+              class="
+                w-full
+                flex
+                items-center
+                justify-between
+                text-left
+                px-3
+                py-1
+                rounded-md
+                cursor-pointer
+              "
+              onclick="loadChart(${index}); chartlist.close();"
+            >
+              <span>${chart.name}</span>
+
+              <svg
+                class="size-4"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-width="2"
+                  d="M9 5l7 7-7 7"
+                />
+              </svg>
+            </button>
+          </li>
+        `;
+      });
+
+      html += `
+          </ul>
+        </section>
+      </details>
+    `;
+    });
+  html += `</section>`;
+
+  $("#chart-list-content").html(html);
+  const accordion = document.querySelector("#chart-list-content .accordion");
+
+  accordion?.addEventListener("click", (event) => {
+    const summary = event.target.closest("summary");
+    if (!summary) return;
+
+    const details = summary.closest("details");
+
+    accordion.querySelectorAll("details").forEach((el) => {
+      if (el !== details) {
+        el.removeAttribute("open");
+      }
+    });
+  });
+}
+
 function togglePanel(force) {
   const body = document.body;
   if (typeof force === "boolean") {
@@ -115,6 +245,7 @@ $(document).ready(function () {
   scaleChanger();
   updateViewportSize();
   updateSpotifyUserDisplay();
+  createChartList();
 
   // restore sidebar state from storage
   if (localStorage.getItem("ui_sidebar_open") === "true") {

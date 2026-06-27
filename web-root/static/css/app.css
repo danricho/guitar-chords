@@ -107,7 +107,7 @@ body.panel-open #song-info {
   background-color: var(--background);
 }
 
-#settings::backdrop {
+dialog::backdrop {
   background: var(--background);
   opacity: 0.9;
   backdrop-filter: blur(4px);
