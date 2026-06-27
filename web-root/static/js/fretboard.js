@@ -23,6 +23,7 @@ function showChord(name, positions) {
     E7: "020100",
     Em: "022000",
     Em7: "022033",
+    Eb: "xx1343",
     Eb5: "xx134x",
     F: "133211",
     "F#": "244322",
@@ -30,7 +31,7 @@ function showChord(name, positions) {
     Fmaj7: "xx3210",
     G: "320003",
     G6: "xx0000",
-    G7: "980007",
+    G7: "320001",
     "": "",
   };
   positions = lookup[name] ?? "";
