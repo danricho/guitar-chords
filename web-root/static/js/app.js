@@ -240,6 +240,17 @@ function updateViewportSize() {
 // Run the function every time the browser window is resized
 window.addEventListener("resize", updateViewportSize);
 
+const RELOAD_AFTER_MS = 60 * 60 * 1000;
+let lastVisible = Date.now();
+
+document.addEventListener("visibilitychange", () => {
+  if (document.hidden) {
+    lastVisible = Date.now();
+  } else if (Date.now() - lastVisible > RELOAD_AFTER_MS) {
+    location.reload();
+  }
+});
+
 $(document).ready(function () {
   themeChanger();
   scaleChanger();
