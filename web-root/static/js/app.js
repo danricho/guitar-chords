@@ -87,6 +87,12 @@ function toggleKidFretCover() {
   kidSwitch.checked = localStorage.getItem("fret_kidmode") === "on";
 }
 
+function toggleSpotifyAutoConnect() {
+  const enabled = localStorage.getItem("spotify_autoconnect") !== "on";
+  localStorage.setItem("spotify_autoconnect", enabled ? "on" : "off");
+  spotifyAutoConnect.checked = enabled;
+}
+
 function loadChart(index) {
   song_index = index;
   $("#chart-index").text(song_index + 1);
@@ -256,6 +262,8 @@ $(document).ready(function () {
   scaleChanger();
   updateViewportSize();
   updateSpotifyUserDisplay();
+  spotifyAutoConnect.checked =
+    localStorage.getItem("spotify_autoconnect") === "on";
   createChartList();
 
   // restore sidebar state from storage
@@ -280,15 +288,17 @@ $(document).ready(function () {
   $("#content").animate({ scrollTop: 0 }, 10);
   $("#heading-title").text(charts[song_index].name);
 
-  // development
-  // start_spotify();
+  // auto-connect to spotify on load if enabled in settings
+  if (localStorage.getItem("spotify_autoconnect") === "on") {
+    start_spotify();
+  }
 
-  // console.table(
-  //   Object.keys(localStorage)
-  //     .sort()
-  //     .reduce((obj, key) => {
-  //       obj[key] = localStorage.getItem(key);
-  //       return obj;
-  //     }, {})
-  // );
+  console.table(
+    Object.keys(localStorage)
+      .sort()
+      .reduce((obj, key) => {
+        obj[key] = localStorage.getItem(key);
+        return obj;
+      }, {}),
+  );
 });

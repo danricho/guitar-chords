@@ -131,13 +131,24 @@
                           d="M15 4h3a1 1 0 0 1 1 1v15a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h3m0 3h6m-6 5h6m-6 4h6M10 3v4h4V3h-4Z"
                         />
                       </svg>
-                      Copy Current Chart Markdown
+                      Copy Current Chart ChordPro Markdown
                     </button>
                   </div>
                 </section>
 
                 <section class="flex flex-col gap-4">
                   <h2 class="font-bold">Spotify</h2>
+                  <label class="label">
+                    <input
+                      id="spotifyAutoConnect"
+                      type="checkbox"
+                      name="switch"
+                      role="switch"
+                      class="input"
+                      onchange="toggleSpotifyAutoConnect()"
+                    />
+                    Auto-connect on load
+                  </label>
                   <div>
                     <button
                       onclick="
@@ -464,12 +475,7 @@
                             <li>
                               Pause on song change (currently commented out)
                             </li>
-                            <li>Autoconnect Spotify on-load</li>
                           </ul>
-                        </li>
-                        <li>
-                          Option to copy/download the current ChordPro markdown
-                          (eg. post transpose)
                         </li>
                       </ul>
                     </small>
