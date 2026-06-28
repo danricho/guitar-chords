@@ -250,6 +250,12 @@ window.addEventListener("resize", updateViewportSize);
 // a rotation; only a full reload recomputes them. Reload on orientation change.
 window.addEventListener("orientationchange", () => location.reload());
 
+// Safety net: always reveal the page on full load, even if ready() throws
+// before its own reveal runs (otherwise the page stays blank forever).
+window.addEventListener("load", () =>
+  document.body.classList.add("app-ready"),
+);
+
 const RELOAD_AFTER_MS = 60 * 60 * 1000;
 let lastVisible = Date.now();
 
@@ -295,6 +301,14 @@ $(document).ready(function () {
   // auto-connect to spotify on load if enabled in settings
   if (localStorage.getItem("spotify_autoconnect") === "on") {
     start_spotify();
+  }
+
+  // reveal the page once the first render + fonts are done (avoids FOUC/reflow)
+  const revealApp = () => document.body.classList.add("app-ready");
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(revealApp);
+  } else {
+    revealApp();
   }
 
   console.table(

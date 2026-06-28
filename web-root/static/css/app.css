@@ -23,6 +23,15 @@ body {
   touch-action: manipulation;
 }
 
+/* Keep page blank until the first chart render + fonts finish, then reveal */
+body {
+  opacity: 0;
+}
+body.app-ready {
+  opacity: 1;
+  transition: opacity 150ms ease;
+}
+
 * {
   /* disable-highlight */
   -webkit-user-select: none; /* Safari */
