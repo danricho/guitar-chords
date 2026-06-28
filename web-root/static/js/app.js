@@ -246,6 +246,10 @@ function updateViewportSize() {
 // Run the function every time the browser window is resized
 window.addEventListener("resize", updateViewportSize);
 
+// iOS Safari leaves touch hit-test targets offset from rendered buttons after
+// a rotation; only a full reload recomputes them. Reload on orientation change.
+window.addEventListener("orientationchange", () => location.reload());
+
 const RELOAD_AFTER_MS = 60 * 60 * 1000;
 let lastVisible = Date.now();
 
