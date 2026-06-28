@@ -86,7 +86,9 @@ Charts.restoreDefaultCapo = function () {
 /** Update the "restore default" button label + visibility. */
 Charts.updateCapoResetButton = function () {
   const def = Charts.state.currentDefaultCapo;
-  $("#capo-reset").text(def === 0 ? "No Capo" : "Fret #" + def);
+  $("#capo-reset").text(
+    def === 0 ? "Default: No Capo" : "Default: Fret #" + def,
+  );
   // Shown only when a saved override actually differs from the default
   const saved = Charts.getSavedCapo(Charts.state.currentSongTitle);
   $("#capo-reset").toggle(saved != null && saved !== def);
@@ -122,7 +124,10 @@ Charts.copyCurrentChart = function () {
  * @param {string} [opts.spotifyIdent=""] passed through to renderSongChart
  * @param {boolean} [opts.scrollTop=true] animate content scroll back to top
  */
-Charts.loadSong = function (index, { spotifyIdent = "", scrollTop = true } = {}) {
+Charts.loadSong = function (
+  index,
+  { spotifyIdent = "", scrollTop = true } = {},
+) {
   Charts.state.songIndex = index;
   $("#chart-index").text(index + 1);
   $("#charts-available").text(charts.length);
@@ -139,7 +144,11 @@ Charts.loadSong = function (index, { spotifyIdent = "", scrollTop = true } = {})
  * @param {string} [spotifyIdent=""] identifier stored in #spotify-ident
  * @param {number} [capoFret=-1] requested capo; -1 = use saved override/default
  */
-Charts.renderSongChart = function (chartproStr, spotifyIdent = "", capoFret = -1) {
+Charts.renderSongChart = function (
+  chartproStr,
+  spotifyIdent = "",
+  capoFret = -1,
+) {
   const parser = new ChordSheetJS.ChordProParser();
   let song = parser.parse(chartproStr.trim());
 
