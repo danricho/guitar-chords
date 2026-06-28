@@ -34,11 +34,7 @@
 
   <body class="h-screen overflow-hidden bg-background">
     <!-- SETTINGS -->
-    <dialog
-      id="settings"
-      class="dialog"
-      onclick="if (event.target === this) this.close();"
-    >
+    <dialog id="settings" class="dialog">
       <div class="w-full sm:max-w-[600px] md:max-w-[700px] max-h-[612px]">
         <header>
           <h2 id="">Settings</h2>
@@ -106,15 +102,11 @@
                       name="switch"
                       role="switch"
                       class="input"
-                      onchange="toggleKidFretCover()"
                     />
                     3 String Fret Cover
                   </label>
                   <div>
-                    <button
-                      onclick="copyCurrentChart()"
-                      class="btn-outline h-9 p-3"
-                    >
+                    <button id="copy-chart-btn" class="btn-outline h-9 p-3">
                       <svg
                         aria-hidden="true"
                         xmlns="http://www.w3.org/2000/svg"
@@ -135,10 +127,7 @@
                     </button>
                   </div>
                   <div>
-                    <button
-                      onclick="clearSavedCapos()"
-                      class="btn-destructive h-9 p-3"
-                    >
+                    <button id="reset-capos-btn" class="btn-destructive h-9 p-3">
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
                         viewBox="0 0 24 24"
@@ -166,18 +155,11 @@
                       name="switch"
                       role="switch"
                       class="input"
-                      onchange="toggleSpotifyAutoConnect()"
                     />
                     Auto-connect on load
                   </label>
                   <div>
-                    <button
-                      onclick="
-                        spotifyLogout();
-                        location.reload();
-                      "
-                      class="btn-destructive h-9 p-3"
-                    >
+                    <button id="spotify-logout-btn" class="btn-destructive h-9 p-3">
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
                         viewBox="0 0 168 168"
@@ -217,11 +199,7 @@
                           "<span></span>"
                           <div class="mt-2">
                             <button
-                              onclick="
-                                navigator.clipboard.writeText(
-                                  $('#spotify-song-match span').text(),
-                                )
-                              "
+                              id="copy-song-match-btn"
                               class="btn-outline h-9 p-3"
                             >
                               <svg
@@ -271,11 +249,6 @@
                         type="checkbox"
                         role="switch"
                         class="input"
-                        onchange="
-                          document.dispatchEvent(
-                            new CustomEvent('basecoat:theme'),
-                          )
-                        "
                       />
                       Light
                     </label>
@@ -284,16 +257,7 @@
                     <div class="flex items-center gap-2">
                       Scale
                       <div role="group" class="button-group mt-2">
-                        <button
-                          class="btn-icon-outline"
-                          onclick="
-                            document.dispatchEvent(
-                              new CustomEvent('basecoat:scale', {
-                                detail: { step: -5 },
-                              }),
-                            )
-                          "
-                        >
+                        <button class="btn-icon-outline" data-action="scale-down">
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
                             width="24"
@@ -316,16 +280,7 @@
                         >
                           Scale
                         </button>
-                        <button
-                          class="btn-icon-outline"
-                          onclick="
-                            document.dispatchEvent(
-                              new CustomEvent('basecoat:scale', {
-                                detail: { step: +5 },
-                              }),
-                            )
-                          "
-                        >
+                        <button class="btn-icon-outline" data-action="scale-up">
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
                             width="24"
@@ -343,13 +298,7 @@
                         </button>
                       </div>
                       <button
-                        onclick="
-                          document.dispatchEvent(
-                            new CustomEvent('basecoat:scale', {
-                              detail: { value: 100 },
-                            }),
-                          )
-                        "
+                        data-action="scale-reset"
                         class="btn-icon-outline mt-2"
                         style="width: 3rem"
                       >
@@ -379,10 +328,7 @@
                 <section class="flex flex-col gap-4">
                   <h2 class="font-bold">Utilities</h2>
                   <div>
-                    <button
-                      onclick="location.reload()"
-                      class="btn-outline h-9 p-3"
-                    >
+                    <button data-action="reload" class="btn-outline h-9 p-3">
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
                         fill="none"
@@ -401,13 +347,7 @@
                   </div>
 
                   <div>
-                    <button
-                      onclick="
-                        localStorage.clear();
-                        location.reload();
-                      "
-                      class="btn-destructive h-9 p-3"
-                    >
+                    <button data-action="clear-storage" class="btn-destructive h-9 p-3">
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
                         viewBox="0 0 24 24"
@@ -508,7 +448,7 @@
         <button
           type="button"
           aria-label="Close dialog"
-          onclick="this.closest('dialog').close()"
+          data-action="close-dialog"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -530,11 +470,7 @@
     </dialog>
 
     <!-- AVAILABLE SONG CHARTS -->
-    <dialog
-      id="chartlist"
-      class="dialog"
-      onclick="if (event.target === this) this.close();"
-    >
+    <dialog id="chartlist" class="dialog">
       <div
         class="w-full sm:max-w-[600px] md:max-w-[700px] lg:max-w-[950px] max-h-[612px] overflow-y-hidden"
       >
@@ -549,7 +485,7 @@
         <button
           type="button"
           aria-label="Close dialog"
-          onclick="this.closest('dialog').close()"
+          data-action="close-dialog"
         >
           ✕
         </button>
@@ -599,7 +535,6 @@
             <button
               id="capo-reset"
               class="btn-outline h-9 p-3"
-              onclick="restoreDefaultCapo()"
               style="display: none"
             ></button>
             <button id="capo-up" class="btn-outline size-9 p-2.5">
@@ -678,9 +613,6 @@
       <div
         id="logo-pane"
         class="fixed bottom-4 z-30 flex items-center gap-2 items-center"
-        onclick="
-          window.open('https://github.com/danricho/guitar-chords', '_blank')
-        "
       >
         <div class="text text-right">
           <h1 class="font-bold leading-none">Guitar Chords</h1>
@@ -1342,7 +1274,7 @@
     >
       <!-- TOP BUTTONS -->
       <div class="flex flex-col items-center gap-2 p-2">
-        <button class="btn-outline size-9 p-1" onclick="chartlist.showModal()">
+        <button id="open-chartlist-btn" class="btn-outline size-9 p-1">
           <svg
             class="w-full h-full"
             xmlns="http://www.w3.org/2000/svg"
@@ -1358,11 +1290,7 @@
             />
           </svg>
         </button>
-        <button
-          id="panel-button"
-          class="btn-outline size-9 p-1"
-          onclick="togglePanel()"
-        >
+        <button id="panel-button" class="btn-outline size-9 p-1">
           <svg
             class="w-full h-full"
             xmlns="http://www.w3.org/2000/svg"
@@ -1374,7 +1302,7 @@
             ></path>
           </svg>
         </button>
-        <button class="btn-outline size-9 p-1" onclick="settings.showModal()">
+        <button id="open-settings-btn" class="btn-outline size-9 p-1">
           <svg
             class="w-full h-full"
             xmlns="http://www.w3.org/2000/svg"
@@ -1398,7 +1326,7 @@
           </svg>
         </button>
 
-        <button class="btn-outline size-9 p-1" onclick="window.print()">
+        <button data-action="print" class="btn-outline size-9 p-1">
           <svg
             class="w-full h-full"
             xmlns="http://www.w3.org/2000/svg"
@@ -1490,7 +1418,6 @@
           <button
             id="spotify-play"
             class="btn-outline size-9 p-1"
-            onclick="spotifyPlay()"
             style="display: none"
           >
             <svg
@@ -1509,7 +1436,6 @@
           <button
             id="spotify-pause"
             class="btn-outline size-9 p-1"
-            onclick="spotifyPause()"
             style="display: none"
           >
             <svg
@@ -1529,7 +1455,6 @@
           <button
             id="spotify-song-restart"
             class="btn-outline size-9 p-1"
-            onclick="spotifyRestartTrack()"
           >
             <svg
               class="w-full h-full"
@@ -1549,7 +1474,6 @@
           <button
             id="spotify-prev"
             class="btn-outline size-9 p-1"
-            onclick="spotifyPrevious()"
           >
             <svg
               class="w-full h-full"
@@ -1567,7 +1491,6 @@
           <button
             id="spotify-next"
             class="btn-outline size-9 p-1"
-            onclick="spotifyNext()"
           >
             <svg
               class="w-full h-full"
@@ -1596,7 +1519,6 @@
         <button
           id="spotify-enable"
           class="btn-outline size-9 p-1"
-          onclick="start_spotify()"
         >
           <svg
             class="w-full h-full"
@@ -1619,7 +1541,6 @@
         <button
           id="spotify-disable"
           class="btn-outline size-9 p-1"
-          onclick="stop_spotify()"
           style="display: none"
         >
           <svg
