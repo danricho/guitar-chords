@@ -35,7 +35,7 @@
   <body class="h-screen overflow-hidden bg-background">
     <!-- SETTINGS -->
     <dialog id="settings" class="dialog">
-      <div class="w-full sm:max-w-[600px] md:max-w-[700px] max-h-[612px]">
+      <div class="w-full sm:max-w-[90%] md:max-w-[700px] max-h-[90dvh]">
         <header>
           <h2 id="">Settings</h2>
         </header>
@@ -127,7 +127,10 @@
                     </button>
                   </div>
                   <div>
-                    <button id="reset-capos-btn" class="btn-destructive h-9 p-3">
+                    <button
+                      id="reset-capos-btn"
+                      class="btn-destructive h-9 p-3"
+                    >
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
                         viewBox="0 0 24 24"
@@ -159,7 +162,10 @@
                     Auto-connect on load
                   </label>
                   <div>
-                    <button id="spotify-logout-btn" class="btn-destructive h-9 p-3">
+                    <button
+                      id="spotify-logout-btn"
+                      class="btn-destructive h-9 p-3"
+                    >
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
                         viewBox="0 0 168 168"
@@ -257,7 +263,10 @@
                     <div class="flex items-center gap-2">
                       Scale
                       <div role="group" class="button-group mt-2">
-                        <button class="btn-icon-outline" data-action="scale-down">
+                        <button
+                          class="btn-icon-outline"
+                          data-action="scale-down"
+                        >
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
                             width="24"
@@ -347,7 +356,10 @@
                   </div>
 
                   <div>
-                    <button data-action="clear-storage" class="btn-destructive h-9 p-3">
+                    <button
+                      data-action="clear-storage"
+                      class="btn-destructive h-9 p-3"
+                    >
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
                         viewBox="0 0 24 24"
@@ -430,6 +442,10 @@
                       <ul class="list-disc ms-5">
                         <li>Add more fretboard chart definitions</li>
                         <li>
+                          Handle small screens better (especially in the dialog
+                          windows).
+                        </li>
+                        <li>
                           New settings for:
                           <ul class="list-disc ms-5">
                             <li>
@@ -472,7 +488,7 @@
     <!-- AVAILABLE SONG CHARTS -->
     <dialog id="chartlist" class="dialog">
       <div
-        class="w-full sm:max-w-[600px] md:max-w-[700px] lg:max-w-[950px] max-h-[612px] overflow-y-hidden"
+        class="w-full sm:max-w-[600px] md:max-w-[700px] lg:max-w-[950px] max-h-[90dvh] overflow-y-hidden"
       >
         <header>
           <h2>Available Charts</h2>
@@ -532,11 +548,6 @@
             >
               Capo:
             </button>
-            <button
-              id="capo-reset"
-              class="btn-outline h-9 p-3"
-              style="display: none"
-            ></button>
             <button id="capo-up" class="btn-outline size-9 p-2.5">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -553,6 +564,12 @@
               </svg>
             </button>
           </div>
+
+          <button
+            id="capo-reset"
+            class="btn-outline h-9 p-3 ms-1"
+            style="display: none"
+          ></button>
           <div class="mx-3">
             <button id="youtube-link" class="btn-outline size-9 p-1.5">
               <svg
@@ -1452,10 +1469,7 @@
             </svg>
           </button>
 
-          <button
-            id="spotify-song-restart"
-            class="btn-outline size-9 p-1"
-          >
+          <button id="spotify-song-restart" class="btn-outline size-9 p-1">
             <svg
               class="w-full h-full"
               xmlns="http://www.w3.org/2000/svg"
@@ -1471,10 +1485,7 @@
               />
             </svg>
           </button>
-          <button
-            id="spotify-prev"
-            class="btn-outline size-9 p-1"
-          >
+          <button id="spotify-prev" class="btn-outline size-9 p-1">
             <svg
               class="w-full h-full"
               xmlns="http://www.w3.org/2000/svg"
@@ -1488,10 +1499,7 @@
               />
             </svg>
           </button>
-          <button
-            id="spotify-next"
-            class="btn-outline size-9 p-1"
-          >
+          <button id="spotify-next" class="btn-outline size-9 p-1">
             <svg
               class="w-full h-full"
               xmlns="http://www.w3.org/2000/svg"
@@ -1516,10 +1524,7 @@
           >Playlist</a
         >
 
-        <button
-          id="spotify-enable"
-          class="btn-outline size-9 p-1"
-        >
+        <button id="spotify-enable" class="btn-outline size-9 p-1">
           <svg
             class="w-full h-full"
             xmlns="http://www.w3.org/2000/svg"
