@@ -52,6 +52,7 @@
     </div>
     <script src="../static/js/jquery-3.7.1.min.js"></script>
     <script src="../static/js/spotify-settings.js"></script>
+    <script src="../static/js/fretboard.js"></script>
     <script src="../static/js/spotify.js"></script>
 
     <script>
@@ -65,7 +66,7 @@
        */
       async function waitForSpotify() {
         // call your auth flow
-        spotifySync.accessToken = await ensureValidSpotifyToken();
+        Spotify.sync.accessToken = await Spotify.ensureValidToken();
         document.getElementById("input").value = "Spotify connected!";
         console.log("Spotify connected!");
         document.getElementById("input").disabled = false;
@@ -143,15 +144,9 @@
        * =========================
        */
       async function getLivePosition() {
-        const token = spotifySync?.accessToken;
-        if (!token) return null;
+        if (!Spotify.sync?.accessToken) return null;
 
-        const res = await fetch("https://api.spotify.com/v1/me/player", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
+        const res = await Spotify.apiRequest("/me/player");
         if (!res.ok) return null;
 
         const data = await res.json();
