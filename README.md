@@ -121,13 +121,13 @@ Cloudflare Tunnel works well for self-hosted installations.
 Update the Spotify configuration file `web-root/static/js/spotify-settings.js`:
 
 ```javascript
-const spotify_clientId = ""; // The Client ID from your Spotify Developer application.
-const spotify_redirectUri = ""; // The redirect URI registered in the Spotify Developer Dashboard.
-const spotify_playlist = ""; // Optional playlist url to add a link near the Spotify button.
-const spotify_capo_change_song = ""; // Optional track name used to trigger the capo-change reminder screen.
+window.SpotifyConfig = {
+  clientId: "", // The Client ID from your Spotify Developer application.
+  redirectUri: "", // The redirect URI registered in the Spotify Developer Dashboard.
+  playlist: "", // (optional) Playlist URL to add a link near the Spotify button.
+  capoChangeSong: "", // (optional) Track ID used to trigger the capo-change reminder screen.
+};
 ```
-
-#### spotify_clientId
 
 ### Spotify User Access
 
@@ -146,12 +146,13 @@ Charts are registered manually in `charts/load-charts.js`.
 Example:
 
 ```javascript
-charts = [
+window.charts = [
   {
     // The `name` field should match the Spotify track title and artist.
     // When a matching track is detected, the chart is loaded automatically from the `path` field.
     name: "Lanterns in the Rain - DanRicho feat. ChatGPT",
     path: "../charts/Fiction-LanternsInTheRain.md",
+    defaultCapo: 0, // groups the chart under this capo in the chart list
   },
 ];
 ```
