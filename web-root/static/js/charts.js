@@ -1,5 +1,54 @@
 song_index = 0; // this is global
 let currentCapo = 0;
+let currentDefaultCapo = 0; // chart's built-in capo, set on each render
+let currentSongTitle = ""; // set on each render, used as capo-store key
+
+// Per-song capo overrides persisted in localStorage, keyed by song title.
+const CAPO_STORE_KEY = "song_capo";
+
+function capoStore() {
+  try {
+    return JSON.parse(localStorage.getItem(CAPO_STORE_KEY) || "{}");
+  } catch (_) {
+    return {};
+  }
+}
+
+function saveCurrentCapo() {
+  if (!currentSongTitle) return;
+  const store = capoStore();
+  store[currentSongTitle] = currentCapo;
+  localStorage.setItem(CAPO_STORE_KEY, JSON.stringify(store));
+}
+
+function getSavedCapo(title) {
+  const store = capoStore();
+  return Object.prototype.hasOwnProperty.call(store, title)
+    ? store[title]
+    : null;
+}
+
+// Wipe all saved capo overrides and re-render the current song at its default.
+function clearSavedCapos() {
+  localStorage.removeItem(CAPO_STORE_KEY);
+  renderSongChart(charts[song_index].chordProChart, $("#spotify-ident").text());
+}
+
+// Clear only the current song's override and re-render at its default capo.
+function restoreDefaultCapo() {
+  const store = capoStore();
+  delete store[currentSongTitle];
+  localStorage.setItem(CAPO_STORE_KEY, JSON.stringify(store));
+  renderSongChart(charts[song_index].chordProChart, $("#spotify-ident").text());
+}
+
+function updateCapoResetButton() {
+  const label =
+    currentDefaultCapo === 0 ? "No Capo" : "Fret #" + currentDefaultCapo;
+  $("#capo-reset").text(label);
+  // Only shown when an override exists for this song
+  $("#capo-reset").toggle(getSavedCapo(currentSongTitle) != null);
+}
 
 function updateCapoDisplay() {
   $("#capo-display").text(
@@ -19,6 +68,8 @@ $("#capo-down").on("click", function () {
       $("#spotify-ident").text(),
       currentCapo,
     );
+    saveCurrentCapo();
+    updateCapoResetButton();
   }
 });
 
@@ -32,6 +83,8 @@ $("#capo-up").on("click", function () {
       $("#spotify-ident").text(),
       currentCapo,
     );
+    saveCurrentCapo();
+    updateCapoResetButton();
   }
 });
 
@@ -73,6 +126,9 @@ function renderSongChart(chartproStr, spotify_ident = "", capoFret = -1) {
   // Store original (concert) key before any transposition
   const originalKey = song.metadata.get("key");
 
+  // Title is the key for per-song capo persistence
+  currentSongTitle = song.metadata.get("title") || "";
+
   if (song.metadata.get("youtube")) {
     $("#youtube-link")
       .attr(
@@ -102,11 +158,16 @@ function renderSongChart(chartproStr, spotify_ident = "", capoFret = -1) {
   let selectedCapo = Number.isFinite(Number(capoFret)) ? Number(capoFret) : 0;
 
   if (selectedCapo == -1) {
-    selectedCapo = originalCapo;
+    // No explicit capo requested: use the user's saved override if any,
+    // otherwise the chart's default capo.
+    const savedCapo = getSavedCapo(currentSongTitle);
+    selectedCapo = savedCapo != null ? savedCapo : originalCapo;
   }
 
+  currentDefaultCapo = originalCapo;
   currentCapo = selectedCapo;
   updateCapoDisplay();
+  updateCapoResetButton();
 
   song = song.transpose(originalCapo - selectedCapo);
 

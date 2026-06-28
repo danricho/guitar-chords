@@ -134,6 +134,27 @@
                       Copy Current Chart ChordPro Markdown
                     </button>
                   </div>
+                  <div>
+                    <button
+                      onclick="clearSavedCapos()"
+                      class="btn-destructive h-9 p-3"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      >
+                        <path d="M3 6h18" />
+                        <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
+                        <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
+                      </svg>
+                      Reset All Saved Song Capo Settings
+                    </button>
+                  </div>
                 </section>
 
                 <section class="flex flex-col gap-4">
@@ -468,7 +489,6 @@
                     <small>
                       <ul class="list-disc ms-5">
                         <li>Add more fretboard chart definitions</li>
-                        <li>Localstorage of each song's Capo setting</li>
                         <li>
                           New settings for:
                           <ul class="list-disc ms-5">
@@ -576,6 +596,12 @@
             >
               Capo:
             </button>
+            <button
+              id="capo-reset"
+              class="btn-outline h-9 p-3"
+              onclick="restoreDefaultCapo()"
+              style="display: none"
+            ></button>
             <button id="capo-up" class="btn-outline size-9 p-2.5">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
