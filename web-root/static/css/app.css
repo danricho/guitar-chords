@@ -44,7 +44,7 @@ body.app-ready {
 }
 
 #fretboard-chart-panel {
-  width: var(--panel-width);
+  width: fit-content;
 }
 
 #logo-pane {
