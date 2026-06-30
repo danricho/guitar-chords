@@ -111,10 +111,11 @@ App.toggleSpotifyAutoConnect = function () {
   App.dom.spotifyAutoConnect.checked = enabled;
 };
 
-/** Measure the panel's current offsetWidth and sync --panel-width on :root. */
-App.syncPanelWidth = function () {
-  const w = document.getElementById("fretboard-chart-panel").offsetWidth;
-  document.documentElement.style.setProperty("--panel-width", w + "px");
+/** Measure the panel and sync --panel-width and --panel-height on :root. */
+App.syncPanelSize = function () {
+  const panel = document.getElementById("fretboard-chart-panel");
+  document.documentElement.style.setProperty("--panel-width", panel.offsetWidth + "px");
+  document.documentElement.style.setProperty("--panel-height", panel.offsetHeight + "px");
 };
 
 /**
@@ -129,7 +130,7 @@ App.togglePanel = function (force) {
     body.classList.toggle("panel-open");
   }
   Store.set("ui_sidebar_open", String(body.classList.contains("panel-open")));
-  requestAnimationFrame(App.syncPanelWidth);
+  requestAnimationFrame(App.syncPanelSize);
 };
 
 /* ------------------------------------------------------------------ */
@@ -375,7 +376,7 @@ App.init = function () {
   Charts.loadSong(0);
 
   // Keep --panel-width in sync whenever chord diagrams are added or removed
-  new MutationObserver(() => requestAnimationFrame(App.syncPanelWidth))
+  new MutationObserver(() => requestAnimationFrame(App.syncPanelSize))
     .observe(document.getElementById("fretboards"), { childList: true });
 
   // Auto-connect to Spotify if enabled in settings

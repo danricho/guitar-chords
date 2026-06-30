@@ -5,6 +5,7 @@
   --panel-width: calc(
     var(--spacing) * (25 + 20)
   ); /* 25 is the width of the svg, 10 allows for most labels */
+  --panel-height: 0px;
   --primary: #ff9900;
   --currentScale: 100;
 }
@@ -96,8 +97,11 @@ body.panel-open #logo-pane {
 
 #content {
   padding-right: 0;
+  padding-bottom: 0;
   margin-right: var(--menu-width);
-  transition: padding-right 250ms ease;
+  transition:
+    padding-right 250ms ease,
+    padding-bottom 250ms ease;
 }
 
 body.panel-open #song-info {
@@ -196,4 +200,63 @@ dialog::backdrop {
   margin-top: 1rem;
   margin-bottom: 0.5rem;
   color: var(--primary);
+}
+
+/* ── Mobile (portrait): chord panel as bottom sheet ───────────────────────────── */
+@media (max-width: 767px) and (orientation: portrait) {
+  #fretboard-chart-panel {
+    top: auto;
+    bottom: 0;
+    left: 0;
+    right: var(--menu-width);
+    width: auto;
+    height: fit-content;
+    border-left: none;
+    border-top: solid 1px var(--color-border);
+    transform: translateY(100%);
+    overflow: hidden;
+  }
+
+  #fretboard-chart-panel > div {
+    height: auto;
+    overflow-x: auto;
+    overflow-y: hidden;
+  }
+
+  body.panel-open #fretboard-chart-panel {
+    transform: translateY(0);
+  }
+
+  body.panel-open #content {
+    padding-right: 0;
+    padding-bottom: var(--panel-height);
+  }
+
+  body.panel-open #spotify-album-art,
+  body.panel-open #spotify-progress,
+  body.panel-open #logo-pane {
+    right: calc(var(--menu-width) + 1rem);
+  }
+
+  body.panel-open #song-info {
+    margin-right: var(--menu-width);
+  }
+
+  /* Horizontal chord layout */
+  #fretboards {
+    flex-direction: row;
+    align-items: flex-end;
+    flex-wrap: nowrap;
+  }
+
+  .fretboard {
+    flex-direction: column-reverse;
+    align-items: center;
+    margin-bottom: 0;
+    flex-shrink: 0;
+  }
+
+  .fretboard > div:last-child {
+    width: auto;
+  }
 }
