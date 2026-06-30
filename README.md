@@ -17,7 +17,7 @@ Designed for practising with real recordings, Guitar Chords can automatically lo
 - Automatic chart loading based on the currently playing Spotify track.
 - Timestamp-based chart synchronisation.
 - Percentage-based fallback synchronisation when timestamps are not present.
-- Guitar chord diagrams displayed alongside charts.
+- Guitar chord diagrams displayed alongside charts, including barre chords.
 - Chord transposition via Capo adjustment controls.
 - Optional 'capo-change' song for spotify playlists.
 - Dark and light themes.
@@ -230,19 +230,47 @@ When timestamps do not exist:
 
 ## Chord Definitions
 
-Chord diagrams are defined manually within the application.
+Chord diagrams are defined manually within the application in `web-root/static/js/fretboard.js`.
 
-Each chord uses a six-character string representation describing the guitar strings from low E to high E: `x02220`
+### Open / Non-Barre Chords
+
+A six-character string describes the guitar strings from low E to high E:
+
+```javascript
+A: "x02220",
+```
 
 Where:
 
 - `x` = muted string
 - `0` = open string
-- `1-9` = fret number
+- `1–9` = fret number
+
+### Barre Chords
+
+Barre chords use an object with a `strings` field (same format as above) and a `barre` descriptor:
+
+```javascript
+F:  { strings: "133211", barre: { fret: 1, from: 1, to: 6 } },
+Bm: { strings: "x24432", barre: { fret: 2, from: 2, to: 6 } },
+```
+
+| Field        | Description                                             |
+| ------------ | ------------------------------------------------------- |
+| `strings`    | Full six-character fret spec, same as a non-barre chord |
+| `barre.fret` | Fret number where the barre bar is drawn                |
+| `barre.from` | First string the barre covers (1 = low E)               |
+| `barre.to`   | Last string the barre covers (6 = high e)               |
+
+The `strings` field still encodes every finger position, including the ones lying on the barre fret. The renderer uses `barre.fret`, `from`, and `to` to decide what to draw:
+
+- A filled pill-shaped bar is drawn across strings `from`–`to` at `barre.fret`.
+- Any string whose fret number in `strings` matches `barre.fret` **and** falls within `from`–`to` is treated as part of the barre — no individual dot is drawn for it.
+- All other fretted positions (higher frets, or strings outside the barre range) are drawn as normal filled dots on top of the bar.
 
 ### Extending the Library
 
-Additional chords can be added by extending the chord lookup table in `web-root/static/js/fretboard.js`.
+Additional chords can be added by extending `Fretboard.CHORD_LOOKUP` in `web-root/static/js/fretboard.js`.
 
 ## Known Limitations
 

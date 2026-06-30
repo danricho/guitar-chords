@@ -68,6 +68,11 @@ window.Fretboard = window.Fretboard || {};
  * "x" = muted, "0" = open, digit = fret number, "" = unknown.
  * Source: https://jguitar.com/chordsearch
  */
+/**
+ * Barre chord entries use an object: { strings, barre: { fret, from, to } }
+ * where from/to are string numbers 1 (low-E) – 6 (high-e).
+ * Plain strings are non-barre chords (backward-compatible).
+ */
 Fretboard.CHORD_LOOKUP = {
   A: "x02220",
   A7: "x02020",
@@ -75,10 +80,10 @@ Fretboard.CHORD_LOOKUP = {
   Am7: "x02010",
   Ab5: "xxx144",
   Abm: "xx110x",
-  B: "x24442",
-  Bm: "xx0432",
+  B: { strings: "x24442", barre: { fret: 2, from: 2, to: 6 } },
+  Bm: { strings: "x24432", barre: { fret: 2, from: 2, to: 6 } },
   B7: "x21202",
-  Bb: "xx3331",
+  Bb: { strings: "x13331", barre: { fret: 1, from: 2, to: 6 } },
   Bb5: "x133xx",
   C: "x32010",
   "C#m": "x4x120",
@@ -92,9 +97,9 @@ Fretboard.CHORD_LOOKUP = {
   Em7: "022033",
   Eb: "xx1343",
   Eb5: "xx134x",
-  F: "133211",
-  "F#": "244322",
-  "F#m": "xxx222",
+  F: { strings: "133211", barre: { fret: 1, from: 1, to: 6 } },
+  "F#": { strings: "244322", barre: { fret: 2, from: 1, to: 6 } },
+  "F#m": { strings: "244222", barre: { fret: 2, from: 1, to: 6 } },
   Fmaj7: "xx3210",
   G: "320003",
   G6: "xx0000",
@@ -102,12 +107,19 @@ Fretboard.CHORD_LOOKUP = {
   "": "",
 };
 
+// SVG geometry constants matching the fretboard template
+Fretboard._CX = { 1: 5.91, 2: 25.91, 3: 45.91, 4: 65.91, 5: 85.91, 6: 105.91 };
+Fretboard._CY = { 1: 28.91, 2: 51.91, 3: 74.91, 4: 97.91 };
+Fretboard._R = 7;
+
 /**
  * Clone the fretboard template and render the given chord into #fretboards.
  * @param {string} name chord name to look up in CHORD_LOOKUP
  */
 Fretboard.showChord = function (name) {
-  const positions = Fretboard.CHORD_LOOKUP[name] ?? "";
+  const spec = Fretboard.CHORD_LOOKUP[name] ?? "";
+  const positions = typeof spec === "string" ? spec : spec.strings;
+  const barre = typeof spec === "object" ? spec.barre : null;
 
   const fresh = $("#fretboard-template").clone();
   fresh.attr("id", "");
@@ -117,13 +129,44 @@ Fretboard.showChord = function (name) {
     fresh.find(".unknown").show();
   }
 
+  if (barre) {
+    const { _CX, _CY, _R } = Fretboard;
+    const x = _CX[barre.from] - _R;
+    const y = _CY[barre.fret] - _R;
+    const w = _CX[barre.to] - _CX[barre.from] + 2 * _R;
+    const barreEl = document.createElementNS(
+      "http://www.w3.org/2000/svg",
+      "rect",
+    );
+    $(barreEl).attr({
+      x,
+      y,
+      width: w,
+      height: 2 * _R,
+      rx: _R,
+      fill: "var(--primary)",
+      stroke: "currentColor",
+      "stroke-width": "2px",
+    });
+    fresh.find("svg g.fretboard-base").after(barreEl);
+  }
+
   Array.from(positions).forEach((char, index) => {
+    const stringNum = index + 1;
     if (char === "x") {
-      fresh.find(`g.string-${index + 1} > .mute`).show();
+      fresh.find(`g.string-${stringNum} > .mute`).show();
     } else if (char === "0") {
-      fresh.find(`g.string-${index + 1} > .open`).show();
+      fresh.find(`g.string-${stringNum} > .open`).show();
     } else {
-      fresh.find(`g.string-${index + 1} > .fret-${char}`).show();
+      const fretNum = parseInt(char);
+      const coveredByBarre =
+        barre &&
+        fretNum === barre.fret &&
+        stringNum >= barre.from &&
+        stringNum <= barre.to;
+      if (!coveredByBarre) {
+        fresh.find(`g.string-${stringNum} > .fret-${char}`).show();
+      }
     }
   });
 
