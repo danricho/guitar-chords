@@ -76,6 +76,11 @@ body.panel-open #panel-button {
   color: var(--primary);
 }
 
+#settings[open] ~ #side-menu #open-settings-btn,
+#chartlist[open] ~ #side-menu #open-chartlist-btn {
+  color: var(--primary);
+}
+
 #spotify-album-art,
 #spotify-progress,
 #logo-pane {
