@@ -118,19 +118,30 @@ Charts.copyCurrentChart = function () {
 /* ------------------------------------------------------------------ */
 
 /**
- * Load a chart by index: update counters, render, scroll to top, set heading.
+ * Load a chart by index: fetch (and cache) its ChordPro source if needed,
+ * then render, scroll to top, and update the heading.
  * @param {number} index index into window.charts
  * @param {object} [opts]
  * @param {string} [opts.spotifyIdent=""] passed through to renderSongChart
  * @param {boolean} [opts.scrollTop=true] animate content scroll back to top
  */
-Charts.loadSong = function (
+Charts.loadSong = async function (
   index,
   { spotifyIdent = "", scrollTop = true } = {},
 ) {
   Charts.state.songIndex = index;
   $("#chart-index").text(index + 1);
   $("#charts-available").text(charts.length);
+
+  if (!charts[index].chordProChart) {
+    try {
+      const res = await fetch(charts[index].path);
+      charts[index].chordProChart = res.ok ? await res.text() : "";
+    } catch (_) {
+      charts[index].chordProChart = "";
+    }
+  }
+
   Charts.renderSongChart(charts[index].chordProChart, spotifyIdent);
   if (scrollTop) {
     $("#content").animate({ scrollTop: 0 }, 10);
