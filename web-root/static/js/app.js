@@ -134,6 +134,80 @@ App.togglePanel = function (force) {
 };
 
 /* ------------------------------------------------------------------ */
+/* Panel drag handle                                                   */
+/* ------------------------------------------------------------------ */
+
+/** Whether the fretboard panel is currently laid out as a bottom sheet. */
+App.panelIsBottomSheet = function () {
+  return window.matchMedia("(max-width: 767px) and (orientation: portrait)")
+    .matches;
+};
+
+/**
+ * Wire pointer-drag on #panel-handle so the fretboard panel can be dragged
+ * open/closed like a native app drawer, instead of only toggled by click.
+ */
+App.bindPanelDrag = function () {
+  const handle = document.getElementById("panel-handle");
+  const panel = document.getElementById("fretboard-chart-panel");
+  const clamp01 = (n) => Math.min(1, Math.max(0, n));
+
+  let dragging = false;
+  let axisSize = 0; // panel width (desktop) or height (mobile) at drag start
+  let startPos = 0; // pointer clientX/clientY at drag start
+  let startHidden = 0; // 0 = was open, 1 = was closed
+
+  const pointerAxis = (e) =>
+    App.panelIsBottomSheet() ? e.clientY : e.clientX;
+
+  const hiddenFraction = (e) => {
+    const delta = pointerAxis(e) - startPos;
+    return clamp01(startHidden + delta / axisSize);
+  };
+
+  handle.addEventListener("pointerdown", (e) => {
+    if (e.pointerType === "mouse" && e.button !== 0) return;
+    dragging = true;
+    startHidden = document.body.classList.contains("panel-open") ? 0 : 1;
+    axisSize = App.panelIsBottomSheet()
+      ? panel.offsetHeight
+      : panel.offsetWidth;
+    startPos = pointerAxis(e);
+    panel.classList.add("dragging");
+    handle.classList.add("dragging", "active");
+    handle.setPointerCapture(e.pointerId);
+    e.preventDefault();
+  });
+
+  handle.addEventListener("pointermove", (e) => {
+    if (!dragging || !axisSize) return;
+    const pct = hiddenFraction(e) * 100;
+    const openPx = (1 - pct / 100) * axisSize;
+    if (App.panelIsBottomSheet()) {
+      panel.style.transform = `translateY(${pct}%)`;
+      handle.style.bottom = `${openPx}px`;
+    } else {
+      panel.style.transform = `translateX(${pct}%)`;
+      handle.style.right = `calc(var(--menu-width) + ${openPx}px)`;
+    }
+  });
+
+  const endDrag = (e) => {
+    if (!dragging) return;
+    dragging = false;
+    panel.classList.remove("dragging");
+    handle.classList.remove("dragging", "active");
+    panel.style.transform = "";
+    handle.style.right = "";
+    handle.style.bottom = "";
+    App.togglePanel(hiddenFraction(e) < 0.5);
+  };
+
+  handle.addEventListener("pointerup", endDrag);
+  handle.addEventListener("pointercancel", endDrag);
+};
+
+/* ------------------------------------------------------------------ */
 /* Viewport readout                                                    */
 /* ------------------------------------------------------------------ */
 
@@ -253,6 +327,7 @@ App.bindEvents = function () {
 
   // Layout / navigation
   $("#panel-button").on("click", () => App.togglePanel());
+  App.bindPanelDrag();
   $("#open-chartlist-btn").on("click", () => chartlist.showModal());
   $("#open-settings-btn").on("click", () => settings.showModal());
   $("#logo-pane").on("click", () =>

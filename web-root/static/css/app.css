@@ -69,6 +69,42 @@ body.panel-open #fretboard-chart-panel {
   transform: translateX(0);
 }
 
+#fretboard-chart-panel.dragging {
+  transition: none;
+}
+
+/* ── Grab handle: left edge on desktop (col-resize) ─────────────────
+   Kept as its own fixed element (not a child of the panel) so it stays
+   on screen and reachable even while the panel is fully hidden. */
+#panel-handle {
+  position: fixed;
+  top: calc(50% - 24px);
+  right: calc(var(--menu-width) + 1rem);
+  width: 3px;
+  height: 48px;
+  background: var(--color-border);
+  border-radius: var(--radius-md);
+  cursor: col-resize;
+  touch-action: none;
+  z-index: 35;
+  transition:
+    right 250ms ease,
+    background-color 150ms ease;
+}
+
+body.panel-open #panel-handle {
+  right: calc(var(--menu-width) + var(--panel-width) + 1rem);
+}
+
+#panel-handle.dragging {
+  transition: none;
+}
+
+#panel-handle:hover,
+#panel-handle.active {
+  background: var(--primary);
+}
+
 body.panel-open #content {
   padding-right: var(--panel-width);
 }
@@ -221,6 +257,25 @@ dialog::backdrop {
     height: auto;
     overflow-x: auto;
     overflow-y: hidden;
+  }
+
+  /* Grab handle flips to top edge (row-resize) as a bottom sheet */
+  #panel-handle {
+    top: auto;
+    right: auto;
+    bottom: 1rem;
+    left: calc(50% - 24px);
+    width: 48px;
+    height: 3px;
+    cursor: row-resize;
+    transition:
+      bottom 250ms ease,
+      background-color 150ms ease;
+  }
+
+  body.panel-open #panel-handle {
+    right: auto;
+    bottom: calc(var(--panel-height) + 1rem);
   }
 
   body.panel-open #fretboard-chart-panel {
