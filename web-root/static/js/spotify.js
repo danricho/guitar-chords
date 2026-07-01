@@ -33,7 +33,10 @@ Spotify._currentTrackId = null;
  * @param {string} [opts.token=Spotify.sync.accessToken] bearer token
  * @returns {Promise<Response>}
  */
-Spotify.apiRequest = function (path, { method = "GET", token = Spotify.sync.accessToken } = {}) {
+Spotify.apiRequest = function (
+  path,
+  { method = "GET", token = Spotify.sync.accessToken } = {},
+) {
   return fetch("https://api.spotify.com/v1" + path, {
     method,
     headers: { Authorization: `Bearer ${token}` },

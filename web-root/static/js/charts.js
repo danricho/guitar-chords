@@ -86,18 +86,16 @@ Charts.restoreDefaultCapo = function () {
 /** Update the "restore default" button label + visibility. */
 Charts.updateCapoResetButton = function () {
   const def = Charts.state.currentDefaultCapo;
-  $("#capo-reset span").text(
-    def === 0 ? "No Capo (Default)" : "Fret #" + def + " (Default)",
-  );
+  $("#capo-reset span").text(def === 0 ? "None" : "Fret " + def + "");
   // Shown only when a saved override actually differs from the default
   const saved = Charts.getSavedCapo(Charts.state.currentSongTitle);
-  $("#capo-reset").toggle(saved != null && saved !== def);
+  $("#capo-reset").prop("disabled", !(saved != null && saved !== def));
 };
 
 /** Update the capo display text + up/down enabled state. */
 Charts.updateCapoDisplay = function () {
   const capo = Charts.state.currentCapo;
-  $("#capo-display").text(capo === 0 ? "No Capo" : "Fret #" + capo);
+  $("#capo-display").text(capo === 0 ? "None" : "Fret " + capo);
   $("#capo-down").prop("disabled", capo <= 0);
   $("#capo-up").prop("disabled", capo >= 11);
 };
