@@ -722,16 +722,27 @@
                 stroke="currentColor"
                 stroke-width="1.5"
                 fill="none"
-                class="size-5 iconoir"
+                class="size-5 iconoir modified"
               >
                 <path
-                  d="M6.75469 17.2828L5.32612 7.28284C5.154 6.07798 6.08892 5 7.30602 5H10.694C11.9111 5 12.846 6.07797 12.6739 7.28284L11.2453 17.2828C11.1046 18.2681 10.2607 19 9.26541 19H8.73459C7.73929 19 6.89545 18.2681 6.75469 17.2828Z"
-                ></path>
+                  d="M6.8,19.4L5.3,5.4c-0.2-1.7,0.8-3.2,2-3.2h3.4c1.2,0,2.2,1.5,2,3.2l-1.4,13.9c-0.1,1.4-1,2.4-2,2.4H8.7
+                  C7.7,21.8,6.9,20.7,6.8,19.4z"
+                />
                 <path
-                  d="M2 12L6 12M22 12L12 12"
                   stroke-linecap="round"
                   stroke-linejoin="round"
-                ></path>
+                  d="M2,12h4 M22,12H12"
+                />
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M2,7h3.4 M22,7h-9.4"
+                />
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M2,17h4.4 M22,17H11.6"
+                />
               </svg>
               <span id="capo-display"></span>
             </button>
@@ -899,6 +910,13 @@
               stroke="currentColor"
             >
               <g class="fretboard-base">
+                <rect
+                  y="13"
+                  x="5.91"
+                  style="fill: var(--primary); opacity: 0.25; stroke: none"
+                  width="101"
+                  height="101.95"
+                />
                 <line
                   x1="5.91"
                   y1="13.8"
@@ -1482,7 +1500,12 @@
                 class="fret-kid-cover"
                 y="-3"
                 x="-2"
-                style="fill: var(--background); opacity: 0.9; display: none"
+                style="
+                  fill: var(--background);
+                  opacity: 0.9;
+                  stroke: none;
+                  display: none;
+                "
                 width="59"
                 height="118.3"
               />

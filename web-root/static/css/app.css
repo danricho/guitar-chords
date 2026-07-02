@@ -247,6 +247,7 @@ dialog::backdrop {
     flex-direction: row;
     align-items: flex-end;
     flex-wrap: nowrap;
+    gap: 1rem;
   }
 
   .fretboard {
