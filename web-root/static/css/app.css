@@ -245,19 +245,6 @@ dialog::backdrop {
   /* Horizontal chord layout */
   #fretboards {
     flex-direction: row;
-    align-items: flex-end;
     flex-wrap: nowrap;
-    gap: 1rem;
-  }
-
-  .fretboard {
-    flex-direction: column-reverse;
-    align-items: center;
-    margin-bottom: 0;
-    flex-shrink: 0;
-  }
-
-  .fretboard > div:last-child {
-    width: auto;
   }
 }

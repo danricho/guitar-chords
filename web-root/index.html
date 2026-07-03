@@ -890,17 +890,13 @@
     >
       <div class="h-full overflow-auto py-4">
         <!-- FRETBOARD HOLDER -->
-        <div id="fretboards" class="p-3 flex flex-col items-end"></div>
+        <div id="fretboards" class="p-3 flex flex-col items-end gap-4"></div>
         <!-- FRETBOARD TEMPLATE -->
         <div
-          class="fretboard flex mb-4 gap-2"
+          class="fretboard flex-col gap-2"
           id="fretboard-template"
           style="display: none"
         >
-          <div
-            class="chord-name self-center text-center text-xl primary tracking-tight"
-            style="color: var(--primary)"
-          ></div>
           <div class="self-center w-3/4">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -908,6 +904,7 @@
               class="size-25"
               stroke-width="2px"
               stroke="currentColor"
+              transform="rotate(-90)"
             >
               <g class="fretboard-base">
                 <rect
@@ -1525,6 +1522,10 @@
               </g>
             </svg>
           </div>
+          <div
+            class="chord-name self-center text-center text-xl primary tracking-tight"
+            style="color: var(--primary)"
+          ></div>
         </div>
       </div>
     </aside>
