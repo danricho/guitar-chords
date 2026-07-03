@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta
       name="viewport"
-      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0"
     />
     <title>Guitar Charts</title>
 
@@ -682,18 +682,20 @@
       <!-- SONG INFO PANEL -->
       <div
         id="song-info"
-        class="fixed top-0 left-0 p-4 z-30 normalise-bg w-full"
+        class="fixed top-0 left-0 p-4 z-30 normalise-bg w-full flex flex-col gap-4"
       >
-        <h1 id="song-title" class="text-2xl font-semibold mb-2"></h1>
-        <p id="song-data" class="text-sm">
-          <span id="spotify-ident" style="display: none"></span>
-          <span id="song-artist" class="me-2"></span>|<span
-            class="mx-2"
-            id="song-key"
-          ></span
-          >|<span class="mx-2" id="song-tempo"></span>
-        </p>
-        <div class="mt-3 flex flex-wrap items-center">
+        <div class="flex gap-4 md:flex-col md:gap-2 items-baseline">
+          <h1 id="song-title" class="text-2xl font-semibold"></h1>
+          <div id="song-data" class="text-md flex gap-2">
+            <span id="spotify-ident" style="display: none"></span>
+            <span id="song-artist"></span>
+            <span class="">|</span>
+            <span id="song-key"></span>
+            <span class="hide-iphone-portrait">|</span>
+            <span class="hide-iphone-portrait" id="song-tempo"></span>
+          </div>
+        </div>
+        <div class="flex gap-4 items-center">
           <div role="group" class="button-group">
             <button id="capo-down" class="btn-outline size-9 p-2.5">
               <svg
@@ -714,7 +716,7 @@
             <button
               class="btn-outline"
               disabled
-              style="opacity: 1; min-width: 7rem"
+              style="opacity: 1; min-width: 6rem"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -785,8 +787,7 @@
               <span></span>
             </button>
           </div>
-
-          <div class="mt-2 w-full sm:mt-0 sm:w-auto sm:mx-3">
+          <div class="hidden md:inline-block">
             <button id="youtube-link" class="btn-outline size-9 p-1.5">
               <svg
                 class="w-full h-full iconoir"
@@ -847,8 +848,8 @@
       </div>
 
       <!-- ALBUM ART -->
-      <div id="spotify-album-art" class="fixed top-4 z-30">
-        <img id="albumArt" class="size-27" style="display: none" />
+      <div id="spotify-album-art" class="fixed top-4 z-30 hide-iphone-portrait">
+        <img id="albumArt" class="size-21 lg:size-27" style="display: none" />
       </div>
 
       <!-- PROGRESS -->
@@ -1536,8 +1537,11 @@
       class="normalise-bg fixed top-0 right-0 z-40 flex h-full flex-col justify-between z-40"
     >
       <!-- TOP BUTTONS -->
-      <div class="flex flex-col items-center gap-2 p-2">
-        <button id="open-chartlist-btn" class="btn-outline size-9 p-1.5">
+      <div class="flex flex-col items-center gap-1 portrait:gap-2 lg:gap-2 p-2">
+        <button
+          id="open-chartlist-btn"
+          class="btn-outline size-7 p-0.5 portrait:size-9 portrait:p-1.5 lg:size-9 lg:p-1.5"
+        >
           <svg
             class="w-full h-full iconoir"
             viewBox="0 0 24 24"
@@ -1567,7 +1571,10 @@
             ></path>
           </svg>
         </button>
-        <button id="panel-button" class="btn-outline size-9 p-1.5">
+        <button
+          id="panel-button"
+          class="btn-outline size-7 p-0.5 portrait:size-9 portrait:p-1.5 lg:size-9 lg:p-1.5"
+        >
           <svg
             class="w-full h-full iconoir modified"
             viewBox="0 0 24 24"
@@ -1584,7 +1591,10 @@
             <circle cx="19" cy="12.5" r="1.2" />
           </svg>
         </button>
-        <button id="open-settings-btn" class="btn-outline size-9 p-1.5">
+        <button
+          id="open-settings-btn"
+          class="btn-outline size-7 p-0.5 portrait:size-9 portrait:p-1.5 lg:size-9 lg:p-1.5"
+        >
           <svg
             class="w-full h-full iconoir"
             viewBox="0 0 24 24"
@@ -1606,7 +1616,10 @@
           </svg>
         </button>
 
-        <button data-action="print" class="btn-outline size-9 p-1.5">
+        <button
+          data-action="print"
+          class="btn-outline size-9 p-1.5 hidden lg:block"
+        >
           <svg
             class="w-full h-full iconoir"
             viewBox="0 0 24 24"
@@ -1632,7 +1645,11 @@
           </svg>
         </button>
 
-        <div id="chart-timesynced" class="size-9 p-1.5" style="display: none">
+        <div
+          id="chart-timesynced"
+          class="size-7 p-0.5 lg:size-9 lg:p-1.5"
+          style="display: none"
+        >
           <svg
             class="w-full h-full opacity-50 iconoir"
             viewBox="0 0 24 24"
@@ -1666,10 +1683,10 @@
       </div>
 
       <!-- MIDDLE BUTTONS -->
-      <div class="flex flex-col items-center gap-2 p-2">
+      <div class="flex flex-col items-center gap-1 lg:gap-2 p-2">
         <button
           id="prev-song"
-          class="btn-outline manual-nav-buttons size-9 p-1.5"
+          class="btn-outline manual-nav-buttons size-7 p-0.5 portrait:size-9 portrait:p-1.5 lg:size-9 lg:p-1.5"
           disabled
         >
           <svg
@@ -1692,7 +1709,7 @@
         </div>
         <button
           id="next-song"
-          class="btn-outline manual-nav-buttons size-9 p-1.5"
+          class="btn-outline manual-nav-buttons size-7 p-0.5 portrait:size-9 portrait:p-1.5 lg:size-9 lg:p-1.5"
         >
           <svg
             class="w-full h-full iconoir"
@@ -1712,14 +1729,14 @@
       </div>
 
       <!-- BOTTOM BUTTONS -->
-      <div class="flex flex-col items-center gap-2 p-2">
+      <div class="flex flex-col items-center gap-1 lg:gap-2 p-2">
         <div
           class="spotify-controls flex flex-col items-center gap-2"
           style="display: none"
         >
           <button
             id="spotify-play"
-            class="btn-outline size-9 p-1.5"
+            class="btn-outline size-7 p-0.5 portrait:size-9 portrait:p-1.5 lg:size-9 lg:p-1.5"
             style="display: none"
           >
             <svg
@@ -1739,7 +1756,7 @@
           </button>
           <button
             id="spotify-pause"
-            class="btn-outline size-9 p-1.5"
+            class="btn-outline size-7 p-0.5 portrait:size-9 portrait:p-1.5 lg:size-9 lg:p-1.5"
             style="display: none"
           >
             <svg
@@ -1759,7 +1776,10 @@
             </svg>
           </button>
 
-          <button id="spotify-song-restart" class="btn-outline size-9 p-1.5">
+          <button
+            id="spotify-song-restart"
+            class="btn-outline size-7 p-0.5 portrait:size-9 portrait:p-1.5 lg:size-9 lg:p-1.5"
+          >
             <svg
               class="w-full h-full flowbite"
               viewBox="0 0 24 24"
@@ -1775,7 +1795,10 @@
               />
             </svg>
           </button>
-          <button id="spotify-prev" class="btn-outline size-9 p-1.5">
+          <button
+            id="spotify-prev"
+            class="btn-outline size-7 p-0.5 portrait:size-9 portrait:p-1.5 lg:size-9 lg:p-1.5"
+          >
             <svg
               class="w-full h-full iconoir"
               viewBox="0 0 24 24"
@@ -1796,7 +1819,10 @@
               ></path>
             </svg>
           </button>
-          <button id="spotify-next" class="btn-outline size-9 p-1.5">
+          <button
+            id="spotify-next"
+            class="btn-outline size-7 p-0.5 portrait:size-9 portrait:p-1.5 lg:size-9 lg:p-1.5"
+          >
             <svg
               class="w-full h-full iconoir"
               viewBox="0 0 24 24"
@@ -1828,7 +1854,10 @@
           >Playlist</a
         >
 
-        <button id="spotify-enable" class="btn-outline size-9 p-1.5">
+        <button
+          id="spotify-enable"
+          class="btn-outline size-7 p-0.5 portrait:size-9 portrait:p-1.5 lg:size-9 lg:p-1.5"
+        >
           <svg
             class="w-full h-full iconoir"
             viewBox="0 0 24 24"
@@ -1861,7 +1890,7 @@
         </button>
         <button
           id="spotify-disable"
-          class="btn-outline size-9 p-1.5"
+          class="btn-outline size-7 p-0.5 portrait:size-9 portrait:p-1.5 lg:size-9 lg:p-1.5"
           style="display: none"
         >
           <svg

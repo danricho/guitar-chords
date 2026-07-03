@@ -202,8 +202,12 @@ dialog::backdrop {
   opacity: 50%;
 }
 
-/* ── Mobile (portrait): chord panel as bottom sheet ───────────────────────────── */
-@media (max-width: 767px) and (orientation: portrait) {
+/* ── Mobile (portrait): chord panel as bottom sheet and a few things to hide */
+@media (max-width: 48rem) and (orientation: portrait) {
+  .hide-iphone-portrait {
+    display: none;
+  }
+
   #fretboard-chart-panel {
     top: auto;
     bottom: 0;
