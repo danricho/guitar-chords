@@ -129,9 +129,10 @@ Fretboard.CHORD_LOOKUP = {
   "": "",
 };
 
-// SVG geometry constants matching the fretboard template
-Fretboard._CX = { 1: 5.91, 2: 25.91, 3: 45.91, 4: 65.91, 5: 85.91, 6: 105.91 };
-Fretboard._CY = { 1: 28.91, 2: 51.91, 3: 74.91, 4: 97.91 };
+// SVG geometry constants matching the fretboard template (horizontal layout:
+// frets run left-to-right on the x-axis, strings run top-to-bottom on the y-axis)
+Fretboard._CX = { 1: 33.35, 2: 56.35, 3: 79.35, 4: 102.35 };
+Fretboard._CY = { 1: 109.54, 2: 89.54, 3: 69.54, 4: 49.54, 5: 29.54, 6: 9.54 };
 Fretboard._R = 7;
 
 /**
@@ -153,9 +154,9 @@ Fretboard.showChord = function (name) {
 
   if (barre) {
     const { _CX, _CY, _R } = Fretboard;
-    const x = _CX[barre.from] - _R;
-    const y = _CY[barre.fret] - _R;
-    const w = _CX[barre.to] - _CX[barre.from] + 2 * _R;
+    const x = _CX[barre.fret] - _R;
+    const y = Math.min(_CY[barre.from], _CY[barre.to]) - _R;
+    const h = Math.abs(_CY[barre.to] - _CY[barre.from]) + 2 * _R;
     const barreEl = document.createElementNS(
       "http://www.w3.org/2000/svg",
       "rect",
@@ -163,8 +164,8 @@ Fretboard.showChord = function (name) {
     $(barreEl).attr({
       x,
       y,
-      width: w,
-      height: 2 * _R,
+      width: 2 * _R,
+      height: h,
       rx: _R,
       fill: "var(--primary)",
       stroke: "currentColor",
