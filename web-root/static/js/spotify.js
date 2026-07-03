@@ -118,10 +118,54 @@ Spotify.fetchState = async function () {
     if (data.item.id == SpotifyConfig.capoChangeSong) {
       $("#song").html(`
         <h2 class="text-xl mb-3">Change Capo!</h2>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          stroke-width="1.5"
+          fill="none"
+          class="size-27 iconoir modified"
+        >
+          <path
+            d="M6.8,19.4L5.3,5.4c-0.2-1.7,0.8-3.2,2-3.2h3.4c1.2,0,2.2,1.5,2,3.2l-1.4,13.9c-0.1,1.4-1,2.4-2,2.4H8.7
+            C7.7,21.8,6.9,20.7,6.8,19.4z"
+          />
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M2,12h4 M22,12H12"
+          />
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M2,7h3.4 M22,7h-9.4"
+          />
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M2,17h4.4 M22,17H11.6"
+          />
+        </svg><br />
         <button id="spotify-next" class="btn-outline size-9 p-1">
-          <svg class="w-full h-full" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
-            <path fill-rule="evenodd" d="M17 6a1 1 0 1 0-2 0v4L8.6 5.2A1 1 0 0 0 7 6v12a1 1 0 0 0 1.6.8L15 14v4a1 1 0 1 0 2 0V6Z" clip-rule="evenodd"></path>
-          </svg>
+          <svg
+              class="w-full h-full iconoir"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentcolor"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M18 7V17"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              ></path>
+              <path
+                d="M6.97179 5.2672C6.57832 4.95657 6 5.23682 6 5.73813V18.2619C6 18.7632 6.57832 19.0434 6.97179 18.7328L14.9035 12.4709C15.2078 12.2307 15.2078 11.7693 14.9035 11.5291L6.97179 5.2672Z"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              ></path>
+            </svg>
         </button>
       `);
       $("#song #spotify-next").on("click", Spotify.next);
