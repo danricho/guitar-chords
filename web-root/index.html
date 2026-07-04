@@ -34,7 +34,7 @@
   <body class="h-screen overflow-hidden bg-background">
     <!-- SETTINGS -->
     <dialog id="settings" class="dialog">
-      <div class="w-full sm:max-w-[90%] md:max-w-[700px] max-h-[90dvh]">
+      <div class="w-full">
         <header>
           <h2 id="">Settings</h2>
         </header>
@@ -50,7 +50,8 @@
                 aria-selected="true"
                 tabindex="0"
               >
-                Chart / Spotify
+                <span class="tab-full">Chart / Spotify</span>
+                <span class="tab-short">Chart</span>
               </button>
               <button
                 type="button"
@@ -60,7 +61,8 @@
                 aria-selected="false"
                 tabindex="0"
               >
-                Interface
+                <span class="tab-full">Interface</span>
+                <span class="tab-short">UI</span>
               </button>
               <button
                 type="button"
@@ -70,7 +72,8 @@
                 aria-selected="false"
                 tabindex="0"
               >
-                Utilities
+                <span class="tab-full">Utilities</span>
+                <span class="tab-short">Utils</span>
               </button>
               <button
                 type="button"
@@ -80,7 +83,8 @@
                 aria-selected="false"
                 tabindex="0"
               >
-                About / Roadmap
+                <span class="tab-full">About / Roadmap</span>
+                <span class="tab-short">About</span>
               </button>
             </nav>
 
@@ -639,7 +643,7 @@
     <!-- AVAILABLE SONG CHARTS -->
     <dialog id="chartlist" class="dialog">
       <div
-        class="w-full sm:max-w-[600px] md:max-w-[700px] lg:max-w-[950px] max-h-[90dvh] overflow-y-hidden"
+        class="w-full"
       >
         <header>
           <h2>Available Charts</h2>
