@@ -28,9 +28,9 @@ Designed for practising with real recordings, Guitar Chords can automatically lo
 
 ## Screenshots
 
-<img src="readme-graphics/annotated-screenshot.png"/>
+<img src="readme-graphics/ipad-landscape-spotify.png"/>
 
-_Screenshots are captured at an iPad 11-inch (A16) sized viewport. More are available in the `readme-graphics` directory._
+_More Screenshots on different devices / orientations are available in the `readme-graphics` directory._
 
 ## How It Works
 
