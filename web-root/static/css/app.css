@@ -69,7 +69,9 @@ body.panel-open #panel-button {
 #spotify-album-art,
 #logo-pane {
   right: calc(var(--menu-width) + 1rem);
-  transition: right 250ms ease;
+  transition:
+    right 250ms ease,
+    bottom 250ms ease;
 }
 
 body.panel-open #spotify-album-art,
@@ -213,6 +215,11 @@ dialog::backdrop {
   body.panel-open #spotify-album-art,
   body.panel-open #logo-pane {
     right: calc(var(--menu-width) + 1rem);
+  }
+
+  /* Lift the logo above the bottom-sheet chord pane */
+  body.panel-open #logo-pane {
+    bottom: calc(var(--panel-height) + 1rem);
   }
 
   body.panel-open #song-info {
