@@ -39,22 +39,6 @@ body.app-ready {
   user-select: none; /* Standard syntax */
 }
 
-#side-menu,
-#fretboard-chart-panel {
-  border-left: solid 1px var(--color-border);
-}
-
-#fretboard-chart-panel {
-  width: fit-content;
-}
-
-#logo-pane {
-  opacity: 0.5;
-  cursor: pointer;
-}
-#logo-pane:hover {
-  opacity: 1;
-}
 #logo-pane {
   transform: scale(calc(100 / var(--current-scale)));
   transform-origin: bottom right;
@@ -121,18 +105,10 @@ body.panel-open #song-info {
   display: none;
 }
 
-.normalise-bg {
-  background-color: var(--background);
-}
-
 dialog::backdrop {
   background: var(--background);
   opacity: 0.9;
   backdrop-filter: blur(4px);
-}
-
-#song-info {
-  border-bottom: solid 1px var(--color-border);
 }
 
 /* Chord Chart Styles */
