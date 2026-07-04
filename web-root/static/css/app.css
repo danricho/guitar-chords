@@ -67,14 +67,12 @@ body.panel-open #panel-button {
 }
 
 #spotify-album-art,
-#spotify-progress,
 #logo-pane {
   right: calc(var(--menu-width) + 1rem);
   transition: right 250ms ease;
 }
 
 body.panel-open #spotify-album-art,
-body.panel-open #spotify-progress,
 body.panel-open #logo-pane {
   right: calc(var(--menu-width) + var(--panel-width) + 1rem);
 }
@@ -213,7 +211,6 @@ dialog::backdrop {
   }
 
   body.panel-open #spotify-album-art,
-  body.panel-open #spotify-progress,
   body.panel-open #logo-pane {
     right: calc(var(--menu-width) + 1rem);
   }

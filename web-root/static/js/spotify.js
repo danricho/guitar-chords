@@ -70,7 +70,6 @@ Spotify.fetchState = async function () {
     console.log("No active Spotify player!");
     $("#spotify-no-player").show();
     $(`
-      #spotify-progress,
       #spotify-text,
       #albumArt,
       #chart-timesynced,
@@ -105,7 +104,6 @@ Spotify.fetchState = async function () {
     `${data.item.name} - ${data.item.artists[0].name}`,
   );
 
-  $("#spotify-percent-played").text("" + Math.round(sync.percent) + " %");
   $("#spotify-pause").toggle(sync.isPlaying);
   $("#spotify-play").toggle(!sync.isPlaying);
 
@@ -175,7 +173,6 @@ Spotify.fetchState = async function () {
       );
     }
     $("#song-info").hide();
-    $("#spotify-progress").hide();
     $("#song-info-clone").remove();
     Fretboard.clearChords();
     $("#fretboards").html(
@@ -214,11 +211,9 @@ Spotify.pollingLoop = async function () {
       // timesynced chart
       Scroll.toVirtualTimestamp(Spotify.sync.position);
       $("#chart-timesynced").show();
-      $("#spotify-progress").hide();
     } else if ($("#song .chord-sheet").length) {
       // percentage-scrolled chart
       $("#chart-timesynced").hide();
-      $("#spotify-progress").show();
       const $elem = $("#content");
       const maxScroll = $elem[0].scrollHeight - $elem.outerHeight();
       const scrollTarget =
@@ -485,7 +480,6 @@ Spotify.stop = function () {
   `).show();
   $(`
     #spotify-disable,
-    #spotify-progress,
     #spotify-text,
     #albumArt,
     #chart-timesynced,
