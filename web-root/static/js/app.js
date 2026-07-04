@@ -298,9 +298,6 @@ App.bindEvents = function () {
         localStorage.clear();
         location.reload();
         break;
-      case "print":
-        window.print();
-        break;
     }
   });
 
