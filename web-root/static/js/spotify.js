@@ -344,8 +344,11 @@ Spotify.ensureValidToken = async function () {
     }
     Spotify.updateUserDisplay();
 
-    // clean URL (important)
-    window.history.replaceState({}, document.title, "/");
+    // clean URL (important) — strip only the OAuth params, keep e.g. ?chart=
+    const cleanUrl = new URL(window.location.href);
+    cleanUrl.searchParams.delete("code");
+    cleanUrl.searchParams.delete("state");
+    window.history.replaceState({}, document.title, cleanUrl);
     return newSession.access_token;
   }
 

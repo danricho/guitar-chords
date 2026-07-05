@@ -20,6 +20,7 @@ Designed for practising with real recordings, Guitar Chords can automatically lo
 - Guitar chord diagrams displayed alongside charts, including barre chords.
 - Chord transposition via Capo adjustment controls.
 - Optional 'capo-change' song for spotify playlists.
+- Shareable deep links: the URL carries a `?chart=<slug>` argument for the loaded chart, and the page title shows the song and artist.
 - Dark and light themes.
 - Kid-friendly three-string chord display mode.
 - Responsive tablet-friendly layout.

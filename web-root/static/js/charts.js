@@ -14,6 +14,51 @@ Charts.NO_CHART_INDEX = -1;
 /** localStorage key for per-song capo overrides (keyed by song title). */
 Charts.CAPO_STORE_KEY = "song_capo";
 
+/** URL query param that names the chart to load (for sharing). */
+Charts.SHARE_PARAM = "chart";
+
+/**
+ * Stable, shareable slug for a chart, derived from its filename.
+ * "../charts/Im-Yours.md" -> "Im-Yours"
+ * @param {number} index index into window.charts
+ * @returns {string} slug, or "" if index is invalid
+ */
+Charts.chartSlug = function (index) {
+  const chart = charts[index];
+  if (!chart) return "";
+  const file = (chart.path || "").split("/").pop() || "";
+  return file.replace(/\.md$/i, "");
+};
+
+/**
+ * @param {string} slug
+ * @returns {number} matching chart index, or NO_CHART_INDEX if none
+ */
+Charts.findChartBySlug = function (slug) {
+  if (!slug) return Charts.NO_CHART_INDEX;
+  const target = slug.toLowerCase();
+  const index = charts.findIndex(
+    (_, i) => Charts.chartSlug(i).toLowerCase() === target,
+  );
+  return index === -1 ? Charts.NO_CHART_INDEX : index;
+};
+
+/**
+ * Reflect the loaded chart in the URL (?chart=<slug>) without a reload, so the
+ * address bar is always a shareable deep link.
+ * @param {number} index index into window.charts
+ */
+Charts.updateShareUrl = function (index) {
+  const slug = Charts.chartSlug(index);
+  const url = new URL(window.location.href);
+  if (slug) {
+    url.searchParams.set(Charts.SHARE_PARAM, slug);
+  } else {
+    url.searchParams.delete(Charts.SHARE_PARAM);
+  }
+  window.history.replaceState(null, "", url);
+};
+
 /** Mutable runtime state shared across modules. */
 Charts.state = {
   songIndex: 0,
@@ -145,6 +190,7 @@ Charts.loadSong = async function (
     $("#content").animate({ scrollTop: 0 }, 10);
   }
   $("#heading-title").text(charts[index].name);
+  Charts.updateShareUrl(index);
 };
 
 /**
@@ -251,8 +297,13 @@ Charts.renderSongChart = function (
     );
   });
 
-  $("#song-title").text(song.metadata.get("title") || "");
-  $("#song-artist").text(song.metadata.get("artist") || "");
+  const songTitle = song.metadata.get("title") || "";
+  const songArtist = song.metadata.get("artist") || "";
+  $("#song-title").text(songTitle);
+  $("#song-artist").text(songArtist);
+  document.title = songTitle
+    ? `${songTitle}${songArtist ? " by " + songArtist : ""} | Guitar Charts`
+    : "Guitar Charts";
   $("#spotify-ident").text(spotifyIdent);
   $("#song-tempo").text((song.metadata.get("tempo") || "") + " BPM");
 

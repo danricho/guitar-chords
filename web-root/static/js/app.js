@@ -369,8 +369,12 @@ App.init = function () {
   const code = new URLSearchParams(window.location.search).get("code");
   if (code) Spotify.start();
 
-  // Load the first chart
-  Charts.loadSong(0);
+  // Load the shared chart (?chart=<slug>) if present, else the first chart
+  const shareSlug = new URLSearchParams(window.location.search).get(
+    Charts.SHARE_PARAM,
+  );
+  const shareIndex = Charts.findChartBySlug(shareSlug);
+  Charts.loadSong(shareIndex !== Charts.NO_CHART_INDEX ? shareIndex : 0);
 
   // Keep --panel-width in sync whenever chord diagrams are added or removed
   new MutationObserver(() => requestAnimationFrame(App.syncPanelSize))
