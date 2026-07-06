@@ -363,6 +363,58 @@ Charts.renderSongChart = function (
   song.getChords().forEach((chord) => Fretboard.showChord(chord));
 
   Charts.updateManualButtonStates();
+
+  // Chords render at width:0 and overflow their column (see .chord CSS) so a
+  // long chord does not stretch the lyric beneath it. That can let two chords
+  // visually collide; nudge them apart once layout + fonts are ready.
+  requestAnimationFrame(() => Charts.avoidChordCollisions());
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(() => Charts.avoidChordCollisions());
+  }
+};
+
+/**
+ * Keep a minimum horizontal gap between adjacent chords in each row.
+ *
+ * Chords are laid out at width:0 with overflow:visible, so their DOM box does
+ * not report the real glyph extent — getBoundingClientRect() gives the (empty)
+ * border box. scrollWidth includes the overflowing text, so the true span is
+ * [rect.left, rect.left + scrollWidth]. When a chord starts before the previous
+ * chord's right edge + MIN_GAP, push its column right via margin-left, which
+ * (rows are flex/nowrap) shifts that column and every column after it, so the
+ * chord stays aligned over its own lyric. Idempotent: prior nudges are reset
+ * first, so it is safe to call on every render and again on fonts.ready.
+ */
+Charts.avoidChordCollisions = function () {
+  const MIN_GAP = 6; // px
+
+  const measure = (chord) => {
+    const left = chord.getBoundingClientRect().left;
+    return { left, right: left + chord.scrollWidth };
+  };
+
+  // Reset any margins from a previous pass before measuring.
+  document.querySelectorAll("#song .column").forEach((col) => {
+    col.style.marginLeft = "";
+  });
+
+  document.querySelectorAll("#song .row").forEach((row) => {
+    const chords = Array.from(row.querySelectorAll(".chord")).filter(
+      (c) => c.textContent.trim() !== "",
+    );
+    let prevRight = -Infinity;
+    chords.forEach((chord) => {
+      let span = measure(chord);
+      if (span.left < prevRight + MIN_GAP) {
+        const delta = prevRight + MIN_GAP - span.left;
+        const col = chord.closest(".column");
+        const cur = parseFloat(col.style.marginLeft) || 0;
+        col.style.marginLeft = cur + delta + "px";
+        span = measure(chord); // re-read after the shift
+      }
+      prevRight = span.right;
+    });
+  });
 };
 
 /* ------------------------------------------------------------------ */

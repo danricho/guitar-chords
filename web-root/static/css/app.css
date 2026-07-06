@@ -149,8 +149,16 @@ dialog::backdrop {
   display: block;
 }
 
+/* Let a chord overflow its column so a long chord (e.g. "Gmaj7/B") does not
+   stretch the lyric beneath it. Column width is driven by the lyric; the chord
+   is laid out at zero width and overflows to the right. padding-right reserves
+   a minimum gap so the next chord/word is never flush against it. */
 .song-sheet .row .column .chord {
-  margin-right: 0.75rem;
+  /* display: inline-block; */
+  width: 0;
+  padding-right: 0.75ch;
+  white-space: nowrap;
+  overflow: visible;
 }
 
 .song-sheet .column {
