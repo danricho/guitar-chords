@@ -65,6 +65,7 @@ Charts.state = {
   currentCapo: 0,
   currentDefaultCapo: 0, // chart's built-in capo, set on each render
   currentSongTitle: "", // capo-store key for the current song
+  currentSongArtist: "", // artist of the current song (for sharing)
   currentlyShownChart: "", // ChordPro of what's on screen (for copy)
 };
 
@@ -154,6 +155,39 @@ Charts.updateManualButtonStates = function () {
 /** Copy the currently displayed chart's ChordPro to the clipboard. */
 Charts.copyCurrentChart = function () {
   navigator.clipboard.writeText(Charts.state.currentlyShownChart);
+};
+
+/**
+ * Shareable deep link for the current chart: current URL with the chart param
+ * set and any transient OAuth params stripped.
+ * @returns {string} absolute URL
+ */
+Charts.shareUrl = function () {
+  const url = new URL(window.location.href);
+  const slug = Charts.chartSlug(Charts.state.songIndex);
+  if (slug) url.searchParams.set(Charts.SHARE_PARAM, slug);
+  ["code", "state"].forEach((p) => url.searchParams.delete(p));
+  return url.toString();
+};
+
+/**
+ * Share the current chart via the Web Share API. No-op (and the button is
+ * hidden at boot) on browsers without navigator.share.
+ */
+Charts.shareCurrentChart = function () {
+  if (!navigator.share) return;
+  const title = Charts.state.currentSongTitle;
+  const artist = Charts.state.currentSongArtist;
+  const label = title
+    ? `${title}${artist ? " by " + artist : ""}`
+    : "this chart";
+  const data = {
+    title: `Play along to ${label} on Guitar Chords!`,
+    text: `Play along to ${label} on Guitar Chords!`,
+    url: Charts.shareUrl(),
+  };
+  // Abort/permission errors are expected when the user dismisses the sheet.
+  navigator.share(data).catch(() => {});
 };
 
 /* ------------------------------------------------------------------ */
@@ -299,6 +333,7 @@ Charts.renderSongChart = function (
 
   const songTitle = song.metadata.get("title") || "";
   const songArtist = song.metadata.get("artist") || "";
+  Charts.state.currentSongArtist = songArtist;
   $("#song-title").text(songTitle);
   $("#song-artist").text(songArtist);
   document.title = songTitle

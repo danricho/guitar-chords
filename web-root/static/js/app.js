@@ -235,6 +235,12 @@ App.bindEvents = function () {
 
   // Chart actions
   $("#copy-chart-btn").on("click", Charts.copyCurrentChart);
+  // Web Share API only — hide the button where it is unsupported.
+  if (navigator.share) {
+    $("#share-chart").on("click", Charts.shareCurrentChart);
+  } else {
+    $("#share-chart").addClass("hidden");
+  }
   $("#reset-capos-btn").on("click", Charts.clearSavedCapos);
   $("#capo-reset").on("click", Charts.restoreDefaultCapo);
 
