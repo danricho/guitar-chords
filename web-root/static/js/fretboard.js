@@ -58,7 +58,7 @@ Store.remove = function (key) {
 };
 
 /* ------------------------------------------------------------------ */
-/* Fretboard — chord diagram rendering                                 */
+/* Fretboard — Fretboard Chord Diagram rendering                       */
 /* ------------------------------------------------------------------ */
 
 window.Fretboard = window.Fretboard || {};
@@ -197,7 +197,7 @@ Fretboard.showChord = function (name) {
   fresh.show();
 };
 
-/** Remove all rendered chord diagrams. */
+/** Remove all rendered Fretboard Chord Diagrams. */
 Fretboard.clearChords = function () {
   $("#fretboards").empty();
 };

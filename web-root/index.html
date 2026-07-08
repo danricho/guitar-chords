@@ -50,7 +50,7 @@
                 aria-selected="true"
                 tabindex="0"
               >
-                <span class="tab-full">Chart / Spotify</span>
+                <span class="tab-full">Song Chart / Spotify</span>
                 <span class="tab-short">Chart</span>
               </button>
               <button
@@ -97,7 +97,7 @@
             >
               <div class="card gap-8">
                 <section class="flex flex-col gap-4">
-                  <h2 class="font-bold">Chord Chart</h2>
+                  <h2 class="font-bold">Song Chart</h2>
                   <label class="label">
                     <input
                       id="kidSwitch"
@@ -132,7 +132,7 @@
                           stroke-linejoin="round"
                         ></path>
                       </svg>
-                      Copy Current Chart ChordPro Markdown
+                      Copy Current Song Chart ChordPro Markdown
                     </button>
                   </div>
                   <div>
@@ -578,8 +578,8 @@
                     <small>
                       <ul class="list-disc ms-5">
                         <li>
-                          Look at implementing multiple options for the chord
-                          fretboards:
+                          Look at implementing multiple options for the
+                          Fretboard Chord Diagrams:
                           <ul>
                             <li>
                               alternative chord shape - would need an
@@ -587,8 +587,8 @@
                               markdown to use an alternative shapes
                             </li>
                             <li>
-                              Setting for vertical vs horizontal chord fretboard
-                              diagrams.
+                              Setting for vertical vs horizontal Fretboard Chord
+                              Diagrams.
                             </li>
                           </ul>
                         </li>
@@ -635,15 +635,15 @@
       </div>
     </dialog>
 
-    <!-- AVAILABLE SONG CHARTS -->
-    <dialog id="chartlist" class="dialog">
+    <!-- SONG LIST -->
+    <dialog id="songlist" class="dialog">
       <div class="w-full">
         <header>
-          <h2>Available Charts</h2>
+          <h2>Song List</h2>
         </header>
 
         <section>
-          <div id="chart-list-content"></div>
+          <div id="song-list-content"></div>
         </section>
 
         <button
@@ -894,7 +894,7 @@
 
     <!-- FRETBOARD PANEL -->
     <aside
-      id="fretboard-chart-panel"
+      id="fretboard-panel"
       class="bg-[var(--background)] border-l border-[var(--color-border)] w-fit fixed top-0 right-[var(--menu-width)] z-30 h-full"
     >
       <div class="h-full overflow-auto py-4">
@@ -1522,7 +1522,7 @@
       <!-- TOP BUTTONS -->
       <div class="flex flex-col items-center gap-1 portrait:gap-2 lg:gap-2 p-2">
         <button
-          id="open-chartlist-btn"
+          id="open-songlist-btn"
           class="btn-outline size-7 p-0.5 portrait:size-9 portrait:p-1.5 lg:size-9 lg:p-1.5"
         >
           <svg

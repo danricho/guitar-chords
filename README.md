@@ -6,21 +6,21 @@
 
 </div>
 
-A lightweight web application for guitarists that renders ChordPro charts and synchronises them with Spotify playback.
+A lightweight web application for guitarists that renders ChordPro Song Charts and synchronises them with Spotify playback.
 
-Designed for practising with real recordings, Guitar Chords can automatically load charts, display chord diagrams, and scroll in time with the currently playing track.
+Designed for practising with real recordings, Guitar Chords can automatically load Song Charts, display Fretboard Chord Diagrams, and scroll in time with the currently playing track.
 
 ## Features
 
-- Render ChordPro charts directly in the browser.
+- Render ChordPro Song Charts directly in the browser.
 - Spotify integration using the Spotify Web API.
-- Automatic chart loading based on the currently playing Spotify track.
-- Timestamp-based chart synchronisation.
+- Automatic Song Chart loading based on the currently playing Spotify track.
+- Timestamp-based Song Chart synchronisation.
 - Percentage-based fallback synchronisation when timestamps are not present.
-- Guitar chord diagrams displayed alongside charts, including barre chords.
+- Fretboard Chord Diagrams displayed alongside Song Charts, including barre chords.
 - Chord transposition via Capo adjustment controls.
 - Optional 'capo-change' song for spotify playlists.
-- Shareable deep links: the URL carries a `?chart=<slug>` argument for the loaded chart, and the page title shows the song and artist. A share button (shown only where the browser supports the Web Share API) opens the native share sheet with a "Play along to &lt;song&gt; by &lt;artist&gt; on Guitar Chords!" message and the deep link.
+- Shareable deep links: the URL carries a `?chart=<slug>` argument for the loaded Song Chart, and the page title shows the song and artist. A share button (shown only where the browser supports the Web Share API) opens the native share sheet with a "Play along to &lt;song&gt; by &lt;artist&gt; on Guitar Chords!" message and the deep link.
 - Dark and light themes.
 - Kid-friendly three-string chord display mode.
 - Responsive tablet-friendly layout.
@@ -35,15 +35,15 @@ _More Screenshots on different devices / orientations are available in the `read
 
 ## How It Works
 
-Charts are written in ChordPro format and manually registered with the application.
+Song Charts are written in ChordPro format and manually registered with the application.
 
 When Spotify playback changes:
 
 1. The current track is read using the Spotify Web API.
-2. The application searches for a matching chart.
-3. The chart is loaded automatically.
+2. The application searches for a matching Song Chart.
+3. The Song Chart is loaded automatically.
 4. Scrolling is synchronised to the current playback position.
-5. Chord diagrams and song metadata are also displayed.
+5. Fretboard Chord Diagrams and song metadata are also displayed.
 
 ## Chord Transposition
 
@@ -58,23 +58,23 @@ Combined with using the capo as set, this allows players to:
 - Play songs in alternative positions on the neck.
 - Quickly experiment with different capo locations.
 
-## Chord Diagram Library
+## Fretboard Chord Diagram Library
 
-Guitar Chords includes a lightweight built-in chord diagram library that displays fretboard positions for recognised chords found within a chart.
+Guitar Chords includes a lightweight built-in Fretboard Chord Diagram library that displays fretboard positions for recognised chords found within a Song Chart.
 
-When a chart is loaded, any supported chords are automatically displayed alongside the lyrics to provide a quick visual reference while playing.
+When a Song Chart is loaded, any supported chords are automatically displayed alongside the lyrics to provide a quick visual reference while playing.
 
 ### Unknown Chords
 
-If a chord appears in a chart but does not exist in the current chord library, a placeholder indicator is displayed instead of a fret diagram.
+If a chord appears in a Song Chart but does not exist in the current chord library, a placeholder indicator is displayed instead of a Fretboard Chord Diagram.
 
-The chart itself will continue to render normally.
+The Song Chart itself will continue to render normally.
 
 ### Kid Mode
 
 A simplified "Kid Mode" is available for younger players and beginners using three-stringed guitars (eg. Loog).
 
-This mode reduces the complexity of displayed chord diagrams by presenting a simplified three-string view, making it easier to focus on essential finger placement while learning basic chord transitions.
+This mode reduces the complexity of displayed Fretboard Chord Diagrams by presenting a simplified three-string view, making it easier to focus on essential finger placement while learning basic chord transitions.
 
 ## Built With
 
@@ -102,7 +102,7 @@ docker compose up -d
 
 Spotify functionality is optional.
 
-If no Spotify Client ID is configured (in `web-root/static/js/spotify-settings.js`), the application will continue to function as a standalone chart viewer and the Spotify button will be hidden.
+If no Spotify Client ID is configured (in `web-root/static/js/spotify-settings.js`), the application will continue to function as a standalone Song Chart viewer and the Spotify button will be hidden.
 
 ### Creating a Spotify Application
 
@@ -140,9 +140,9 @@ To allow additional users:
 2. Navigate to User Management.
 3. Add the Spotify account email addresses that should have access.
 
-## Adding Charts
+## Adding Song Charts
 
-Charts are registered manually in `charts/load-charts.js`.
+Song Charts are registered manually in `charts/load-charts.js`.
 
 Example:
 
@@ -150,21 +150,21 @@ Example:
 window.charts = [
   {
     // The `name` field should match the Spotify track title and artist.
-    // When a matching track is detected, the chart is loaded automatically from the `path` field.
+    // When a matching track is detected, the Song Chart is loaded automatically from the `path` field.
     name: "Lanterns in the Rain - DanRicho feat. ChatGPT",
     path: "../charts/Fiction-LanternsInTheRain.md",
-    defaultCapo: 0, // shown as the chart's capo badge in the chart list
+    defaultCapo: 0, // shown as the Song Chart's capo badge in the Song List
   },
 ];
 ```
 
 ### Why Manual Registration?
 
-Manual chart registration keeps the application compatible with static hosting environments and avoids requiring server-side file discovery.
+Manual Song Chart registration keeps the application compatible with static hosting environments and avoids requiring server-side file discovery.
 
-## ChordPro Charts
+## ChordPro Song Charts
 
-Charts are stored as Markdown files using ChordPro syntax.
+Song Charts are stored as Markdown files using ChordPro syntax.
 
 ### Metadata
 
@@ -182,13 +182,13 @@ Supported metadata fields:
 | ------ | ----------------------- | ----------------------------------------------------------- |
 | title  | Song title              | Displayed as Title                                          |
 | artist | Song artist             | Displayed as Artist                                         |
-| capo   | Suggested capo position | The starting Capo setting (matches the chords in the chart) |
+| capo   | Suggested capo position | The starting Capo setting (matches the chords in the Song Chart) |
 | key    | Song key                | The key of the song (per the recording being played)        |
 | tempo  | Song tempo              | The tempo of the song                                       |
 
 ### Sections
 
-Sections help organise charts.
+Sections help organise Song Charts.
 
 ```text
 {sov: Verse}
@@ -226,12 +226,12 @@ When timestamps exist:
 
 When timestamps do not exist:
 
-- Scrolling is calculated from the percentage of the chart completed.
+- Scrolling is calculated from the percentage of the Song Chart completed.
 - Playback position is calculated from the percentage of the song completed.
 
 ## Chord Definitions
 
-Chord diagrams are defined manually within the application in `web-root/static/js/fretboard.js`.
+Fretboard Chord Diagrams are defined manually within the application in `web-root/static/js/fretboard.js`.
 
 ### Open / Non-Barre Chords
 
@@ -275,9 +275,9 @@ Additional chords can be added by extending `Fretboard.CHORD_LOOKUP` in `web-roo
 
 ## Known Limitations
 
-- Charts must be registered manually.
-- Timestamp accuracy depends on chart authoring quality.
-- Spotify track naming variations may require manual chart mapping.
+- Song Charts must be registered manually.
+- Timestamp accuracy depends on Song Chart authoring quality.
+- Spotify track naming variations may require manual Song Chart mapping.
 - Chord library is not yet exhaustive.
 
 ## Roadmap

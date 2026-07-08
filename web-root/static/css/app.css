@@ -44,12 +44,12 @@ body.app-ready {
   transform-origin: bottom right;
 }
 
-#fretboard-chart-panel {
+#fretboard-panel {
   transform: translateX(100%);
   transition: transform 250ms ease;
 }
 
-body.panel-open #fretboard-chart-panel {
+body.panel-open #fretboard-panel {
   transform: translateX(0);
 }
 
@@ -62,7 +62,7 @@ body.panel-open #panel-button {
 }
 
 #settings[open] ~ #side-menu #open-settings-btn,
-#chartlist[open] ~ #side-menu #open-chartlist-btn {
+#songlist[open] ~ #side-menu #open-songlist-btn {
   color: var(--primary);
 }
 
@@ -117,7 +117,7 @@ dialog::backdrop {
   overflow-x: hidden;
 }
 
-/* Chord Chart Styles */
+/* Song Chart Styles */
 .song-sheet {
   margin: 1rem 0;
 }
@@ -198,7 +198,7 @@ dialog::backdrop {
     display: none;
   }
 
-  #fretboard-chart-panel {
+  #fretboard-panel {
     top: auto;
     bottom: 0;
     left: 0;
@@ -211,13 +211,13 @@ dialog::backdrop {
     overflow: hidden;
   }
 
-  #fretboard-chart-panel > div {
+  #fretboard-panel > div {
     height: auto;
     overflow-x: auto;
     overflow-y: hidden;
   }
 
-  body.panel-open #fretboard-chart-panel {
+  body.panel-open #fretboard-panel {
     transform: translateY(0);
   }
 
@@ -251,7 +251,7 @@ dialog::backdrop {
    Overrides basecoat's .dialog>* sizing (which clamps to 32rem ≥640px and
    sets no overflow). ID selectors win on specificity without !important. */
 #settings > div,
-#chartlist > div {
+#songlist > div {
   /* iPhone, both orientations: near-fullscreen with a small margin */
   width: calc(100% - 1rem);
   max-width: calc(100% - 1rem);
@@ -263,7 +263,7 @@ dialog::backdrop {
 /* iPad portrait + everything lg and up: centred, capped box */
 @media (min-width: 48rem) and (orientation: portrait), (min-width: 64rem) {
   #settings > div,
-  #chartlist > div {
+  #songlist > div {
     width: 100%;
     height: auto;
     max-height: 90dvh;
@@ -271,12 +271,12 @@ dialog::backdrop {
   #settings > div {
     max-width: 700px;
   }
-  #chartlist > div {
+  #songlist > div {
     max-width: 950px;
   }
 }
 
-/* Scrollable content areas — tab panels / chart list scroll, nav stays put.
+/* Scrollable content areas — tab panels / song list scroll, nav stays put.
    Scrollbars are hidden globally (see * rule above), fine for touch. */
 #settings > div > section {
   display: flex;
@@ -294,7 +294,7 @@ dialog::backdrop {
   min-height: 0;
   overflow-y: auto;
 }
-#chartlist > div > section {
+#songlist > div > section {
   min-height: 0;
   overflow-y: auto;
 }
@@ -315,7 +315,7 @@ dialog::backdrop {
   }
 }
 
-/* Bold the currently-loaded song in the chart list. */
-#chart-list-content [data-chart-index].current-song {
+/* Bold the currently-loaded song in the song list. */
+#song-list-content [data-chart-index].current-song {
   font-weight: 700;
 }

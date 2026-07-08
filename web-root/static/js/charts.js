@@ -180,7 +180,7 @@ Charts.shareCurrentChart = function () {
   const artist = Charts.state.currentSongArtist;
   const label = title
     ? `${title}${artist ? " by " + artist : ""}`
-    : "this chart";
+    : "this Song Chart";
   const data = {
     title: `Play along to ${label} on Guitar Chords!`,
     text: `Play along to ${label} on Guitar Chords!`,

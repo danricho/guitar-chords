@@ -1,5 +1,5 @@
 /**
- * app.js — top-level UI: theme, scaling, sidebar, chart list, event wiring,
+ * app.js — top-level UI: theme, scaling, sidebar, song list, event wiring,
  * and the boot sequence. Loaded last; orchestrates every other module.
  *
  * Depends on: Store, Charts, Spotify, jQuery.
@@ -113,7 +113,7 @@ App.toggleSpotifyAutoConnect = function () {
 
 /** Measure the panel and sync --panel-width and --panel-height on :root. */
 App.syncPanelSize = function () {
-  const panel = document.getElementById("fretboard-chart-panel");
+  const panel = document.getElementById("fretboard-panel");
   document.documentElement.style.setProperty("--panel-width", panel.offsetWidth + "px");
   document.documentElement.style.setProperty("--panel-height", panel.offsetHeight + "px");
 };
@@ -144,14 +144,14 @@ App.updateViewportSize = function () {
 };
 
 /* ------------------------------------------------------------------ */
-/* Chart list (sidebar)                                                */
+/* Song list (sidebar)                                                 */
 /* ------------------------------------------------------------------ */
 
 /**
- * Build the flat chart list (load-charts.js order preserved). Each song shows
+ * Build the flat song list (load-charts.js order preserved). Each song shows
  * a capo badge indicating its default capo setting.
  */
-App.createChartList = function () {
+App.createSongList = function () {
   let html = `<ul class="space-y-1">`;
 
   charts.forEach((chart, index) => {
@@ -177,13 +177,13 @@ App.createChartList = function () {
 
   html += `</ul>`;
 
-  $("#chart-list-content").html(html);
+  $("#song-list-content").html(html);
 };
 
-/** Flag the currently-loaded song's button in the chart list (for bolding). */
+/** Flag the currently-loaded song's button in the song list (for bolding). */
 App.markCurrentSong = function () {
   const buttons = document.querySelectorAll(
-    "#chart-list-content [data-chart-index]",
+    "#song-list-content [data-chart-index]",
   );
   buttons.forEach((btn) => {
     btn.classList.toggle(
@@ -232,9 +232,9 @@ App.bindEvents = function () {
 
   // Layout / navigation
   $("#panel-button").on("click", () => App.togglePanel());
-  $("#open-chartlist-btn").on("click", () => {
+  $("#open-songlist-btn").on("click", () => {
     App.markCurrentSong();
-    chartlist.showModal();
+    songlist.showModal();
     document.activeElement?.blur(); // drop autofocus glow on first item
   });
   $("#open-settings-btn").on("click", () => {
@@ -246,7 +246,7 @@ App.bindEvents = function () {
   );
 
   // Dialog backdrop close
-  ["settings", "chartlist"].forEach((id) => {
+  ["settings", "songlist"].forEach((id) => {
     const dlg = document.getElementById(id);
     if (!dlg) return;
     dlg.addEventListener("click", (e) => {
@@ -287,14 +287,14 @@ App.bindEvents = function () {
     }
   });
 
-  // Delegated sidebar song selection (survives chart-list re-renders)
+  // Delegated sidebar song selection (survives song-list re-renders)
   document
-    .getElementById("chart-list-content")
+    .getElementById("song-list-content")
     .addEventListener("click", (e) => {
       const btn = e.target.closest("[data-chart-index]");
       if (!btn) return;
       Charts.loadSong(Number(btn.dataset.chartIndex));
-      chartlist.close();
+      songlist.close();
     });
 };
 
@@ -343,7 +343,7 @@ App.init = function () {
   App.dom.spotifyAutoConnect.checked =
     Store.get("spotify_autoconnect") === "on";
 
-  App.createChartList();
+  App.createSongList();
   Charts.bindControls();
   Spotify.applyConfigVisibility();
   App.bindEvents();
@@ -362,7 +362,7 @@ App.init = function () {
   const shareIndex = Charts.findChartBySlug(shareSlug);
   Charts.loadSong(shareIndex !== Charts.NO_CHART_INDEX ? shareIndex : 0);
 
-  // Keep --panel-width in sync whenever chord diagrams are added or removed
+  // Keep --panel-width in sync whenever Fretboard Chord Diagrams are added or removed
   new MutationObserver(() => requestAnimationFrame(App.syncPanelSize))
     .observe(document.getElementById("fretboards"), { childList: true });
 

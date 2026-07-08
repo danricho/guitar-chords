@@ -178,7 +178,7 @@ Spotify.fetchState = async function () {
       $("#song #spotify-next").on("click", Spotify.next);
     } else {
       $("#song").html(
-        `<h2 class="text-xl">No ChordPro chart for "${songLabel}".</h2>`,
+        `<h2 class="text-xl">No Song Chart for "${songLabel}".</h2>`,
       );
     }
     $("#song-info").hide();
@@ -187,7 +187,7 @@ Spotify.fetchState = async function () {
     $("#fretboards").html(
       "<div class='w-full text-center'><em>No Chords</em></div>",
     );
-    console.log("No Chart for song:", songLabel);
+    console.log("No Song Chart for song:", songLabel);
     $("#heading-title").text(songLabel);
   } else if ($("#spotify-ident").text() != charts[index].name) {
     // New matching chart — load it
