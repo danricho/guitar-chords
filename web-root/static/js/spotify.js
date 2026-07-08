@@ -469,17 +469,10 @@ Spotify.start = async function () {
   const token = await Spotify.ensureValidToken();
   if (!token) return; // redirect happening
   Spotify.startScrollSync(token);
-  $(`
-    #spotify-disable,
-    #spotify-text,
-    #albumArt,
-    .spotify-controls
-  `).show();
-  $(`
-    #spotify-enable,
-    .manual-nav-buttons
-  `).hide();
-  $("#song").css({ "padding-bottom": "50vh", "padding-top": "50vh" });
+  // #spotify-text, #albumArt, .spotify-controls, padding + manual-nav hide are
+  // applied by fetchState once a live player is confirmed (204 case otherwise).
+  $("#spotify-disable").show();
+  $("#spotify-enable").hide();
 };
 
 /** Leave Spotify mode: stop polling, restore manual UI. */
