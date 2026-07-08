@@ -314,3 +314,8 @@ dialog::backdrop {
     width: 100%;
   }
 }
+
+/* Bold the currently-loaded song in the chart list. */
+#chart-list-content [data-chart-index].current-song {
+  font-weight: 700;
+}

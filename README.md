@@ -153,7 +153,7 @@ window.charts = [
     // When a matching track is detected, the chart is loaded automatically from the `path` field.
     name: "Lanterns in the Rain - DanRicho feat. ChatGPT",
     path: "../charts/Fiction-LanternsInTheRain.md",
-    defaultCapo: 0, // groups the chart under this capo in the chart list
+    defaultCapo: 0, // shown as the chart's capo badge in the chart list
   },
 ];
 ```

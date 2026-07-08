@@ -147,76 +147,49 @@ App.updateViewportSize = function () {
 /* Chart list (sidebar)                                                */
 /* ------------------------------------------------------------------ */
 
-/** Build the grouped-by-capo accordion of available charts. */
+/**
+ * Build the flat chart list (load-charts.js order preserved). Each song shows
+ * a capo badge indicating its default capo setting.
+ */
 App.createChartList = function () {
-  const grouped = {};
+  let html = `<ul class="space-y-1">`;
+
   charts.forEach((chart, index) => {
     const capo = chart.defaultCapo ?? 0;
-    if (!grouped[capo]) grouped[capo] = [];
-    grouped[capo].push({ chart, index });
+    const capoLabel = capo == 0 ? "No Capo" : `Capo ${capo}`;
+    html += `
+      <li>
+        <button
+          class="w-full flex items-center justify-between gap-3 text-left px-3 py-1 rounded-md cursor-pointer"
+          data-chart-index="${index}"
+        >
+          <span>${chart.name}</span>
+          <div class="flex items-center gap-2 shrink-0">
+            <span class="badge-secondary">${capoLabel}</span>
+            <svg class="size-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <path stroke="currentColor" stroke-linecap="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+            </svg>
+          </div>
+        </button>
+      </li>
+    `;
   });
 
-  let html = `<section class="accordion">`;
-
-  Object.keys(grouped)
-    .sort((a, b) => Number(a) - Number(b))
-    .forEach((capo) => {
-      html += `
-      <details class="group border-b last:border-b-0">
-        <summary class="w-full transition-all outline-none rounded-md">
-          <h2 class="flex flex-1 items-center justify-between gap-4 py-2 text-left">
-            <span style='color: var(--primary);'>
-              ${capo == 0 ? "No Capo" : `Capo ${capo}`}
-            </span>
-            <div class="flex items-center gap-2">
-              <span class="badge-secondary">${grouped[capo].length}</span>
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
-                   stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                   class="size-4 shrink-0 transition-transform duration-200 group-open:rotate-180">
-                <path d="m6 9 6 6 6-6"/>
-              </svg>
-            </div>
-          </h2>
-        </summary>
-        <section class="pb-4 border-t">
-          <ul class="space-y-1">
-      `;
-
-      grouped[capo].forEach(({ chart, index }) => {
-        html += `
-          <li>
-            <button
-              class="w-full flex items-center justify-between text-left px-3 py-1 rounded-md cursor-pointer"
-              data-chart-index="${index}"
-            >
-              <span>${chart.name}</span>
-              <svg class="size-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <path stroke="currentColor" stroke-linecap="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-              </svg>
-            </button>
-          </li>
-        `;
-      });
-
-      html += `
-          </ul>
-        </section>
-      </details>
-    `;
-    });
-  html += `</section>`;
+  html += `</ul>`;
 
   $("#chart-list-content").html(html);
+};
 
-  // Collapse sibling accordions when one opens
-  const accordion = document.querySelector("#chart-list-content .accordion");
-  accordion?.addEventListener("click", (event) => {
-    const summary = event.target.closest("summary");
-    if (!summary) return;
-    const details = summary.closest("details");
-    accordion.querySelectorAll("details").forEach((el) => {
-      if (el !== details) el.removeAttribute("open");
-    });
+/** Flag the currently-loaded song's button in the chart list (for bolding). */
+App.markCurrentSong = function () {
+  const buttons = document.querySelectorAll(
+    "#chart-list-content [data-chart-index]",
+  );
+  buttons.forEach((btn) => {
+    btn.classList.toggle(
+      "current-song",
+      Number(btn.dataset.chartIndex) === Charts.state.songIndex,
+    );
   });
 };
 
@@ -259,8 +232,15 @@ App.bindEvents = function () {
 
   // Layout / navigation
   $("#panel-button").on("click", () => App.togglePanel());
-  $("#open-chartlist-btn").on("click", () => chartlist.showModal());
-  $("#open-settings-btn").on("click", () => settings.showModal());
+  $("#open-chartlist-btn").on("click", () => {
+    App.markCurrentSong();
+    chartlist.showModal();
+    document.activeElement?.blur(); // drop autofocus glow on first item
+  });
+  $("#open-settings-btn").on("click", () => {
+    settings.showModal();
+    document.activeElement?.blur(); // drop autofocus glow on first tab
+  });
   $("#logo-pane").on("click", () =>
     window.open("https://github.com/danricho/guitar-chords", "_blank"),
   );
