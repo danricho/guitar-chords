@@ -111,6 +111,12 @@ dialog::backdrop {
   backdrop-filter: blur(4px);
 }
 
+/* Main content: no horizontal scroll (ID beats Tailwind overflow-auto;
+   overflow-y stays auto from the shorthand). */
+#content {
+  overflow-x: hidden;
+}
+
 /* Chord Chart Styles */
 .song-sheet {
   margin: 1rem 0;

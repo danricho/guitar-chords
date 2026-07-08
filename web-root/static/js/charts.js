@@ -285,7 +285,11 @@ Charts.renderSongChart = function (
 
   song = song.transpose(originalCapo - selectedCapo);
 
-  const formatter = new ChordSheetJS.HtmlDivFormatter();
+  // normalizeChordSuffix:false keeps written suffixes intact (e.g. "Dsus2"
+  // stays "Dsus2" instead of the default normalization to "D2").
+  const formatter = new ChordSheetJS.HtmlDivFormatter({
+    normalizeChordSuffix: false,
+  });
   const html = formatter.format(song);
 
   const chordProFormatter = new ChordSheetJS.ChordProFormatter();
