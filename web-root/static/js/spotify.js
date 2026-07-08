@@ -75,6 +75,12 @@ Spotify.fetchState = async function () {
       #chart-timesynced,
       .spotify-controls
     `).hide();
+    // No player → render like Spotify mode is off: no padding, manual nav on.
+    $(".manual-nav-buttons").show();
+    $("#song").css({ "padding-bottom": "", "padding-top": "" });
+    if (Charts.state.songIndex === Charts.NO_CHART_INDEX) {
+      Charts.loadSong(0);
+    }
     return null;
   }
   $("#spotify-no-player").hide();
@@ -83,6 +89,9 @@ Spotify.fetchState = async function () {
     #albumArt,
     .spotify-controls
   `).show();
+  // Player active → restore synced view: padding + manual nav hidden.
+  $(".manual-nav-buttons").hide();
+  $("#song").css({ "padding-bottom": "50vh", "padding-top": "50vh" });
 
   if (!res.ok) return;
 
