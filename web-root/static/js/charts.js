@@ -283,7 +283,13 @@ Charts.renderSongChart = function (
   Charts.updateCapoDisplay();
   Charts.updateCapoResetButton();
 
-  song = song.transpose(originalCapo - selectedCapo);
+  // Skip the no-op transpose: ChordSheetJS respells chords to the song key's
+  // modifier even at delta 0 (e.g. Bm -> Cbm in Ab), which would leak into
+  // currentlyShownChart.
+  const capoDelta = originalCapo - selectedCapo;
+  if (capoDelta !== 0) {
+    song = song.transpose(capoDelta);
+  }
 
   // normalizeChordSuffix:false keeps written suffixes intact (e.g. "Dsus2"
   // stays "Dsus2" instead of the default normalization to "D2").
@@ -363,8 +369,19 @@ Charts.renderSongChart = function (
   $(".fret-kid-cover").toggle(kidMode);
   $("#kidSwitch").prop("checked", kidMode);
 
+  // Build Fretboard Chord Diagrams from the rendered chart rather than
+  // song.getChords(): the two can disagree on enharmonic spelling (e.g. the
+  // chart shows Dbm while getChords() returns C#m), and the diagrams must
+  // match what the chart displays.
   Fretboard.clearChords();
-  song.getChords().forEach((chord) => Fretboard.showChord(chord));
+  const shownChords = new Set();
+  $("#song .chord").each(function () {
+    const chordName = $(this).text().trim();
+    if (chordName && !shownChords.has(chordName)) {
+      shownChords.add(chordName);
+      Fretboard.showChord(chordName);
+    }
+  });
 
   Charts.updateManualButtonStates();
 

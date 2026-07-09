@@ -129,6 +129,26 @@ Fretboard.CHORD_LOOKUP = {
   "": "",
 };
 
+// Enharmonic equivalents for chord roots, both directions. Used as a lookup
+// fallback so a chart spelling like Cbm or Dbm still finds its fingering
+// (stored under Bm / C#m) while the diagram label keeps the chart's spelling.
+Fretboard.ENHARMONIC_ROOTS = {
+  Cb: "B",
+  "B#": "C",
+  Fb: "E",
+  "E#": "F",
+  Db: "C#",
+  "C#": "Db",
+  Eb: "D#",
+  "D#": "Eb",
+  Gb: "F#",
+  "F#": "Gb",
+  Ab: "G#",
+  "G#": "Ab",
+  Bb: "A#",
+  "A#": "Bb",
+};
+
 // SVG geometry constants matching the fretboard template (horizontal layout:
 // frets run left-to-right on the x-axis, strings run top-to-bottom on the y-axis)
 Fretboard._CX = { 1: 33.35, 2: 56.35, 3: 79.35, 4: 102.35 };
@@ -140,7 +160,15 @@ Fretboard._R = 7;
  * @param {string} name chord name to look up in CHORD_LOOKUP
  */
 Fretboard.showChord = function (name) {
-  const spec = Fretboard.CHORD_LOOKUP[name] ?? "";
+  let spec = Fretboard.CHORD_LOOKUP[name];
+  if (spec === undefined) {
+    const parts = name.match(/^([A-G][b#]?)(.*)$/);
+    const equivalentRoot = parts && Fretboard.ENHARMONIC_ROOTS[parts[1]];
+    if (equivalentRoot) {
+      spec = Fretboard.CHORD_LOOKUP[equivalentRoot + parts[2]];
+    }
+  }
+  spec = spec ?? "";
   const positions = typeof spec === "string" ? spec : spec.strings;
   const barre = typeof spec === "object" ? spec.barre : null;
 
