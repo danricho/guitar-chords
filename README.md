@@ -149,9 +149,14 @@ Example:
 ```javascript
 window.charts = [
   {
-    // The `name` field should match the Spotify track title and artist.
+    // The `spotifyMatch` field should match the Spotify track title and artist.
     // When a matching track is detected, the Song Chart is loaded automatically from the `path` field.
-    name: "Lanterns in the Rain - DanRicho feat. ChatGPT",
+    spotifyMatch: "Lanterns in the Rain - DanRicho feat. AI",
+    title: "Lanterns in the Rain", // shown with `artist` as "title by artist" in the heading and Song List
+    artist: "DanRicho feat. AI",
+    difficulty: null,
+    chords: ["G", "D", "Em", "C"], // unique chords as written in the chart, in order of first appearance
+    heardKey: "G", // concert key of the recording (what the audience hears)
     path: "../charts/Fiction-LanternsInTheRain.md",
     defaultCapo: 0, // shown as the Song Chart's capo badge in the Song List
   },
@@ -169,22 +174,16 @@ Song Charts are stored as Markdown files using ChordPro syntax.
 ### Metadata
 
 ```text
-{title: Lanterns in the Rain}
-{artist: DanRicho feat. ChatGPT}
-{capo: None}
-{key: G}
 {tempo: 92}
 ```
 
 Supported metadata fields:
 
-| Field  | Description             | Used for                                                    |
-| ------ | ----------------------- | ----------------------------------------------------------- |
-| title  | Song title              | Displayed as Title                                          |
-| artist | Song artist             | Displayed as Artist                                         |
-| capo   | Suggested capo position | The starting Capo setting (matches the chords in the Song Chart) |
-| key    | Song key                | The key of the song (per the recording being played)        |
-| tempo  | Song tempo              | The tempo of the song                                       |
+| Field | Description | Used for              |
+| ----- | ----------- | --------------------- |
+| tempo | Song tempo  | The tempo of the song |
+
+Title, artist, key and capo are not stored in the Song Chart file — they come from the registry entry in `charts/load-charts.js` (`title`, `artist`, `heardKey`, `defaultCapo`). Keeping the key out of the file means capo transposition can never alter it (e.g. when copying a Song Chart out). The chords in the file must be written as played at `defaultCapo`.
 
 ### Sections
 

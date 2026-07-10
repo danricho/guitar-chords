@@ -1,7 +1,3 @@
-{title: Lanterns in the Rain}
-{artist: DanRicho feat. ChatGPT}
-{capo: None}
-{key: G}
 {tempo: 92}
 
 {sov: Verse}

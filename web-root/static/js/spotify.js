@@ -117,7 +117,7 @@ Spotify.fetchState = async function () {
   $("#spotify-play").toggle(!sync.isPlaying);
 
   const songLabel = data.item.name + " - " + data.item.artists[0].name;
-  const index = charts.findIndex((song) => song.name == songLabel);
+  const index = charts.findIndex((song) => song.spotifyMatch == songLabel);
 
   if (index === Charts.NO_CHART_INDEX) {
     // No chart for the playing track
@@ -189,9 +189,9 @@ Spotify.fetchState = async function () {
     );
     console.log("No Song Chart for song:", songLabel);
     $("#heading-title").text(songLabel);
-  } else if ($("#spotify-ident").text() != charts[index].name) {
+  } else if ($("#spotify-ident").text() != charts[index].spotifyMatch) {
     // New matching chart — load it
-    Charts.loadSong(index, { spotifyIdent: charts[index].name });
+    Charts.loadSong(index, { spotifyIdent: charts[index].spotifyMatch });
   }
   /* else: already showing the right chart */
 

@@ -114,8 +114,14 @@ App.toggleSpotifyAutoConnect = function () {
 /** Measure the panel and sync --panel-width and --panel-height on :root. */
 App.syncPanelSize = function () {
   const panel = document.getElementById("fretboard-panel");
-  document.documentElement.style.setProperty("--panel-width", panel.offsetWidth + "px");
-  document.documentElement.style.setProperty("--panel-height", panel.offsetHeight + "px");
+  document.documentElement.style.setProperty(
+    "--panel-width",
+    panel.offsetWidth + "px",
+  );
+  document.documentElement.style.setProperty(
+    "--panel-height",
+    panel.offsetHeight + "px",
+  );
 };
 
 /**
@@ -163,7 +169,7 @@ App.createSongList = function () {
           class="w-full flex items-center justify-between gap-3 text-left px-3 py-1 rounded-md cursor-pointer"
           data-chart-index="${index}"
         >
-          <span>${chart.name}</span>
+          <span>${chart.title} by ${chart.artist}</span>
           <div class="flex items-center gap-2 shrink-0">
             <span class="badge-secondary">${capoLabel}</span>
             <svg class="size-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -363,8 +369,10 @@ App.init = function () {
   Charts.loadSong(shareIndex !== Charts.NO_CHART_INDEX ? shareIndex : 0);
 
   // Keep --panel-width in sync whenever Fretboard Chord Diagrams are added or removed
-  new MutationObserver(() => requestAnimationFrame(App.syncPanelSize))
-    .observe(document.getElementById("fretboards"), { childList: true });
+  new MutationObserver(() => requestAnimationFrame(App.syncPanelSize)).observe(
+    document.getElementById("fretboards"),
+    { childList: true },
+  );
 
   // Auto-connect to Spotify if enabled in settings
   if (Store.get("spotify_autoconnect") === "on") Spotify.start();

@@ -223,12 +223,14 @@ Charts.loadSong = async function (
   if (scrollTop) {
     $("#content").animate({ scrollTop: 0 }, 10);
   }
-  $("#heading-title").text(charts[index].name);
+  $("#heading-title").text(`${charts[index].title} by ${charts[index].artist}`);
   Charts.updateShareUrl(index);
 };
 
 /**
  * Parse, transpose (by capo) and render a ChordPro chart into the DOM.
+ * Title, artist and capo come from the registry entry at
+ * charts[Charts.state.songIndex] (not from ChordPro metadata).
  * @param {string} chartproStr raw ChordPro source
  * @param {string} [spotifyIdent=""] identifier stored in #spotify-ident
  * @param {number} [capoFret=-1] requested capo; -1 = use saved override/default
@@ -238,14 +240,13 @@ Charts.renderSongChart = function (
   spotifyIdent = "",
   capoFret = -1,
 ) {
+  const chart = charts[Charts.state.songIndex] || {};
+
   const parser = new ChordSheetJS.ChordProParser();
   let song = parser.parse(chartproStr.trim());
 
-  // Store original (concert) key before any transposition
-  const originalKey = song.metadata.get("key");
-
   // Title is the key for per-song capo persistence
-  Charts.state.currentSongTitle = song.metadata.get("title") || "";
+  Charts.state.currentSongTitle = chart.title || "";
 
   // External link buttons (bound dynamically since the URL is per-song)
   const youtubeUrl = song.metadata.get("youtube");
@@ -269,8 +270,9 @@ Charts.renderSongChart = function (
   }
 
   // Resolve capo: explicit request, else saved override, else chart default
-  const capoMeta = song.metadata.get("capo");
-  const originalCapo = Number.isFinite(Number(capoMeta)) ? Number(capoMeta) : 0;
+  const originalCapo = Number.isFinite(Number(chart.defaultCapo))
+    ? Number(chart.defaultCapo)
+    : 0;
 
   let selectedCapo = Number.isFinite(Number(capoFret)) ? Number(capoFret) : 0;
   if (selectedCapo === -1) {
@@ -283,9 +285,9 @@ Charts.renderSongChart = function (
   Charts.updateCapoDisplay();
   Charts.updateCapoResetButton();
 
-  // Skip the no-op transpose: ChordSheetJS respells chords to the song key's
-  // modifier even at delta 0 (e.g. Bm -> Cbm in Ab), which would leak into
-  // currentlyShownChart.
+  // Skip the no-op transpose: ChordSheetJS transpose() can respell chords
+  // even at delta 0 (historically to the song key's modifier, e.g. Bm -> Cbm
+  // in Ab), which would leak into currentlyShownChart.
   const capoDelta = originalCapo - selectedCapo;
   if (capoDelta !== 0) {
     song = song.transpose(capoDelta);
@@ -341,8 +343,8 @@ Charts.renderSongChart = function (
     );
   });
 
-  const songTitle = song.metadata.get("title") || "";
-  const songArtist = song.metadata.get("artist") || "";
+  const songTitle = chart.title || "";
+  const songArtist = chart.artist || "";
   Charts.state.currentSongArtist = songArtist;
   $("#song-title").text(songTitle);
   $("#song-artist").text(songArtist);
@@ -352,8 +354,9 @@ Charts.renderSongChart = function (
   $("#spotify-ident").text(spotifyIdent);
   $("#song-tempo").text((song.metadata.get("tempo") || "") + " BPM");
 
-  // Concert key (what the audience hears)
-  $("#song-key").text(originalKey || "");
+  // Concert key (what the audience hears) — from the registry, not ChordPro
+  // metadata, so capo transposition can never alter it (e.g. in copied charts)
+  $("#song-key").text(chart.heardKey || "");
 
   // Capo currently selected by the user
   $("#capo-setting").text(selectedCapo === 0 ? "None" : "Fret " + selectedCapo);
