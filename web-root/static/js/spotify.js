@@ -77,7 +77,7 @@ Spotify.fetchState = async function () {
     `).hide();
     // No player → render like Spotify mode is off: no padding, manual nav on.
     $(".manual-nav-buttons").show();
-    $("#song").css({ "padding-bottom": "", "padding-top": "" });
+    $("#song").css({ "padding-bottom": "2rem", "padding-top": "2rem" });
     if (Charts.state.songIndex === Charts.NO_CHART_INDEX) {
       Charts.loadSong(0);
     }
@@ -490,7 +490,7 @@ Spotify.stop = function () {
     #chart-timesynced,
     .spotify-controls
   `).hide();
-  $("#song").css({ "padding-bottom": "", "padding-top": "" });
+  $("#song").css({ "padding-bottom": "2rem", "padding-top": "2rem" });
   if (Charts.state.songIndex === Charts.NO_CHART_INDEX) {
     Charts.loadSong(0);
   }
