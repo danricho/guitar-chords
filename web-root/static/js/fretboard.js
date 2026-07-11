@@ -83,7 +83,8 @@ Fretboard.CHORD_LOOKUP = {
   Am7: "x02010",
   Ab5: "xxx144",
   Abm: "xx110x",
-  B: { strings: "x24442", barre: { fret: 2, from: 2, to: 6 } },
+  //B: { strings: "x24442", barre: { fret: 2, from: 2, to: 6 } },
+  B: { strings: "xx444x" }, // beginner stuff!
   Bm: { strings: "x24432", barre: { fret: 2, from: 2, to: 6 } },
   Bm7: "x20202",
   B7: "x21202",
@@ -110,7 +111,8 @@ Fretboard.CHORD_LOOKUP = {
   E5: "022xxx",
   Esus2: "024400",
   Esus4: "022200",
-  Eb: "xx1343",
+  //Eb: "xx1343",
+  Eb: "xxx343", // beginner stuff!
   Eb5: "xx134x",
   F: { strings: "133211", barre: { fret: 1, from: 1, to: 6 } },
   F7: { strings: "131211", barre: { fret: 1, from: 1, to: 6 } },
