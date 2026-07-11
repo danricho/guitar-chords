@@ -21,6 +21,9 @@ Spotify.sync = {
 /** Last album-art track id rendered (avoids redundant <img> swaps). */
 Spotify._currentTrackId = null;
 
+/** Registry index shown as "up next" on the capo-change display (-1 = none). */
+Spotify.capoChangeNextIndex = -1;
+
 /* ------------------------------------------------------------------ */
 /* Low-level request helpers                                           */
 /* ------------------------------------------------------------------ */
@@ -99,6 +102,10 @@ Spotify.fetchState = async function () {
   if (!data || !data.item) return;
 
   const sync = Spotify.sync;
+  // Previous poll's track + progress, captured before sync is overwritten
+  // (used to tell forward playback from a back-press on track change).
+  const prevLabel = sync.name ? sync.name + " - " + sync.artist : "";
+  const prevPercent = sync.percent || 0;
   sync.duration = data.item.duration_ms;
   sync.position = data.progress_ms;
   sync.name = data.item.name;
@@ -125,11 +132,28 @@ Spotify.fetchState = async function () {
     Charts.state.songIndex = Charts.NO_CHART_INDEX;
     const isCapoChange = data.item.id == SpotifyConfig.capoChangeSong;
     if (isCapoChange) {
-      // Next song comes from the registry: the entry after the last loaded
-      // chart (playlists are assumed to follow load-charts.js order).
+      // Next song comes from the registry (playlists are assumed to follow
+      // load-charts.js order). Decide it once, on arrival at the capo-change
+      // track, so later polls of this track don't recompute from stale data.
+      if (prevLabel !== songLabel) {
+        const last = Charts.state.lastSongIndex;
+        let next = last >= 0 ? last + 1 : -1;
+        if (last >= 0) {
+          // A back-press lands here from the FIRST song of a capo group,
+          // leaving it unfinished — that same song will replay after the
+          // capo change, so don't look one ahead of it.
+          const finished = prevPercent > 90;
+          const firstOfGroup =
+            last === 0 ||
+            (charts[last - 1].defaultCapo ?? 0) !==
+              (charts[last].defaultCapo ?? 0);
+          if (!finished && firstOfGroup) next = last;
+        }
+        Spotify.capoChangeNextIndex = next;
+      }
       const nextChart =
-        Charts.state.lastSongIndex >= 0
-          ? charts[Charts.state.lastSongIndex + 1]
+        Spotify.capoChangeNextIndex >= 0
+          ? charts[Spotify.capoChangeNextIndex]
           : undefined;
       if (nextChart) {
         const capo =
