@@ -52,6 +52,6 @@ Scroll.toVirtualTimestamp = function (targetTimestamp) {
   // Centre interpolated position in the visible area
   const scrollTop = targetTop - $container.innerHeight() / 2;
   if (App.state.isTabActive) {
-    $container.animate({ scrollTop }, 1000);
+    $container.animate({ scrollTop }, 750);
   }
 };

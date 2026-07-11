@@ -227,13 +227,13 @@ Spotify.pollingLoop = async function () {
         maxScroll * (Spotify.sync.percent / 100) +
         $("#song-info").outerHeight();
       if (App.state.isTabActive) {
-        $elem.animate({ scrollTop: scrollTarget }, 1000);
+        $elem.animate({ scrollTop: scrollTarget }, 750);
       }
     }
   }
 
   if (Spotify.sync.stopSpotifyMode) return;
-  Spotify.sync.loopTimeOut = setTimeout(Spotify.pollingLoop, 2000);
+  Spotify.sync.loopTimeOut = setTimeout(Spotify.pollingLoop, 1000);
 };
 
 /** Begin polling with the given token. @param {string} accessToken */
