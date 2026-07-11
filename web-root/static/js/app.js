@@ -171,7 +171,7 @@ App.createSongList = function () {
     // Zebra stripe every second row; small break where the default capo
     // changes (the registry is grouped by capo).
     const zebra = index % 2 ? "bg-[var(--color-muted)]/40" : "";
-    const capoBreak = prevCapo !== null && capo !== prevCapo ? "mt-3" : "";
+    const capoBreak = prevCapo !== null && capo !== prevCapo ? "mt-5" : "";
     prevCapo = capo;
     html += `
       <li class="contents">
@@ -191,7 +191,7 @@ App.createSongList = function () {
     const trafficClass = chart.difficulty
       ? Charts.DIFFICULTY_CLASSES[chart.difficulty.toLowerCase()] || ""
       : "";
-    html += `<span class="badge capitalize outline ps-1 justify-self-center ${trafficClass}"><svg viewBox="0 0 3 6" height="1rem"><circle r="1.5" cx="1.5" cy="3"></circle></svg> ${difficulty}</span>`;
+    html += `<span class="badge capitalize outline ps-1 justify-self-center ${trafficClass}"><svg viewBox="0 0 3 6" height="1rem" class="animate-pulse"><circle r="1.5" cx="1.5" cy="3"></circle></svg> ${difficulty}</span>`;
 
     html += `<span class="badge capitalize outline justify-self-center">${capoLabel}</span>`;
 
