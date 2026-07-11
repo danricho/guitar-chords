@@ -1,7 +1,7 @@
 /**
  * load-charts.js — the chart registry (edit this to add songs).
  *
- * Exposes: window.charts — array of { spotifyMatch, title, artist, difficulty, chords, heardKey, path, defaultCapo }.
+ * Exposes: window.charts — array of { spotifyMatch, title, artist, difficulty, category, chords, heardKey, path, defaultCapo }.
  * Each entry's `.chordProChart` is fetched and cached on first load by Charts.loadSong().
  */
 
@@ -13,6 +13,7 @@ window.charts = [
     title: "Lanterns in the Rain",
     artist: "DanRicho feat. AI",
     difficulty: "easy",
+    category: "Likes",
     chords: ["G", "D", "Em", "C"],
     heardKey: "G",
     path: "../charts/Fiction-LanternsInTheRain.md",

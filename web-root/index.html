@@ -641,7 +641,72 @@
         </header>
 
         <section>
-          <div id="song-list-content"></div>
+          <div id="song-list-content">
+            <div class="tabs w-full" id="songlist-tabs">
+              <nav role="tablist" aria-orientation="horizontal" class="w-full">
+                <button
+                  type="button"
+                  role="tab"
+                  id="songlist-tabs-tab-1"
+                  aria-controls="songlist-tabs-panel-1"
+                  aria-selected="true"
+                  tabindex="0"
+                >
+                  Likes
+                </button>
+                <button
+                  type="button"
+                  role="tab"
+                  id="songlist-tabs-tab-2"
+                  aria-controls="songlist-tabs-panel-2"
+                  aria-selected="false"
+                  tabindex="0"
+                >
+                  Training
+                </button>
+                <button
+                  type="button"
+                  role="tab"
+                  id="songlist-tabs-tab-3"
+                  aria-controls="songlist-tabs-panel-3"
+                  aria-selected="false"
+                  tabindex="0"
+                >
+                  Creating
+                </button>
+              </nav>
+
+              <div
+                role="tabpanel"
+                id="songlist-tabs-panel-1"
+                aria-labelledby="songlist-tabs-tab-1"
+                tabindex="-1"
+                aria-selected="true"
+              >
+                <div id="song-list-likes"></div>
+              </div>
+              <div
+                role="tabpanel"
+                id="songlist-tabs-panel-2"
+                aria-labelledby="songlist-tabs-tab-2"
+                tabindex="-1"
+                aria-selected="false"
+                hidden
+              >
+                <div id="song-list-training"></div>
+              </div>
+              <div
+                role="tabpanel"
+                id="songlist-tabs-panel-3"
+                aria-labelledby="songlist-tabs-tab-3"
+                tabindex="-1"
+                aria-selected="false"
+                hidden
+              >
+                <div id="song-list-creating"></div>
+              </div>
+            </div>
+          </div>
         </section>
 
         <button

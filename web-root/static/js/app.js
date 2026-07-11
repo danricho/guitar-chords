@@ -153,24 +153,45 @@ App.updateViewportSize = function () {
 /* Song list (sidebar)                                                 */
 /* ------------------------------------------------------------------ */
 
+/** Song list categories, in tab order (see #songlist-tabs in index.html). */
+App.SONG_CATEGORIES = [
+  { name: "Likes", target: "#song-list-likes", tab: "#songlist-tabs-tab-1" },
+  {
+    name: "Training",
+    target: "#song-list-training",
+    tab: "#songlist-tabs-tab-2",
+  },
+  {
+    name: "Creating",
+    target: "#song-list-creating",
+    tab: "#songlist-tabs-tab-3",
+  },
+];
+
 /**
- * Build the flat song list (load-charts.js order preserved). Each song shows
- * a capo badge indicating its default capo setting.
+ * Build one category's song list (registry order preserved).
+ * @param {{chart: object, index: number}[]} entries charts with their
+ *        window.charts index (kept as data-chart-index for loading)
+ * @returns {string} the <ul> html
  */
-App.createSongList = function () {
+App.buildSongListHtml = function (entries) {
+  if (!entries.length) {
+    return `<p class="text-[var(--color-muted-foreground)] px-3 py-1"><em>No songs in this category yet.</em></p>`;
+  }
+
   // The <ul> is a grid and each row's button subgrids onto it, so the
   // chord/difficulty/capo badge columns align across songs (max-content
   // tracks resolve against the whole list). Badges must stay direct children
-  // of the button. Below md the chord group is hidden and its track dropped.
+  // of the button. Below sm the chord group is hidden and its track dropped.
   let html = `<ul class="grid grid-cols-[1fr_max-content_max-content_min-content] sm:grid-cols-[1fr_max-content_max-content_max-content_min-content] gap-y-1">`;
 
   let prevCapo = null;
-  charts.forEach((chart, index) => {
+  entries.forEach(({ chart, index }, row) => {
     const capo = chart.defaultCapo ?? 0;
     const capoLabel = capo == 0 ? "No Capo" : `Capo ${capo}`;
     // Zebra stripe every second row; small break where the default capo
     // changes (the registry is grouped by capo).
-    const zebra = index % 2 ? "bg-[var(--color-muted)]/40" : "";
+    const zebra = row % 2 ? "bg-[var(--color-muted)]/40" : "";
     const capoBreak = prevCapo !== null && capo !== prevCapo ? "mt-5" : "";
     prevCapo = capo;
     html += `
@@ -205,8 +226,29 @@ App.createSongList = function () {
   });
 
   html += `</ul>`;
+  return html;
+};
 
-  $("#song-list-content").html(html);
+/** Fill each category tab of the Song List (see App.SONG_CATEGORIES). */
+App.createSongList = function () {
+  App.SONG_CATEGORIES.forEach(({ name, target }) => {
+    const entries = charts
+      .map((chart, index) => ({ chart, index }))
+      .filter(
+        ({ chart }) =>
+          (chart.category || App.SONG_CATEGORIES[0].name) === name,
+      );
+    $(target).html(App.buildSongListHtml(entries));
+  });
+};
+
+/** Switch the Song List to the tab holding the currently-loaded song. */
+App.showCurrentSongTab = function () {
+  const chart = charts[Charts.state.songIndex];
+  if (!chart) return;
+  const category = chart.category || App.SONG_CATEGORIES[0].name;
+  const entry = App.SONG_CATEGORIES.find((c) => c.name === category);
+  if (entry) $(entry.tab).trigger("click");
 };
 
 /** Flag the currently-loaded song's button in the song list (for bolding). */
@@ -264,6 +306,7 @@ App.bindEvents = function () {
   $("#panel-button").on("click", () => App.togglePanel());
   $("#open-songlist-btn, #no-chart-songlist-btn").on("click", () => {
     App.markCurrentSong();
+    App.showCurrentSongTab();
     songlist.showModal();
     document.activeElement?.blur(); // drop autofocus glow on first item
   });

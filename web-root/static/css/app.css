@@ -278,23 +278,29 @@ dialog::backdrop {
 
 /* Scrollable content areas — tab panels / song list scroll, nav stays put.
    Scrollbars are hidden globally (see * rule above), fine for touch. */
-#settings > div > section {
+#settings > div > section,
+#songlist > div > section {
   display: flex;
   flex-direction: column;
   min-height: 0;
 }
-#settings-tabs {
+#songlist > div > section > #song-list-content {
+  display: flex;
+  flex-direction: column;
   flex: 1;
   min-height: 0;
 }
-#settings-tabs > [role="tablist"] {
+#settings-tabs,
+#songlist-tabs {
+  flex: 1;
+  min-height: 0;
+}
+#settings-tabs > [role="tablist"],
+#songlist-tabs > [role="tablist"] {
   flex-shrink: 0;
 }
-#settings-tabs > [role="tabpanel"] {
-  min-height: 0;
-  overflow-y: auto;
-}
-#songlist > div > section {
+#settings-tabs > [role="tabpanel"],
+#songlist-tabs > [role="tabpanel"] {
   min-height: 0;
   overflow-y: auto;
 }
