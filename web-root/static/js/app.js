@@ -164,13 +164,19 @@ App.createSongList = function () {
   // of the button. Below md the chord group is hidden and its track dropped.
   let html = `<ul class="grid grid-cols-[1fr_max-content_max-content_min-content] sm:grid-cols-[1fr_max-content_max-content_max-content_min-content] gap-y-1">`;
 
+  let prevCapo = null;
   charts.forEach((chart, index) => {
     const capo = chart.defaultCapo ?? 0;
     const capoLabel = capo == 0 ? "No Capo" : `Capo ${capo}`;
+    // Zebra stripe every second row; small break where the default capo
+    // changes (the registry is grouped by capo).
+    const zebra = index % 2 ? "bg-[var(--color-muted)]/40" : "";
+    const capoBreak = prevCapo !== null && capo !== prevCapo ? "mt-3" : "";
+    prevCapo = capo;
     html += `
       <li class="contents">
         <button
-          class="col-span-full grid grid-cols-subgrid gap-x-2 items-center text-left px-3 py-1 rounded-md cursor-pointer"
+          class="col-span-full grid grid-cols-subgrid gap-x-2 items-center text-left px-3 py-1 rounded-md cursor-pointer ${zebra} ${capoBreak}"
           data-chart-index="${index}"
         >
           <span>${chart.title} <small class="italic"> - ${chart.artist}</small></span>`;

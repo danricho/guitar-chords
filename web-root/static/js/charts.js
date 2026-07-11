@@ -253,9 +253,15 @@ Charts.renderSongChart = function (
   const chart = charts[Charts.state.songIndex] || {};
 
   // A chart is taking over: restore it and hide the static replacement
-  // displays (#no-chart-display / #capo-change-display in index.html)
+  // displays (#no-chart-display / #capo-change-display in index.html), and
+  // bring the Fretboard Chord Diagram pane back per the saved preference
+  // (the no-chart state hides it without persisting).
   $("#song").removeClass("hidden");
   $("#no-chart-display, #capo-change-display").addClass("hidden");
+  document.body.classList.toggle(
+    "panel-open",
+    Store.get("ui_sidebar_open") === "true",
+  );
 
   const parser = new ChordSheetJS.ChordProParser();
   let song = parser.parse(chartproStr.trim());

@@ -148,6 +148,10 @@ Spotify.fetchState = async function () {
     $("#capo-change-display").toggleClass("hidden", !isCapoChange);
     $("#no-chart-display").toggleClass("hidden", isCapoChange);
     $("#song").addClass("hidden");
+    // Slide the Fretboard Chord Diagram pane away while no chart is shown.
+    // The stored ui_sidebar_open preference is untouched; renderSongChart
+    // restores the pane from it when a chart takes over again.
+    document.body.classList.remove("panel-open");
     $("#song-info").hide();
     $("#song-info-clone").remove();
     Fretboard.clearChords();
