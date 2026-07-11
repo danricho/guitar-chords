@@ -341,10 +341,10 @@ dialog::backdrop {
 /* Traffic-light accents for .badge.outline: tint the border and the svg dot.
    Intended as a difficulty indicator on song list capo/difficulty badges. */
 :root {
-  --traffic-red: oklch(0.577 0.245 27.3); /* red-600 */
-  --traffic-orange: oklch(0.646 0.222 41.1); /* orange-600 */
-  --traffic-yellow: oklch(0.681 0.162 75.8); /* yellow-600 */
-  --traffic-green: oklch(0.627 0.194 149.2); /* green-600 */
+  --traffic-red: oklch(0.637 0.237 25.3); /* red-500 */
+  --traffic-orange: oklch(0.705 0.213 47.6); /* orange-500 */
+  --traffic-yellow: oklch(0.795 0.184 86); /* yellow-500 */
+  --traffic-green: oklch(0.723 0.219 149.6); /* green-500 */
 }
 .dark {
   --traffic-red: oklch(0.637 0.237 25.3); /* red-500 */
