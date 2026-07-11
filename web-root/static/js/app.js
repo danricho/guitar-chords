@@ -250,12 +250,13 @@ App.bindEvents = function () {
   $("#spotify-song-restart").on("click", Spotify.restartTrack);
   $("#spotify-prev").on("click", Spotify.previous);
   $("#spotify-next").on("click", Spotify.next);
+  $("#capo-change-skip").on("click", Spotify.next);
   $("#spotify-enable").on("click", Spotify.start);
   $("#spotify-disable").on("click", Spotify.stop);
 
   // Layout / navigation
   $("#panel-button").on("click", () => App.togglePanel());
-  $("#open-songlist-btn").on("click", () => {
+  $("#open-songlist-btn, #no-chart-songlist-btn").on("click", () => {
     App.markCurrentSong();
     songlist.showModal();
     document.activeElement?.blur(); // drop autofocus glow on first item

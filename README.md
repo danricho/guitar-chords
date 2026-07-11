@@ -20,7 +20,7 @@ Designed for practising with real recordings, Guitar Chords can automatically lo
 - Fretboard Chord Diagrams displayed alongside Song Charts, including barre chords.
 - Chord transposition via Capo adjustment controls.
 - Traffic-light difficulty badges (easy/ok/medium/hard, set per song in the registry) shown in the Song List and next to the song info.
-- Optional 'capo-change' song for spotify playlists.
+- Optional 'capo-change' song for spotify playlists, showing the next registered song and its capo setting.
 - Shareable deep links: the URL carries a `?chart=<slug>` argument for the loaded Song Chart, and the page title shows the song and artist. A share button (shown only where the browser supports the Web Share API) opens the native share sheet with a "Play along to &lt;song&gt; by &lt;artist&gt; on Guitar Chords!" message and the deep link.
 - Dark and light themes.
 - Kid-friendly three-string chord display mode.

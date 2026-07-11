@@ -120,67 +120,34 @@ Spotify.fetchState = async function () {
   const index = charts.findIndex((song) => song.spotifyMatch == songLabel);
 
   if (index === Charts.NO_CHART_INDEX) {
-    // No chart for the playing track
+    // No chart for the playing track — swap the Song Chart for one of the
+    // static displays in index.html (capo-change or no-chart).
     Charts.state.songIndex = Charts.NO_CHART_INDEX;
-    if (data.item.id == SpotifyConfig.capoChangeSong) {
-      $("#song").html(`
-        <h2 class="text-xl mb-3">Change Capo!</h2>
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-          stroke-width="1.5"
-          fill="none"
-          class="size-27 iconoir modified"
-        >
-          <path
-            d="M6.8,19.4L5.3,5.4c-0.2-1.7,0.8-3.2,2-3.2h3.4c1.2,0,2.2,1.5,2,3.2l-1.4,13.9c-0.1,1.4-1,2.4-2,2.4H8.7
-            C7.7,21.8,6.9,20.7,6.8,19.4z"
-          />
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            d="M2,12h4 M22,12H12"
-          />
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            d="M2,7h3.4 M22,7h-9.4"
-          />
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            d="M2,17h4.4 M22,17H11.6"
-          />
-        </svg><br />
-        <button id="spotify-next" class="btn-outline size-9 p-1">
-          <svg
-              class="w-full h-full iconoir"
-              viewBox="0 0 24 24"
-              stroke-width="1.5"
-              stroke="currentcolor"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M18 7V17"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              ></path>
-              <path
-                d="M6.97179 5.2672C6.57832 4.95657 6 5.23682 6 5.73813V18.2619C6 18.7632 6.57832 19.0434 6.97179 18.7328L14.9035 12.4709C15.2078 12.2307 15.2078 11.7693 14.9035 11.5291L6.97179 5.2672Z"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              ></path>
-            </svg>
-        </button>
-      `);
-      $("#song #spotify-next").on("click", Spotify.next);
+    const isCapoChange = data.item.id == SpotifyConfig.capoChangeSong;
+    if (isCapoChange) {
+      // Next song comes from the registry: the entry after the last loaded
+      // chart (playlists are assumed to follow load-charts.js order).
+      const nextChart =
+        Charts.state.lastSongIndex >= 0
+          ? charts[Charts.state.lastSongIndex + 1]
+          : undefined;
+      if (nextChart) {
+        const capo =
+          Charts.getSavedCapo(nextChart.title) ?? nextChart.defaultCapo ?? 0;
+        $("#capo-change-next-title").text(
+          `${nextChart.title} by ${nextChart.artist}`,
+        );
+        $("#capo-change-next-capo").text(
+          capo === 0 ? "No Capo" : "Capo " + capo,
+        );
+      }
+      $("#capo-change-next").toggleClass("hidden", !nextChart);
     } else {
-      $("#song").html(
-        `<h2 class="text-xl">No Song Chart for "${songLabel}".</h2>`,
-      );
+      $("#no-chart-song").text(songLabel);
     }
+    $("#capo-change-display").toggleClass("hidden", !isCapoChange);
+    $("#no-chart-display").toggleClass("hidden", isCapoChange);
+    $("#song").addClass("hidden");
     $("#song-info").hide();
     $("#song-info-clone").remove();
     Fretboard.clearChords();

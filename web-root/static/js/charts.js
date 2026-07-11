@@ -70,6 +70,7 @@ Charts.updateShareUrl = function (index) {
 /** Mutable runtime state shared across modules. */
 Charts.state = {
   songIndex: 0,
+  lastSongIndex: -1, // last successfully loaded chart (survives no-chart tracks)
   currentCapo: 0,
   currentDefaultCapo: 0, // chart's built-in capo, set on each render
   currentSongTitle: "", // capo-store key for the current song
@@ -215,6 +216,7 @@ Charts.loadSong = async function (
   { spotifyIdent = "", scrollTop = true } = {},
 ) {
   Charts.state.songIndex = index;
+  Charts.state.lastSongIndex = index;
   $("#chart-index").text(index + 1);
   $("#charts-available").text(charts.length);
 
@@ -249,6 +251,11 @@ Charts.renderSongChart = function (
   capoFret = -1,
 ) {
   const chart = charts[Charts.state.songIndex] || {};
+
+  // A chart is taking over: restore it and hide the static replacement
+  // displays (#no-chart-display / #capo-change-display in index.html)
+  $("#song").removeClass("hidden");
+  $("#no-chart-display, #capo-change-display").addClass("hidden");
 
   const parser = new ChordSheetJS.ChordProParser();
   let song = parser.parse(chartproStr.trim());
