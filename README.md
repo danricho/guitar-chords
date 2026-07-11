@@ -19,6 +19,7 @@ Designed for practising with real recordings, Guitar Chords can automatically lo
 - Percentage-based fallback synchronisation when timestamps are not present.
 - Fretboard Chord Diagrams displayed alongside Song Charts, including barre chords.
 - Chord transposition via Capo adjustment controls.
+- Traffic-light difficulty badges (easy/ok/medium/hard, set per song in the registry) shown in the Song List and next to the song info.
 - Optional 'capo-change' song for spotify playlists.
 - Shareable deep links: the URL carries a `?chart=<slug>` argument for the loaded Song Chart, and the page title shows the song and artist. A share button (shown only where the browser supports the Web Share API) opens the native share sheet with a "Play along to &lt;song&gt; by &lt;artist&gt; on Guitar Chords!" message and the deep link.
 - Dark and light themes.
@@ -154,7 +155,7 @@ window.charts = [
     spotifyMatch: "Lanterns in the Rain - DanRicho feat. AI",
     title: "Lanterns in the Rain", // shown with `artist` as "title by artist" in the heading and Song List
     artist: "DanRicho feat. AI",
-    difficulty: null,
+    difficulty: null, // "easy" | "ok" | "medium" | "hard" | null (shown as TBD)
     chords: ["G", "D", "Em", "C"], // unique chords as written in the chart, in order of first appearance
     heardKey: "G", // concert key of the recording (what the audience hears)
     path: "../charts/Fiction-LanternsInTheRain.md",

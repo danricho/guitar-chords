@@ -319,3 +319,79 @@ dialog::backdrop {
 #song-list-content [data-chart-index].current-song {
   font-weight: 700;
 }
+
+/* Badge variant that mimics the .btn-outline surface: same background,
+   border color and radius in both themes (badge base keeps its own
+   padding/typography; this only swaps the pill look for the button look). */
+.badge.outline {
+  border-radius: var(--radius-md);
+  border-color: var(--color-border);
+  background-color: var(--color-background);
+  box-shadow: 0 1px 2px 0 #0000000d;
+  color: unset;
+}
+.dark .badge.outline {
+  border-color: var(--color-input);
+  background-color: color-mix(in oklab, var(--color-input) 30%, transparent);
+}
+.badge.outline svg {
+  fill: var(--color-border);
+}
+
+/* Traffic-light accents for .badge.outline: tint the border and the svg dot.
+   Intended as a difficulty indicator on song list capo/difficulty badges. */
+:root {
+  --traffic-red: oklch(0.577 0.245 27.3); /* red-600 */
+  --traffic-orange: oklch(0.646 0.222 41.1); /* orange-600 */
+  --traffic-yellow: oklch(0.681 0.162 75.8); /* yellow-600 */
+  --traffic-green: oklch(0.627 0.194 149.2); /* green-600 */
+}
+.dark {
+  --traffic-red: oklch(0.637 0.237 25.3); /* red-500 */
+  --traffic-orange: oklch(0.705 0.213 47.6); /* orange-500 */
+  --traffic-yellow: oklch(0.795 0.184 86); /* yellow-500 */
+  --traffic-green: oklch(0.723 0.219 149.6); /* green-500 */
+}
+.badge.outline.traffic-red {
+  border-color: var(--traffic-red);
+}
+.badge.outline.traffic-red svg {
+  fill: var(--traffic-red);
+}
+.badge.outline.traffic-orange {
+  border-color: var(--traffic-orange);
+}
+.badge.outline.traffic-orange svg {
+  fill: var(--traffic-orange);
+}
+.badge.outline.traffic-yellow {
+  border-color: var(--traffic-yellow);
+}
+.badge.outline.traffic-yellow svg {
+  fill: var(--traffic-yellow);
+}
+.badge.outline.traffic-green {
+  border-color: var(--traffic-green);
+}
+.badge.outline.traffic-green svg {
+  fill: var(--traffic-green);
+}
+
+/* Joins adjacent badges into one segmented control: only the group's outer
+   corners stay rounded, and shared borders collapse to a single 1px line.
+   Display is NOT set here — give the element flex/inline-flex (or hidden)
+   via utilities so responsive variants like max-md:hidden can win. */
+.badge-group > .badge {
+  border-radius: 0;
+}
+.badge-group > .badge:not(:first-child) {
+  margin-left: -1px; /* collapse the doubled border between neighbours */
+}
+.badge-group > .badge:first-child {
+  border-top-left-radius: var(--radius-md);
+  border-bottom-left-radius: var(--radius-md);
+}
+.badge-group > .badge:last-child {
+  border-top-right-radius: var(--radius-md);
+  border-bottom-right-radius: var(--radius-md);
+}

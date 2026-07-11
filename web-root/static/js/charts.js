@@ -17,6 +17,14 @@ Charts.CAPO_STORE_KEY = "song_capo";
 /** URL query param that names the chart to load (for sharing). */
 Charts.SHARE_PARAM = "chart";
 
+/** Difficulty value → traffic-light badge class (see app.css). */
+Charts.DIFFICULTY_CLASSES = {
+  easy: "traffic-green",
+  ok: "traffic-yellow",
+  medium: "traffic-orange",
+  hard: "traffic-red",
+};
+
 /**
  * Stable, shareable slug for a chart, derived from its filename.
  * "../charts/Im-Yours.md" -> "Im-Yours"
@@ -353,6 +361,15 @@ Charts.renderSongChart = function (
     : "Guitar Charts";
   $("#spotify-ident").text(spotifyIdent);
   $("#song-tempo").text((song.metadata.get("tempo") || "") + " BPM");
+
+  // Difficulty badge (registry-sourced, like title/artist/heardKey)
+  const trafficClass = chart.difficulty
+    ? Charts.DIFFICULTY_CLASSES[chart.difficulty.toLowerCase()] || ""
+    : "";
+  $("#song-difficulty")
+    .removeClass(Object.values(Charts.DIFFICULTY_CLASSES).join(" "))
+    .addClass(trafficClass);
+  $("#song-difficulty-label").text(chart.difficulty || "TBD");
 
   // Concert key (what the audience hears) — from the registry, not ChordPro
   // metadata, so capo transposition can never alter it (e.g. in copied charts)

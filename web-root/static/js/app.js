@@ -158,24 +158,41 @@ App.updateViewportSize = function () {
  * a capo badge indicating its default capo setting.
  */
 App.createSongList = function () {
-  let html = `<ul class="space-y-1">`;
+  // The <ul> is a grid and each row's button subgrids onto it, so the
+  // chord/difficulty/capo badge columns align across songs (max-content
+  // tracks resolve against the whole list). Badges must stay direct children
+  // of the button. Below md the chord group is hidden and its track dropped.
+  let html = `<ul class="grid grid-cols-[1fr_max-content_max-content_min-content] sm:grid-cols-[1fr_max-content_max-content_max-content_min-content] gap-y-1">`;
 
   charts.forEach((chart, index) => {
     const capo = chart.defaultCapo ?? 0;
     const capoLabel = capo == 0 ? "No Capo" : `Capo ${capo}`;
     html += `
-      <li>
+      <li class="contents">
         <button
-          class="w-full flex items-center justify-between gap-3 text-left px-3 py-1 rounded-md cursor-pointer"
+          class="col-span-full grid grid-cols-subgrid gap-x-2 items-center text-left px-3 py-1 rounded-md cursor-pointer"
           data-chart-index="${index}"
         >
-          <span>${chart.title} by ${chart.artist}</span>
-          <div class="flex items-center gap-2 shrink-0">
-            <span class="badge-secondary">${capoLabel}</span>
-            <svg class="size-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-              <path stroke="currentColor" stroke-linecap="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-            </svg>
-          </div>
+          <span>${chart.title} <small class="italic"> - ${chart.artist}</small></span>`;
+
+    html += `<span class="badge-group inline-flex max-sm:hidden justify-self-end">`;
+    chart.chords.forEach((chord) => {
+      html += `<span class="badge outline">${chord}</span>`;
+    });
+    html += `</span>`;
+
+    const difficulty = chart.difficulty || "TBD";
+    const trafficClass = chart.difficulty
+      ? Charts.DIFFICULTY_CLASSES[chart.difficulty.toLowerCase()] || ""
+      : "";
+    html += `<span class="badge capitalize outline ps-1 justify-self-center ${trafficClass}"><svg viewBox="0 0 3 6" height="1rem"><circle r="1.5" cx="1.5" cy="3"></circle></svg> ${difficulty}</span>`;
+
+    html += `<span class="badge capitalize outline justify-self-center">${capoLabel}</span>`;
+
+    html += `
+          <svg class="size-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <path stroke="currentColor" stroke-linecap="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+          </svg>
         </button>
       </li>
     `;
