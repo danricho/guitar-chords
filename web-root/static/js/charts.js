@@ -76,6 +76,7 @@ Charts.state = {
   currentSongTitle: "", // capo-store key for the current song
   currentSongArtist: "", // artist of the current song (for sharing)
   currentlyShownChart: "", // ChordPro of what's on screen (for copy)
+  currentChordList: [], // unique chords as shown, in order of first appearance
 };
 
 /* ------------------------------------------------------------------ */
@@ -163,7 +164,11 @@ Charts.updateManualButtonStates = function () {
 
 /** Copy the currently displayed chart's ChordPro to the clipboard. */
 Charts.copyCurrentChart = function () {
-  navigator.clipboard.writeText(Charts.state.currentlyShownChart);
+  const chords = Charts.state.currentChordList;
+  const header = chords.length
+    ? `chords: [${chords.map((c) => `"${c}"`).join(", ")}]\n\n`
+    : "";
+  navigator.clipboard.writeText(header + Charts.state.currentlyShownChart);
 };
 
 /**
@@ -415,6 +420,7 @@ Charts.renderSongChart = function (
       Fretboard.showChord(chordName);
     }
   });
+  Charts.state.currentChordList = Array.from(shownChords);
 
   Charts.updateManualButtonStates();
 
