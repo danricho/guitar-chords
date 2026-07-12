@@ -192,6 +192,54 @@ dialog::backdrop {
   opacity: 50%;
 }
 
+/* ── Section accents ─────────────────────────────────────────────────
+   Coloured left border + faint tint per section type (verse/chorus/
+   bridge — the classes HtmlDivFormatter puts on .paragraph), with
+   the label in the same colour. Low-chroma (muted) shades: darker in
+   light mode, lighter in dark mode. */
+:root {
+  --section-verse: oklch(0.55 0.08 237.3); /* muted sky */
+  --section-chorus: oklch(0.55 0.1 16.4); /* muted rose */
+  --section-bridge: oklch(0.55 0.09 292.7); /* muted violet */
+}
+.dark {
+  --section-verse: oklch(0.72 0.08 232.7); /* muted sky */
+  --section-chorus: oklch(0.72 0.09 13.4); /* muted rose */
+  --section-bridge: oklch(0.72 0.08 293.5); /* muted violet */
+}
+
+.song-sheet .paragraph.verse {
+  --section-color: var(--section-verse);
+}
+.song-sheet .paragraph.chorus {
+  --section-color: var(--section-chorus);
+}
+.song-sheet .paragraph.bridge {
+  --section-color: var(--section-bridge);
+}
+
+.song-sheet .paragraph:is(.verse, .chorus, .bridge) {
+  border-left: 2px solid
+    color-mix(in oklab, var(--section-color) 65%, transparent);
+  background: color-mix(in oklab, var(--section-color) 5%, transparent);
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+  padding: 0.375rem 0.75rem 0.625rem;
+  margin: 1.25rem 0;
+}
+
+/* The 2rem first-row gap (below) is section spacing; inside a tinted box
+   it would open a hole above the label, so neutralise it there. */
+.song-sheet .paragraph:is(.verse, .chorus, .bridge) .row:first-of-type {
+  margin-top: 0;
+}
+
+.song-sheet .paragraph:is(.verse, .chorus, .bridge) .label {
+  color: var(--section-color);
+  opacity: 1;
+  margin-top: 0;
+  letter-spacing: 0.05em;
+}
+
 /* ── Mobile (portrait): chord panel as bottom sheet and a few things to hide */
 @media (max-width: 48rem) and (orientation: portrait) {
   .hide-iphone-portrait {
@@ -355,7 +403,7 @@ dialog::backdrop {
 .dark {
   --traffic-red: oklch(0.637 0.237 25.3); /* red-500 */
   --traffic-orange: oklch(0.705 0.213 47.6); /* orange-500 */
-  --traffic-yellow: oklch(0.795 0.184 86); /* yellow-500 */
+  --traffic-yellow: oklch(0.735 0.184 86); /* yellow-500 */
   --traffic-green: oklch(0.723 0.219 149.6); /* green-500 */
 }
 .badge.outline.traffic-red {

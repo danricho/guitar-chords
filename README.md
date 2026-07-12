@@ -19,6 +19,7 @@ Designed for practising with real recordings, Guitar Chords can automatically lo
 - Percentage-based fallback synchronisation when timestamps are not present.
 - Fretboard Chord Diagrams displayed alongside Song Charts, including barre chords.
 - Chord transposition via Capo adjustment controls.
+- Colour-coded Song Chart sections: verse, chorus and bridge each get a distinct coloured left border, background tint and label.
 - Traffic-light difficulty badges (easy/ok/medium/hard, set per song in the registry) shown in the Song List and next to the song info.
 - Song List grouped into category tabs (Likes / Training / Creating, set per song in the registry).
 - Optional 'capo-change' song for spotify playlists, showing the next registered song and its capo setting.
