@@ -91,6 +91,7 @@ Fretboard.CHORD_LOOKUP = {
   Bb: { strings: "x13331", barre: { fret: 1, from: 2, to: 6 } },
   Bb5: "x133xx",
   C: "x32010",
+  Cm: "x31013",
   "C#m": "x4x120",
   C5: "xxxx13",
   C7: "x32310",
