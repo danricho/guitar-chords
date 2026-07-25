@@ -307,17 +307,27 @@ Spotify.ensureValidToken = async function () {
     }
     if (session.refresh_token) {
       console.log("Refreshing Token.");
-      session = await Spotify.refreshAccessToken(session.refresh_token);
-      const newSession = {
-        access_token: session.access_token,
-        refresh_token: session.refresh_token || session.refresh_token_old,
-        expires_at: Date.now() + session.expires_in * 1000,
-      };
-      Spotify.saveSession(newSession);
-      return newSession.access_token;
+      const oldRefreshToken = session.refresh_token;
+      const tokenData = await Spotify.refreshAccessToken(oldRefreshToken);
+      if (!tokenData.access_token) {
+        // Refresh token revoked/invalid — fall through to full login.
+        console.log("Refresh failed; clearing session.", tokenData);
+        Store.remove("spotify_session");
+      } else {
+        const newSession = {
+          access_token: tokenData.access_token,
+          // Spotify doesn't always rotate the refresh token — keep the old
+          // one when no new one is returned.
+          refresh_token: tokenData.refresh_token || oldRefreshToken,
+          expires_at: Date.now() + tokenData.expires_in * 1000,
+        };
+        Spotify.saveSession(newSession);
+        return newSession.access_token;
+      }
+    } else {
+      console.log("Clearing Session.");
+      Store.remove("spotify_session");
     }
-    console.log("Clearing Session.");
-    Store.remove("spotify_session");
   }
 
   // 2. OAuth callback
