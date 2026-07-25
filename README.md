@@ -191,16 +191,24 @@ Title, artist, key and capo are not stored in the Song Chart file — they come 
 
 ### Sections
 
-Sections help organise Song Charts.
+Sections help organise Song Charts. The conventions are:
+
+- Verses use the verse environment and are numbered by order of appearance: `{start_of_verse: Verse 1}`
+- Choruses use the chorus environment and are numbered the same way: `{start_of_chorus: Chorus 2}`
+- Every other section (Pre-Chorus, Intro, Outro, Bridge, Solo, Interlude, Instrumental, Ending, ...) uses the bridge environment with an unnumbered label: `{start_of_bridge: Intro}` — only Verse and Chorus get numbers.
 
 ```text
-{sov: Verse}
+{start_of_verse: Verse 1}
 ...
-{eov}
+{end_of_verse}
 
-{soc: Chorus}
+{start_of_chorus: Chorus 1}
 ...
-{eoc}
+{end_of_chorus}
+
+{start_of_bridge: Outro}
+...
+{end_of_bridge}
 ```
 
 ### Chords
