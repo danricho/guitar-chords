@@ -1,0 +1,15 @@
+{
+  "charts": [
+    {
+      "spotifyMatch": "Lanterns in the Rain - DanRicho feat. AI",
+      "title": "Lanterns in the Rain",
+      "artist": "DanRicho feat. AI",
+      "difficulty": null,
+      "category": "Likes",
+      "chords": ["G", "D", "Em", "C"],
+      "heardKey": "G",
+      "path": "../charts/Fiction-LanternsInTheRain.md",
+      "defaultCapo": 0
+    }
+  ]
+}

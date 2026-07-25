@@ -145,27 +145,31 @@ To allow additional users:
 
 ## Adding Song Charts
 
-Song Charts are registered manually in `charts/load-charts.js`.
+Song Charts are registered manually in `charts/!registry.json`, under its top-level `charts` array. `charts/load-charts.js` (in `static/js/`, not the `charts/` directory) is just the loader — it fetches that JSON file synchronously and sets `window.charts`.
 
-Example:
+Example entry:
 
-```javascript
-window.charts = [
-  {
-    // The `spotifyMatch` field should match the Spotify track title and artist.
-    // When a matching track is detected, the Song Chart is loaded automatically from the `path` field.
-    spotifyMatch: "Lanterns in the Rain - DanRicho feat. AI",
-    title: "Lanterns in the Rain", // shown with `artist` as "title by artist" in the heading and Song List
-    artist: "DanRicho feat. AI",
-    difficulty: null, // "easy" | "ok" | "medium" | "hard" | null (shown as TBD)
-    category: "Likes", // Song List tab: "Likes" | "Training" | "Creating"
-    chords: ["G", "D", "Em", "C"], // unique chords as written in the chart, in order of first appearance
-    heardKey: "G", // concert key of the recording (what the audience hears)
-    path: "../charts/Fiction-LanternsInTheRain.md",
-    defaultCapo: 0, // shown as the Song Chart's capo badge in the Song List
-  },
-];
+```json
+{
+  "spotifyMatch": "Lanterns in the Rain - DanRicho feat. AI",
+  "title": "Lanterns in the Rain",
+  "artist": "DanRicho feat. AI",
+  "difficulty": null,
+  "category": "Likes",
+  "chords": ["G", "D", "Em", "C"],
+  "heardKey": "G",
+  "path": "../charts/Fiction-LanternsInTheRain.md",
+  "defaultCapo": 0
+}
 ```
+
+- `spotifyMatch` should match the Spotify track title and artist — when a matching track is detected, the Song Chart loads automatically from `path`.
+- `title` is shown with `artist` as "title by artist" in the heading and Song List.
+- `difficulty`: `"easy"` | `"ok"` | `"medium"` | `"hard"` | `null` (shown as TBD).
+- `category`: Song List tab — `"Likes"` | `"Training"` | `"Creating"`.
+- `chords`: unique chords as written in the chart, in order of first appearance.
+- `heardKey`: concert key of the recording (what the audience hears).
+- `defaultCapo`: shown as the Song Chart's capo badge in the Song List.
 
 ### Why Manual Registration?
 
@@ -187,7 +191,7 @@ Supported metadata fields:
 | ----- | ----------- | --------------------- |
 | tempo | Song tempo  | The tempo of the song |
 
-Title, artist, key and capo are not stored in the Song Chart file — they come from the registry entry in `charts/load-charts.js` (`title`, `artist`, `heardKey`, `defaultCapo`). Keeping the key out of the file means capo transposition can never alter it (e.g. when copying a Song Chart out). The chords in the file must be written as played at `defaultCapo`.
+Title, artist, key and capo are not stored in the Song Chart file — they come from the registry entry in `charts/!registry.json` (`title`, `artist`, `heardKey`, `defaultCapo`). Keeping the key out of the file means capo transposition can never alter it (e.g. when copying a Song Chart out). The chords in the file must be written as played at `defaultCapo`.
 
 ### Sections
 
