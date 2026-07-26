@@ -1,0 +1,733 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Playlist Alignment Check</title>
+
+    <style>
+      body {
+        font-family: sans-serif;
+        max-width: 900px;
+        margin: 20px auto;
+        padding: 0 20px;
+        line-height: 1.4;
+      }
+
+      h1 {
+        font-size: 1.3em;
+      }
+
+      #status {
+        opacity: 0.8;
+        margin-bottom: 1em;
+      }
+
+      #summary {
+        margin-bottom: 1em;
+      }
+
+      #summary.ok {
+        color: #1a7f37;
+        font-weight: bold;
+      }
+
+      .issue {
+        border: 1px solid #d33;
+        border-left-width: 6px;
+        border-radius: 4px;
+        padding: 10px 14px;
+        margin-bottom: 10px;
+      }
+
+      .issue .label {
+        font-size: 0.75em;
+        text-transform: uppercase;
+        opacity: 0.6;
+        letter-spacing: 0.05em;
+      }
+
+      .issue button {
+        margin-top: 8px;
+      }
+
+      .issue button:disabled {
+        opacity: 0.5;
+      }
+
+      .unmatched {
+        border: 1px solid #999;
+        border-left-width: 6px;
+        border-radius: 4px;
+        padding: 10px 14px;
+        margin-bottom: 6px;
+        opacity: 0.85;
+      }
+
+      button {
+        cursor: pointer;
+      }
+
+      #rerun {
+        margin-bottom: 1em;
+      }
+
+      pre {
+        white-space: pre-wrap;
+        background: rgba(128, 128, 128, 0.15);
+        padding: 8px;
+        border-radius: 4px;
+      }
+
+      .song-list {
+        list-style: none;
+        padding-left: 0;
+        counter-reset: song;
+      }
+
+      .song-list .song-item {
+        counter-increment: song;
+        padding: 2px 0;
+      }
+
+      .song-list .song-item::before {
+        content: counter(song) ". ";
+        opacity: 0.6;
+      }
+
+      .song-list .capo-item {
+        padding: 2px 0 2px 1.5em;
+        margin: 8px 0;
+        opacity: 0.4;
+        font-style: italic;
+        font-size: 0.85em;
+      }
+    </style>
+  </head>
+
+  <body>
+    <h1>Spotify Playlist Alignment Check</h1>
+    <p>
+      Compares the live Spotify playlist order against
+      <code>charts/!registry.json</code>, and checks that the capo-change
+      track appears before any song whose <code>defaultCapo</code> differs
+      from the song before it.
+    </p>
+
+    <div id="status">Loading…</div>
+    <button id="rerun" style="display: none">Re-run check</button>
+    <div id="summary"></div>
+    <div id="issues"></div>
+    <div id="unmatched"></div>
+    <div id="missing-from-playlist"></div>
+    <div id="playlist-list"></div>
+
+    <script src="../static/js/fretboard.js"></script>
+    <script src="../static/js/spotify-settings.js"></script>
+    <script src="../static/js/spotify.js"></script>
+
+    <script>
+      const statusEl = document.getElementById("status");
+      const summaryEl = document.getElementById("summary");
+      const issuesEl = document.getElementById("issues");
+      const unmatchedEl = document.getElementById("unmatched");
+      const missingFromPlaylistEl = document.getElementById("missing-from-playlist");
+      const playlistListEl = document.getElementById("playlist-list");
+      const rerunBtn = document.getElementById("rerun");
+
+      rerunBtn.addEventListener("click", run);
+
+      function setStatus(text) {
+        statusEl.textContent = text;
+      }
+
+      /* ---------------------------------------------------------------- */
+      /* Auth — reuse the session the main app already logged in with.    */
+      /* Doesn't call Spotify.ensureValidToken() because its no-session   */
+      /* branch redirects to Spotify's authorize page with the app's root */
+      /* redirect_uri, which would strand this tool page.                 */
+      /* ---------------------------------------------------------------- */
+      const REQUIRED_SCOPES = ["playlist-read-private", "playlist-modify-public", "playlist-modify-private"];
+
+      /** @returns {?object} the full session (access_token, scope, ...), not just the token */
+      async function getValidSession() {
+        const session = Spotify.loadSession();
+        if (!session?.access_token || !session?.expires_at) return null;
+        if (Date.now() <= session.expires_at) return session;
+        if (!session.refresh_token) return null;
+
+        const tokenData = await Spotify.refreshAccessToken(
+          session.refresh_token,
+        );
+        if (!tokenData.access_token) return null;
+
+        const newSession = {
+          access_token: tokenData.access_token,
+          refresh_token: tokenData.refresh_token || session.refresh_token,
+          expires_at: Date.now() + tokenData.expires_in * 1000,
+          scope: tokenData.scope || session.scope,
+        };
+        Spotify.saveSession(newSession);
+        return newSession;
+      }
+
+      function missingScopes(session) {
+        const granted = (session.scope || "").split(" ");
+        return REQUIRED_SCOPES.filter((s) => !granted.includes(s));
+      }
+
+      /* ---------------------------------------------------------------- */
+      /* Data loading                                                      */
+      /* ---------------------------------------------------------------- */
+      function extractPlaylistId(url) {
+        const m = url && url.match(/playlist\/([a-zA-Z0-9]+)/);
+        return m ? m[1] : null;
+      }
+
+      async function loadRegistry() {
+        const res = await fetch("../charts/!registry.json");
+        if (!res.ok) throw new Error(`Failed to load registry.json: HTTP ${res.status}`);
+        return (await res.json()).charts;
+      }
+
+      /**
+       * Fetch the playlist's own metadata (name/owner/visibility) and the
+       * logged-in user's profile, so a 403 on the tracks endpoint can be
+       * explained rather than just reported.
+       */
+      async function diagnosePlaylistAccess(playlistId, token) {
+        const [meRes, playlistRes] = await Promise.all([
+          Spotify.apiRequest("/me", { token }),
+          Spotify.apiRequest(
+            `/playlists/${playlistId}?fields=${encodeURIComponent("name,public,collaborative,owner.id,owner.display_name")}`,
+            { token },
+          ),
+        ]);
+
+        const me = meRes.ok ? await meRes.json() : null;
+        const playlist = playlistRes.ok ? await playlistRes.json() : null;
+
+        return {
+          me,
+          playlist,
+          playlistMetaStatus: playlistRes.status,
+          playlistMetaBody: playlistRes.ok ? null : await playlistRes.text(),
+        };
+      }
+
+      /** @returns {Array<{ pos: number, id: string, label: string }>} playlist tracks in order */
+      async function loadPlaylistTracks(playlistId, token) {
+        const tracks = [];
+        let absolutePos = 0;
+        const fields = encodeURIComponent(
+          "next,items.item.id,items.item.name,items.item.artists.name",
+        );
+        // GET /playlists/{id}/tracks was removed by Spotify (Feb 2026) in
+        // favour of /playlists/{id}/items. Max limit dropped from 100 to 50
+        // too, and each entry's track data moved from `.track` to `.item`
+        // (`.track` is still in the schema but deprecated and comes back
+        // empty).
+        let url = `/playlists/${playlistId}/items?fields=${fields}&limit=50`;
+        while (url) {
+          const res = await Spotify.apiRequest(url, { token });
+          if (!res.ok) {
+            const body = await res.text();
+            throw new Error(
+              `Spotify API error fetching playlist "${playlistId}": HTTP ${res.status} — ${body}`,
+            );
+          }
+          const data = await res.json();
+          data.items.forEach((entry) => {
+            const t = entry.item;
+            // Position must be the track's true absolute index in the
+            // playlist (what Spotify's reorder API expects for range_start/
+            // insert_before) — so this still counts null/local/unavailable
+            // entries even though they're skipped from the `tracks` array,
+            // rather than using tracks.length (which desyncs the moment any
+            // such entry appears earlier in the playlist).
+            if (t) {
+              const artist = t.artists[0]?.name ?? "";
+              tracks.push({
+                pos: absolutePos,
+                id: t.id,
+                name: t.name,
+                artist,
+                label: `${t.name} - ${artist}`,
+              });
+            }
+            absolutePos++;
+          });
+          url = data.next ? data.next.replace("https://api.spotify.com/v1", "") : null;
+        }
+        return tracks;
+      }
+
+      /** e.g. `"Wonderwall" (Likes, capo 2)` — used everywhere a song is named in the report. */
+      function songTag(entry) {
+        return `"${entry.title}" (${entry.category}, capo ${entry.defaultCapo})`;
+      }
+
+      /* ---------------------------------------------------------------- */
+      /* Comparison                                                        */
+      /* ---------------------------------------------------------------- */
+      function buildReport(registry, tracks, capoChangeId) {
+        // Matched sequence: playlist tracks that correspond to a registry entry.
+        const matched = [];
+        tracks.forEach((t) => {
+          const idx = registry.findIndex((e) => e.spotifyMatch === t.label);
+          if (idx !== -1) matched.push({ pos: t.pos, idx, entry: registry[idx] });
+        });
+
+        const issues = [];
+
+        // Order: find the longest run of matched songs whose registry index
+        // is already increasing (the "backbone") — everything NOT in that
+        // backbone is misplaced. Each misplaced song's fix targets its true
+        // final position relative to the backbone directly, rather than just
+        // swapping with whichever song happens to be next to it right now
+        // (which only nudges it one step per fix for a song displaced by
+        // many positions).
+        const n = matched.length;
+        const lisLen = new Array(n).fill(1);
+        const lisPrev = new Array(n).fill(-1);
+        for (let i = 0; i < n; i++) {
+          for (let j = 0; j < i; j++) {
+            if (matched[j].idx < matched[i].idx && lisLen[j] + 1 > lisLen[i]) {
+              lisLen[i] = lisLen[j] + 1;
+              lisPrev[i] = j;
+            }
+          }
+        }
+        let lisEnd = 0;
+        for (let i = 1; i < n; i++) if (lisLen[i] > lisLen[lisEnd]) lisEnd = i;
+        const backboneSet = new Set();
+        for (let i = lisEnd; i !== -1; i = lisPrev[i]) backboneSet.add(i);
+        // Already in playlist-position order since `matched` is.
+        const backbone = [...backboneSet].sort((a, b) => a - b).map((i) => matched[i]);
+
+        matched.forEach((song, i) => {
+          if (backboneSet.has(i)) return;
+
+          const target = backbone.find((b) => b.idx > song.idx);
+          const insertBeforePos = target ? target.pos : (backbone[backbone.length - 1]?.pos ?? song.pos) + 1;
+          const neighborLabel = target
+            ? `before ${songTag(target.entry)}`
+            : backbone.length
+              ? `after ${songTag(backbone[backbone.length - 1].entry)} (the end)`
+              : "at the start";
+
+          if (insertBeforePos === song.pos || insertBeforePos === song.pos + 1) return; // already there
+
+          issues.push({
+            type: "order",
+            summary: `${songTag(song.entry)} (registry #${song.idx}) is out of order — belongs ${neighborLabel}.`,
+            // Lowest position this fix touches — a move affects everything
+            // from here onward, so fixes are applied lowest-first to avoid
+            // each one invalidating the positions the next one was computed
+            // against.
+            targetIndex: Math.min(song.pos, insertBeforePos),
+            fix: {
+              kind: "move",
+              fromPos: song.pos,
+              insertBeforePos,
+              currLabel: song.entry.spotifyMatch,
+            },
+          });
+        });
+
+        // Capo-change awareness: between two consecutive matched songs whose
+        // defaultCapo differs, exactly one capo-change track must appear
+        // somewhere in between; between songs with the SAME capo, none
+        // should. Skipped for Creating entries — they're drafts, not yet
+        // slotted into a real capo-ordered position in the playlist.
+        //
+        // A missing slot is anchored to "right after prev" rather than
+        // "right before curr" — equivalent when they're adjacent, but more
+        // correct if some unrelated (non-registry) track already sits
+        // between them.
+        const missingSlots = []; // { insertBeforePos, summary }
+        const extraneous = []; // { pos, summary }
+
+        for (let i = 1; i < matched.length; i++) {
+          const prev = matched[i - 1];
+          const curr = matched[i];
+          if (prev.entry.category === "Creating" || curr.entry.category === "Creating") continue;
+
+          const between = tracks.slice(prev.pos + 1, curr.pos);
+          const capoTracksBetween = between.filter((t) => t.id === capoChangeId);
+
+          if (prev.entry.defaultCapo === curr.entry.defaultCapo) {
+            capoTracksBetween.forEach((t) => {
+              extraneous.push({
+                pos: t.pos,
+                summary: `Capo-change track sits between ${songTag(prev.entry)} and ${songTag(curr.entry)}, which are both capo ${prev.entry.defaultCapo} — no change needed here.`,
+              });
+            });
+          } else if (capoTracksBetween.length === 0) {
+            missingSlots.push({
+              insertBeforePos: prev.pos + 1,
+              summary: `Capo changes from ${songTag(prev.entry)} to ${songTag(curr.entry)} with no capo-change track between them.`,
+            });
+          } else if (capoTracksBetween.length > 1) {
+            // First one is legitimate; any more are duplicates.
+            capoTracksBetween.slice(1).forEach((t) => {
+              extraneous.push({
+                pos: t.pos,
+                summary: `Duplicate capo-change track between ${songTag(prev.entry)} and ${songTag(curr.entry)} (only one is needed here).`,
+              });
+            });
+          }
+        }
+
+        // Pair up extras with gaps where possible — moving a stray
+        // capo-change track to where one's actually missing is a safe,
+        // position-scoped reorder. Removing a stray one outright is NOT
+        // safe to automate: Spotify's remove-items endpoint deletes every
+        // occurrence of that URI in the playlist, not just the one at this
+        // position, and the capo-change track is deliberately reused at
+        // every real transition.
+        const pairCount = Math.min(missingSlots.length, extraneous.length);
+        for (let i = 0; i < pairCount; i++) {
+          issues.push({
+            type: "capo",
+            summary: `${extraneous[i].summary} Meanwhile: ${missingSlots[i].summary} — moving the stray one there.`,
+            targetIndex: Math.min(extraneous[i].pos, missingSlots[i].insertBeforePos),
+            fix: { kind: "move", fromPos: extraneous[i].pos, insertBeforePos: missingSlots[i].insertBeforePos },
+          });
+        }
+        for (let i = pairCount; i < missingSlots.length; i++) {
+          issues.push({
+            type: "capo",
+            summary: missingSlots[i].summary,
+            targetIndex: missingSlots[i].insertBeforePos,
+            fix: { kind: "insert-capo", insertBeforePos: missingSlots[i].insertBeforePos },
+          });
+        }
+        for (let i = pairCount; i < extraneous.length; i++) {
+          issues.push({
+            type: "capo",
+            summary:
+              extraneous[i].summary +
+              " Not auto-fixable safely — removing it would delete every capo-change track in the playlist (Spotify's remove endpoint deletes by track URI, not by position). Remove this one manually in Spotify.",
+            targetIndex: extraneous[i].pos,
+            fix: null,
+          });
+        }
+
+        const unmatched = tracks.filter(
+          (t) => t.id !== capoChangeId && !registry.some((e) => e.spotifyMatch === t.label),
+        );
+
+        // No-chart tracks (unmatched, not the capo-change marker) should
+        // all sit after every Song Chart track — flag any that plays before
+        // the last matched song, and offer to move it to the very end.
+        const lastMatchedPos = matched.length ? Math.max(...matched.map((m) => m.pos)) : -1;
+        const playlistEndPos = tracks.length ? Math.max(...tracks.map((t) => t.pos)) + 1 : 0;
+        unmatched
+          .filter((t) => t.pos < lastMatchedPos)
+          .forEach((t) => {
+            issues.push({
+              type: "no-chart",
+              summary: `"${t.label}" has no Song Chart and should be at the end of the playlist, but currently plays before other charted songs.`,
+              targetIndex: t.pos,
+              fix: { kind: "move", fromPos: t.pos, insertBeforePos: playlistEndPos },
+            });
+          });
+
+        // Lowest-position-first: fixing an earlier problem shifts every
+        // position after it, which would invalidate later issues' already-
+        // computed target positions.
+        issues.sort((a, b) => a.targetIndex - b.targetIndex);
+
+        // Registry entries with no corresponding playlist track — checked
+        // across all categories, including Creating drafts.
+        const missingFromPlaylist = registry.filter(
+          (e) => !tracks.some((t) => t.label === e.spotifyMatch),
+        );
+
+        return { matched, issues, unmatched, missingFromPlaylist, tracks };
+      }
+
+      /* ---------------------------------------------------------------- */
+      /* Fixes — mutate the live playlist                                 */
+      /* ---------------------------------------------------------------- */
+      async function insertCapoTrack(playlistId, token, capoChangeId, beforePos) {
+        // Spotify.apiRequest doesn't support a request body, so this hits
+        // the API directly instead. POST .../tracks was removed by Spotify
+        // (Feb 2026) in favour of .../items — same body shape, new path.
+        return fetch(`https://api.spotify.com/v1/playlists/${playlistId}/items`, {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            uris: [`spotify:track:${capoChangeId}`],
+            position: beforePos,
+          }),
+        });
+      }
+
+      async function moveTrack(playlistId, token, fromPos, insertBeforePos) {
+        // insert_before is a position in the original (pre-removal) list —
+        // e.g. per Spotify's docs, moving index 0 to the end of a 10-item
+        // playlist uses insert_before: 10, not 9. No off-by-one adjustment
+        // needed here since the caller already passes the exact original
+        // index to insert before. PUT .../tracks was removed by Spotify
+        // (Feb 2026) in favour of .../items.
+        return fetch(`https://api.spotify.com/v1/playlists/${playlistId}/items`, {
+          method: "PUT",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            range_start: fromPos,
+            range_length: 1,
+            insert_before: insertBeforePos,
+          }),
+        });
+      }
+
+      /* ---------------------------------------------------------------- */
+      /* Rendering                                                         */
+      /* ---------------------------------------------------------------- */
+      function renderReport({ issues, unmatched, missingFromPlaylist, matched, tracks }, ctx) {
+        summaryEl.classList.toggle("ok", issues.length === 0);
+        summaryEl.textContent =
+          issues.length === 0
+            ? `✓ Aligned — ${matched.length} matched songs, no issues found.`
+            : `${issues.length} issue${issues.length === 1 ? "" : "s"} found (${matched.length} matched songs checked).`;
+
+        issuesEl.innerHTML = "";
+        // Issues are pre-sorted lowest-target-index-first (see buildReport).
+        // Only the first fixable one is clickable — fixing it shifts
+        // positions, which would silently invalidate every other issue's
+        // already-computed target position if applied blind. Re-run after
+        // each fix (applyFix does this automatically) to get fresh targets.
+        let firstFixableFound = false;
+        issues.forEach((issue) => {
+          const div = document.createElement("div");
+          div.className = "issue";
+          div.innerHTML = `
+            <div class="label">${{ order: "Order", capo: "Capo", "no-chart": "No Chart" }[issue.type]}</div>
+            <div>${issue.summary}</div>
+          `;
+          if (issue.fix) {
+            const isFirst = !firstFixableFound;
+            firstFixableFound = true;
+
+            const btn = document.createElement("button");
+            btn.textContent = "Fix";
+            if (isFirst) {
+              btn.addEventListener("click", () => applyFix(issue, ctx, btn));
+            } else {
+              btn.disabled = true;
+              btn.title = "Fix the earliest issue first — positions shift once it's applied, which would make this one's target stale.";
+            }
+            div.appendChild(btn);
+          }
+          issuesEl.appendChild(div);
+        });
+
+        unmatchedEl.innerHTML = "";
+        if (unmatched.length) {
+          const heading = document.createElement("p");
+          heading.innerHTML = `<strong>${unmatched.length} playlist track(s) with no matching registry entry</strong> (informational — check for a stale <code>spotifyMatch</code>, or these just aren't Song Charts):`;
+          unmatchedEl.appendChild(heading);
+          unmatched.forEach((t) => {
+            const div = document.createElement("div");
+            div.className = "unmatched";
+            div.textContent = t.label;
+            unmatchedEl.appendChild(div);
+          });
+        }
+
+        missingFromPlaylistEl.innerHTML = "";
+        if (missingFromPlaylist.length) {
+          const heading = document.createElement("p");
+          heading.innerHTML = `<strong>${missingFromPlaylist.length} registry entr${missingFromPlaylist.length === 1 ? "y" : "ies"} not found in the playlist</strong> (informational — not auto-fixed, since adding a song is your call):`;
+          missingFromPlaylistEl.appendChild(heading);
+          missingFromPlaylist.forEach((e) => {
+            const div = document.createElement("div");
+            div.className = "unmatched";
+            div.textContent = `${songTag(e)} by ${e.artist} — spotifyMatch: "${e.spotifyMatch}"`;
+            missingFromPlaylistEl.appendChild(div);
+          });
+        }
+
+        playlistListEl.innerHTML = "";
+        const heading = document.createElement("p");
+        heading.innerHTML = `<strong>Current playlist (${tracks.length} track${tracks.length === 1 ? "" : "s"})</strong>:`;
+        playlistListEl.appendChild(heading);
+        // Plain <ul> with CSS counters instead of <ol> — capo-change entries
+        // are shown inline but must not consume a number, which native <ol>
+        // numbering can't skip selectively.
+        const list = document.createElement("ul");
+        list.className = "song-list";
+        const noChartPositions = new Set(unmatched.map((t) => t.pos));
+        tracks.forEach((t) => {
+          const li = document.createElement("li");
+          const isCapo = t.id === ctx.capoChangeId;
+          const isNoChart = !isCapo && noChartPositions.has(t.pos);
+          li.className = isCapo || isNoChart ? "capo-item" : "song-item";
+          const prefix = isCapo ? "CAPO CHANGE: " : isNoChart ? "NO CHART: " : "";
+          li.textContent = prefix + `${t.name} by ${t.artist}`;
+          list.appendChild(li);
+        });
+        playlistListEl.appendChild(list);
+      }
+
+      async function applyFix(issue, ctx, btn) {
+        const { playlistId, token, capoChangeId, registry } = ctx;
+        const confirmed = confirm(
+          issue.fix.kind === "insert-capo"
+            ? `Insert the capo-change track into the live playlist?\n\n${issue.summary}\n\n` +
+              `(position: ${issue.fix.insertBeforePos})`
+            : `Move this track in the live playlist?\n\n${issue.summary}\n\n` +
+              `(range_start: ${issue.fix.fromPos}, insert_before: ${issue.fix.insertBeforePos})`,
+        );
+        if (!confirmed) return;
+
+        btn.disabled = true;
+        btn.textContent = "Fixing…";
+        try {
+          const res =
+            issue.fix.kind === "insert-capo"
+              ? await insertCapoTrack(playlistId, token, capoChangeId, issue.fix.insertBeforePos)
+              : await moveTrack(playlistId, token, issue.fix.fromPos, issue.fix.insertBeforePos);
+
+          if (!res.ok) {
+            const body = await res.text();
+            throw new Error(`HTTP ${res.status}: ${body}`);
+          }
+
+          if (issue.fix.kind === "move") {
+            // Verify against the same detection logic used for the report,
+            // rather than a hand-rolled before/after position check — so
+            // "still wrong" means the same thing here as it does on screen.
+            setStatus("Fix applied — verifying the actual result…");
+            const freshTracks = await loadPlaylistTracks(playlistId, token);
+            const freshReport = buildReport(registry, freshTracks, capoChangeId);
+            const stillBroken = freshReport.issues.find(
+              (i) => i.type === "order" && i.fix.currLabel === issue.fix.currLabel,
+            );
+            if (stillBroken) {
+              alert(
+                `Fix applied, but this song is still out of order afterwards.\n\n` +
+                  `Sent: range_start=${issue.fix.fromPos}, insert_before=${issue.fix.insertBeforePos}\n` +
+                  `Now: ${stillBroken.summary}`,
+              );
+            }
+          }
+
+          setStatus("Re-checking…");
+          await run();
+        } catch (err) {
+          console.error(err);
+          alert(
+            "Fix failed: " +
+              err.message +
+              (err.message.includes("403")
+                ? "\n\nThis usually means the current Spotify login doesn't have playlist-edit permission yet — log out and reconnect Spotify from the main app to grant it."
+                : ""),
+          );
+          btn.disabled = false;
+          btn.textContent = "Fix";
+        }
+      }
+
+      /* ---------------------------------------------------------------- */
+      /* Run                                                               */
+      /* ---------------------------------------------------------------- */
+      async function run() {
+        rerunBtn.style.display = "none";
+        summaryEl.textContent = "";
+        issuesEl.innerHTML = "";
+        unmatchedEl.innerHTML = "";
+        missingFromPlaylistEl.innerHTML = "";
+        playlistListEl.innerHTML = "";
+        setStatus("Checking Spotify login…");
+
+        const session = await getValidSession();
+        if (!session) {
+          setStatus("");
+          summaryEl.innerHTML =
+            'Not logged into Spotify. Open the <a href="../index.html">main app</a>, connect Spotify there, then reload this page.';
+          return;
+        }
+        const token = session.access_token;
+
+        const missing = missingScopes(session);
+        if (missing.length) {
+          setStatus("");
+          summaryEl.innerHTML =
+            `Current Spotify login is missing permission(s): <code>${missing.join(", ")}</code>.` +
+            ' Log out via the main app\'s Spotify settings, then reconnect — the login screen should now ask for these too. (Granted scope: <code>' +
+            (session.scope || "none recorded — this session predates scope tracking, so just reconnect") +
+            "</code>)";
+          return;
+        }
+
+        const playlistId = extractPlaylistId(SpotifyConfig.playlist);
+        if (!playlistId) {
+          setStatus("");
+          summaryEl.textContent = "SpotifyConfig.playlist isn't set to a playlist URL — nothing to check.";
+          return;
+        }
+
+        try {
+          setStatus("Loading registry…");
+          const registry = await loadRegistry();
+
+          setStatus(`Loading playlist tracks (playlist ID: ${playlistId}, from SpotifyConfig.playlist: ${SpotifyConfig.playlist})…`);
+          const tracks = await loadPlaylistTracks(playlistId, token);
+
+          setStatus(`Comparing ${registry.length} registry entries against ${tracks.length} playlist tracks…`);
+          const report = buildReport(registry, tracks, SpotifyConfig.capoChangeSong);
+
+          setStatus("");
+          renderReport(report, { playlistId, token, capoChangeId: SpotifyConfig.capoChangeSong, registry });
+        } catch (err) {
+          console.error(err);
+          setStatus("Fetching diagnostic info (who am I, who owns the playlist)…");
+
+          let diagHtml = "";
+          try {
+            const diag = await diagnosePlaylistAccess(playlistId, token);
+            if (diag.playlist) {
+              const sameOwner = diag.me && diag.playlist.owner.id === diag.me.id;
+              diagHtml = `
+                <p><strong>Diagnostic</strong> (playlist metadata fetch succeeded, so it's the tracks
+                sub-resource specifically that's forbidden):</p>
+                <ul>
+                  <li>Playlist: "${diag.playlist.name}" — public: ${diag.playlist.public}, collaborative: ${diag.playlist.collaborative}</li>
+                  <li>Playlist owner: ${diag.playlist.owner.display_name} (${diag.playlist.owner.id})</li>
+                  <li>Logged in as: ${diag.me ? `${diag.me.display_name} (${diag.me.id})` : "unknown"}</li>
+                  <li>Same account: ${sameOwner ? "yes" : "<strong>NO — this is not your account's own playlist as far as Spotify is concerned</strong>"}</li>
+                </ul>`;
+            } else {
+              diagHtml = `
+                <p><strong>Diagnostic</strong>: fetching the playlist's own metadata (not even the
+                track list) also failed — HTTP ${diag.playlistMetaStatus}:</p>
+                <pre>${(diag.playlistMetaBody || "").replace(/[<>&]/g, (c) => ({ "<": "&lt;", ">": "&gt;", "&": "&amp;" })[c])}</pre>
+                <p>Logged in as: ${diag.me ? `${diag.me.display_name} (${diag.me.id})` : "unknown — /me also failed"}.
+                This points to the Spotify app registration itself (Development Mode user allowlist,
+                or the app's Web API access) rather than anything in this tool.</p>`;
+            }
+          } catch (diagErr) {
+            diagHtml = `<p>(Diagnostic fetch also failed: ${diagErr.message})</p>`;
+          }
+
+          setStatus("");
+          summaryEl.innerHTML =
+            `<strong>Error</strong><pre>${err.message.replace(/[<>&]/g, (c) => ({ "<": "&lt;", ">": "&gt;", "&": "&amp;" })[c])}</pre>` +
+            diagHtml;
+        } finally {
+          rerunBtn.style.display = "";
+        }
+      }
+
+      window.addEventListener("load", run);
+    </script>
+  </body>
+</html>

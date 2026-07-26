@@ -320,6 +320,9 @@ Spotify.ensureValidToken = async function () {
           // one when no new one is returned.
           refresh_token: tokenData.refresh_token || oldRefreshToken,
           expires_at: Date.now() + tokenData.expires_in * 1000,
+          // Refresh responses don't always repeat `scope` — it doesn't
+          // change on refresh, so fall back to what the session already had.
+          scope: tokenData.scope || session.scope,
         };
         Spotify.saveSession(newSession);
         return newSession.access_token;
@@ -348,6 +351,7 @@ Spotify.ensureValidToken = async function () {
       access_token: tokenData.access_token,
       refresh_token: tokenData.refresh_token,
       expires_at: Date.now() + tokenData.expires_in * 1000,
+      scope: tokenData.scope,
     };
     Spotify.saveSession(newSession);
     Store.remove("spotify_oauth_state");
@@ -429,7 +433,8 @@ Spotify.redirectToLogin = async function () {
     response_type: "code",
     client_id: SpotifyConfig.clientId,
     scope:
-      "user-read-playback-state user-read-currently-playing user-modify-playback-state",
+      "user-read-playback-state user-read-currently-playing user-modify-playback-state" +
+      " playlist-read-private playlist-modify-public playlist-modify-private",
     redirect_uri: SpotifyConfig.redirectUri,
     code_challenge_method: "S256",
     code_challenge: challenge,
