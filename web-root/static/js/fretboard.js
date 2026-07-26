@@ -83,6 +83,7 @@ Fretboard.CHORD_LOOKUP = {
   Am7: "x02010",
   Ab5: "xxx144",
   Abm: "xx110x",
+  Adim7: "x01212",
   //B: { strings: "x24442", barre: { fret: 2, from: 2, to: 6 } },
   B: { strings: "xx444x" }, // beginner stuff!
   Bm: { strings: "x24432", barre: { fret: 2, from: 2, to: 6 } },
