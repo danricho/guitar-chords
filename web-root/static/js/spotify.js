@@ -375,6 +375,16 @@ Spotify.ensureValidToken = async function () {
 
   // 3. Not logged in → redirect (page will reload)
   console.log("Spotify Login needed.");
+  if (Store.get("spotify_autoconnect") === "on") {
+    // Auto-connect is meant to silently resume an existing session — if it
+    // ever needs a fresh login redirect instead, that's not silent, and
+    // doing it again on every subsequent page load is an unwanted repeat
+    // trip to Spotify's login page. Turn it off before redirecting so the
+    // next load doesn't do this automatically again; the user can still
+    // reconnect manually.
+    Store.set("spotify_autoconnect", "off");
+    $("#spotifyAutoConnect").prop("checked", false);
+  }
   await Spotify.redirectToLogin();
   return null;
 };
