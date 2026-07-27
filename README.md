@@ -33,9 +33,7 @@ Designed for practising with real recordings, Guitar Chords can automatically lo
 
 ## Screenshots
 
-<img src="readme-graphics/ipad-landscape-spotify.png"/>
-
-_More Screenshots on different devices / orientations are available in the `readme-graphics` directory._
+<img src="readme-graphics/screenshot.png"/>
 
 ## How It Works
 
