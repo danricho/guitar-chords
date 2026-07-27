@@ -289,8 +289,29 @@ Sonos.bindEvents = function () {
 
   $("#sonosModeToggle").on("change", function () {
     Store.set("sonos_mode", this.checked ? "on" : "off");
-    if (this.checked) Sonos.start();
-    else Sonos.stop();
+    if (this.checked) {
+      Sonos.start();
+      // Mutually exclusive with Spotify auto-connect — can't have both.
+      if (Store.get("spotify_autoconnect") === "on") {
+        Store.set("spotify_autoconnect", "off");
+        $("#spotifyAutoConnect").prop("checked", false);
+      }
+    } else {
+      Sonos.stop();
+    }
+  });
+
+  // Other half of the mutual exclusion — adds to app.js's own
+  // #spotifyAutoConnect change handler (App.toggleSpotifyAutoConnect),
+  // doesn't replace it. Reads the checkbox's native .checked directly
+  // rather than Store, since this listener is bound before app.js's (sonos.js
+  // loads first) and would otherwise see Store's pre-toggle value.
+  $("#spotifyAutoConnect").on("change", function () {
+    if (this.checked && Store.get("sonos_mode") === "on") {
+      Store.set("sonos_mode", "off");
+      document.getElementById("sonosModeToggle").checked = false;
+      Sonos.stop();
+    }
   });
 
   $("#sonos-play").on("click", Sonos.play);
@@ -316,6 +337,16 @@ Sonos.init = function () {
   const toggle = document.getElementById("sonosModeToggle");
   const wantsOn = Store.get("sonos_mode") === "on";
   if (toggle) toggle.checked = wantsOn;
+
+  // Reconcile stale state — both could be persisted "on" from before mutual
+  // exclusion existed. Sonos wins (matches how it already wins at runtime:
+  // Sonos.start() is deferred to window "load", after Spotify auto-connect
+  // would've already fired during App.init()'s "ready" phase, and stops it).
+  if (wantsOn && Store.get("spotify_autoconnect") === "on") {
+    Store.set("spotify_autoconnect", "off");
+    const spotifyToggle = document.getElementById("spotifyAutoConnect");
+    if (spotifyToggle) spotifyToggle.checked = false;
+  }
 
   if (wantsOn) {
     // Deferred to window "load" (fires after "ready", always) rather than
