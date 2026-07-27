@@ -101,6 +101,31 @@
         font-style: italic;
         font-size: 0.85em;
       }
+
+      .registry-table {
+        border-collapse: collapse;
+        width: 100%;
+        font-size: 0.9em;
+      }
+
+      .registry-table th,
+      .registry-table td {
+        border: 1px solid #8884;
+        padding: 4px 8px;
+        text-align: left;
+      }
+
+      .registry-table th {
+        opacity: 0.7;
+        font-size: 0.85em;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+      }
+
+      .registry-table td:first-child,
+      .registry-table td:nth-child(4) {
+        text-align: right;
+      }
     </style>
   </head>
 
@@ -491,7 +516,7 @@
       /* ---------------------------------------------------------------- */
       /* Rendering                                                         */
       /* ---------------------------------------------------------------- */
-      function renderReport({ issues, unmatched, missingFromPlaylist, matched, tracks }, ctx) {
+      function renderReport({ issues, unmatched, missingFromPlaylist, matched }, ctx) {
         summaryEl.classList.toggle("ok", issues.length === 0);
         summaryEl.textContent =
           issues.length === 0
@@ -556,25 +581,46 @@
         }
 
         playlistListEl.innerHTML = "";
+        const registry = ctx.registry;
         const heading = document.createElement("p");
-        heading.innerHTML = `<strong>Current playlist (${tracks.length} track${tracks.length === 1 ? "" : "s"})</strong>:`;
+        heading.innerHTML = `<strong>Chart registry (${registry.length} entr${registry.length === 1 ? "y" : "ies"})</strong>:`;
         playlistListEl.appendChild(heading);
-        // Plain <ul> with CSS counters instead of <ol> — capo-change entries
-        // are shown inline but must not consume a number, which native <ol>
-        // numbering can't skip selectively.
-        const list = document.createElement("ul");
-        list.className = "song-list";
-        const noChartPositions = new Set(unmatched.map((t) => t.pos));
-        tracks.forEach((t) => {
-          const li = document.createElement("li");
-          const isCapo = t.id === ctx.capoChangeId;
-          const isNoChart = !isCapo && noChartPositions.has(t.pos);
-          li.className = isCapo || isNoChart ? "capo-item" : "song-item";
-          const prefix = isCapo ? "CAPO CHANGE: " : isNoChart ? "NO CHART: " : "";
-          li.textContent = prefix + `${t.name} by ${t.artist}`;
-          list.appendChild(li);
+
+        const table = document.createElement("table");
+        table.className = "registry-table";
+        table.innerHTML = `
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Song</th>
+              <th>Category</th>
+              <th>Capo</th>
+              <th>Difficulty</th>
+              <th>Chords</th>
+            </tr>
+          </thead>
+        `;
+        const tbody = document.createElement("tbody");
+        registry.forEach((e, i) => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td>${i + 1}</td>
+            <td>${escapeHtml(e.title)} by ${escapeHtml(e.artist)}</td>
+            <td>${escapeHtml(e.category)}</td>
+            <td>${e.defaultCapo}</td>
+            <td>${escapeHtml(e.difficulty ?? "—")}</td>
+            <td>${escapeHtml(e.chords.join(", "))}</td>
+          `;
+          tbody.appendChild(tr);
         });
-        playlistListEl.appendChild(list);
+        table.appendChild(tbody);
+        playlistListEl.appendChild(table);
+      }
+
+      function escapeHtml(s) {
+        const div = document.createElement("div");
+        div.textContent = String(s);
+        return div.innerHTML;
       }
 
       async function applyFix(issue, ctx, btn) {
