@@ -153,18 +153,27 @@ App.updateViewportSize = function () {
 /* Song list (sidebar)                                                 */
 /* ------------------------------------------------------------------ */
 
+/** Category assumed for a chart with no `category` set — kept separate from
+ * tab order below, so reordering tabs can never silently change this. */
+App.DEFAULT_SONG_CATEGORY = "Creating";
+
 /** Song list categories, in tab order (see #songlist-tabs in index.html). */
 App.SONG_CATEGORIES = [
-  { name: "Likes", target: "#song-list-likes", tab: "#songlist-tabs-tab-1" },
+  {
+    name: "Favourites",
+    target: "#song-list-favourites",
+    tab: "#songlist-tabs-tab-1",
+  },
+  { name: "Likes", target: "#song-list-likes", tab: "#songlist-tabs-tab-2" },
   {
     name: "Training",
     target: "#song-list-training",
-    tab: "#songlist-tabs-tab-2",
+    tab: "#songlist-tabs-tab-3",
   },
   {
     name: "Creating",
     target: "#song-list-creating",
-    tab: "#songlist-tabs-tab-3",
+    tab: "#songlist-tabs-tab-4",
   },
 ];
 
@@ -235,8 +244,7 @@ App.createSongList = function () {
     const entries = charts
       .map((chart, index) => ({ chart, index }))
       .filter(
-        ({ chart }) =>
-          (chart.category || App.SONG_CATEGORIES[0].name) === name,
+        ({ chart }) => (chart.category || App.DEFAULT_SONG_CATEGORY) === name,
       );
     $(target).html(App.buildSongListHtml(entries));
   });
@@ -246,7 +254,7 @@ App.createSongList = function () {
 App.showCurrentSongTab = function () {
   const chart = charts[Charts.state.songIndex];
   if (!chart) return;
-  const category = chart.category || App.SONG_CATEGORIES[0].name;
+  const category = chart.category || App.DEFAULT_SONG_CATEGORY;
   const entry = App.SONG_CATEGORIES.find((c) => c.name === category);
   if (entry) $(entry.tab).trigger("click");
 };

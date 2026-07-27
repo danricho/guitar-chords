@@ -4,7 +4,7 @@
  * Usage: node tools/sort-registry.js
  *
  * Sort priority:
- *   1. category — Likes, Training, Creating (anything else sinks to the end)
+ *   1. category — Favourites, Likes, Training, Creating (anything else sinks to the end)
  *   2. defaultCapo — ascending (0/none first)
  *   3. difficulty — easy, ok, medium, hard, then null/tbd (case-insensitive)
  * Ties keep their existing relative order (stable sort).
@@ -21,7 +21,7 @@ const REGISTRY_PATH = path.join(
   "!registry.json",
 );
 
-const CATEGORY_ORDER = ["Likes", "Training", "Creating"];
+const CATEGORY_ORDER = ["Favourites", "Likes", "Training", "Creating"];
 const DIFFICULTY_ORDER = ["easy", "ok", "medium", "hard"];
 
 function categoryRank(category) {

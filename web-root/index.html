@@ -741,7 +741,7 @@
                   aria-selected="true"
                   tabindex="0"
                 >
-                  Likes
+                  Favourites
                 </button>
                 <button
                   type="button"
@@ -751,13 +751,23 @@
                   aria-selected="false"
                   tabindex="0"
                 >
-                  Training
+                  Likes
                 </button>
                 <button
                   type="button"
                   role="tab"
                   id="songlist-tabs-tab-3"
                   aria-controls="songlist-tabs-panel-3"
+                  aria-selected="false"
+                  tabindex="0"
+                >
+                  Training
+                </button>
+                <button
+                  type="button"
+                  role="tab"
+                  id="songlist-tabs-tab-4"
+                  aria-controls="songlist-tabs-panel-4"
                   aria-selected="false"
                   tabindex="0"
                 >
@@ -772,7 +782,7 @@
                 tabindex="-1"
                 aria-selected="true"
               >
-                <div id="song-list-likes"></div>
+                <div id="song-list-favourites"></div>
               </div>
               <div
                 role="tabpanel"
@@ -782,12 +792,22 @@
                 aria-selected="false"
                 hidden
               >
-                <div id="song-list-training"></div>
+                <div id="song-list-likes"></div>
               </div>
               <div
                 role="tabpanel"
                 id="songlist-tabs-panel-3"
                 aria-labelledby="songlist-tabs-tab-3"
+                tabindex="-1"
+                aria-selected="false"
+                hidden
+              >
+                <div id="song-list-training"></div>
+              </div>
+              <div
+                role="tabpanel"
+                id="songlist-tabs-panel-4"
+                aria-labelledby="songlist-tabs-tab-4"
                 tabindex="-1"
                 aria-selected="false"
                 hidden

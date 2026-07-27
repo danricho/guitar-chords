@@ -22,7 +22,7 @@ Designed for practising with real recordings, Guitar Chords can automatically lo
 - Chord transposition via Capo adjustment controls.
 - Colour-coded Song Chart sections: verse, chorus and bridge each get a distinct coloured left border, background tint and label.
 - Traffic-light difficulty badges (easy/ok/medium/hard, set per song in the registry) shown in the Song List and next to the song info.
-- Song List grouped into category tabs (Likes / Training / Creating, set per song in the registry).
+- Song List grouped into category tabs (Favourites / Likes / Training / Creating, set per song in the registry).
 - Optional 'capo-change' track (works with either sync source), showing the next registered song and its capo setting.
 - Shareable deep links: the URL carries a `?chart=<slug>` argument for the loaded Song Chart, and the page title shows the song and artist. A share button (shown only where the browser supports the Web Share API) opens the native share sheet with a "Play along to &lt;song&gt; by &lt;artist&gt; on Guitar Chords!" message and the deep link.
 - Dark and light themes.
@@ -206,7 +206,7 @@ Example entry:
 - `spotifyMatch` should match the Spotify track title and artist — when a matching track is detected, the Song Chart loads automatically from `path`.
 - `title` is shown with `artist` as "title by artist" in the heading and Song List.
 - `difficulty`: `"easy"` | `"ok"` | `"medium"` | `"hard"` | `null` (shown as TBD).
-- `category`: Song List tab — `"Likes"` | `"Training"` | `"Creating"`.
+- `category`: Song List tab — `"Favourites"` | `"Likes"` | `"Training"` | `"Creating"`. Missing/unset defaults to `"Creating"`.
 - `chords`: unique chords as written in the chart, in order of first appearance.
 - `heardKey`: concert key of the recording (what the audience hears).
 - `defaultCapo`: shown as the Song Chart's capo badge in the Song List.
