@@ -10,3 +10,16 @@ services:
     volumes:
       - ./web-root:/usr/share/nginx/html:ro
       - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro #"no-cache" configuration
+
+  sonos-proxy:
+    image: node:alpine
+    restart: "unless-stopped"
+    working_dir: /app
+    command: node server.js
+    environment:
+      - SONOS_SPEAKER_UPSTAIRS_IP=192.168.0.40
+      - SONOS_SPEAKER_DOWNSTAIRS_IP=192.168.0.50
+    volumes:
+      - ./sonos-proxy:/app:ro
+    # No ports: — only reachable from web-server over the Compose-internal
+    # network, proxied through nginx's /api/sonos/ (see nginx.conf).

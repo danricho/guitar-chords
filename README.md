@@ -6,15 +6,16 @@
 
 </div>
 
-A lightweight web application for guitarists that renders ChordPro Song Charts and synchronises them with Spotify playback.
+A lightweight web application for guitarists that renders ChordPro Song Charts and synchronises them with playback — via Spotify, or a local Sonos speaker.
 
 Designed for practising with real recordings, Guitar Chords can automatically load Song Charts, display Fretboard Chord Diagrams, and scroll in time with the currently playing track.
 
 ## Features
 
 - Render ChordPro Song Charts directly in the browser.
-- Spotify integration using the Spotify Web API.
-- Automatic Song Chart loading based on the currently playing Spotify track.
+- Two optional, mutually exclusive sync sources — the app works fully as a standalone Song Chart viewer with neither configured:
+  - **Spotify** — automatic Song Chart loading and scroll sync driven by the Spotify Web API, based on the currently playing track.
+  - **Sonos (local)** — the same automatic loading and sync, driven instead by a Sonos speaker on your home network via a small local proxy — no Spotify account involved. See [Sonos Setup](#sonos-setup).
 - Timestamp-based Song Chart synchronisation.
 - Percentage-based fallback synchronisation when timestamps are not present.
 - Fretboard Chord Diagrams displayed alongside Song Charts, including barre chords.
@@ -22,7 +23,7 @@ Designed for practising with real recordings, Guitar Chords can automatically lo
 - Colour-coded Song Chart sections: verse, chorus and bridge each get a distinct coloured left border, background tint and label.
 - Traffic-light difficulty badges (easy/ok/medium/hard, set per song in the registry) shown in the Song List and next to the song info.
 - Song List grouped into category tabs (Likes / Training / Creating, set per song in the registry).
-- Optional 'capo-change' song for spotify playlists, showing the next registered song and its capo setting.
+- Optional 'capo-change' track (works with either sync source), showing the next registered song and its capo setting.
 - Shareable deep links: the URL carries a `?chart=<slug>` argument for the loaded Song Chart, and the page title shows the song and artist. A share button (shown only where the browser supports the Web Share API) opens the native share sheet with a "Play along to &lt;song&gt; by &lt;artist&gt; on Guitar Chords!" message and the deep link.
 - Dark and light themes.
 - Kid-friendly three-string chord display mode.
@@ -40,13 +41,37 @@ _More Screenshots on different devices / orientations are available in the `read
 
 Song Charts are written in ChordPro format and manually registered with the application.
 
-When Spotify playback changes:
+When playback changes on whichever sync source is active (Spotify or Sonos — see [Sonos Setup](#sonos-setup)):
 
-1. The current track is read using the Spotify Web API.
+1. The current track is read — via the Spotify Web API, or via a local Sonos speaker.
 2. The application searches for a matching Song Chart.
 3. The Song Chart is loaded automatically.
 4. Scrolling is synchronised to the current playback position.
 5. Fretboard Chord Diagrams and song metadata are also displayed.
+
+The two sync sources reach the currently-playing track very differently. Spotify sync talks straight to Spotify's own cloud API, wherever the phone/device playing it is. Sonos sync never talks to Spotify at all — it doesn't matter that the audio originated from Spotify, the app only ever asks the Sonos speaker itself, over the local network:
+
+```mermaid
+flowchart TD
+    subgraph SPOTIFY["Spotify sync — e.g. playing on a phone"]
+        direction LR
+        P1["Phone<br/>(Spotify app)"] -- "Spotify Connect" --> P2["Spotify Cloud"]
+        P3["Guitar Chords<br/>(browser)"] -- "Web API poll<br/>/me/player (~1s)" --> P2
+    end
+
+    subgraph SONOS["Sonos sync — e.g. a Spotify playlist playing on Sonos"]
+        direction LR
+        S1["Phone / Sonos app<br/>(Spotify as source)"] -- "Spotify Connect /<br/>Sonos integration" --> S2["Spotify Cloud"]
+        S2 -- "streams audio" --> S3["Sonos speaker<br/>(LAN)"]
+        S4["Guitar Chords<br/>(browser)"] -- "HTTPS<br/>/api/sonos/status" --> S5["nginx"]
+        S5 -- "local HTTP" --> S6["sonos-proxy<br/>(Docker sidecar)"]
+        S6 -- "local UPnP/SOAP<br/>port 1400" --> S3
+    end
+
+    SPOTIFY ~~~ SONOS
+```
+
+In Spotify sync, the browser is one more client talking to Spotify's cloud, same as the phone. In Sonos sync, the browser's request never leaves the local network — `sonos-proxy` exists specifically because a Sonos speaker's control API is plain HTTP, which the browser (served over HTTPS) can't call directly without triggering mixed-content blocking; see [Sonos Setup](#sonos-setup) for why.
 
 ## Chord Transposition
 
@@ -101,6 +126,8 @@ The included `docker-compose.yml` demonstrates a simple self-hosted deployment u
 docker compose up -d
 ```
 
+`docker-compose.yml` also defines a `sonos-proxy` service. It's entirely optional (see [Sonos Setup](#sonos-setup)) — ignore it if you're not using Sonos sync.
+
 ### Spotify Setup
 
 Spotify functionality is optional.
@@ -142,6 +169,21 @@ To allow additional users:
 1. Open your Spotify Developer application.
 2. Navigate to User Management.
 3. Add the Spotify account email addresses that should have access.
+
+### Sonos Setup
+
+Sonos sync is entirely optional and off by default — skip this whole section if you don't have a Sonos speaker, or are happy with Spotify sync (or neither). Nothing else in the app changes if it's not configured.
+
+It works via a small local network proxy, since the app is served over HTTPS but a Sonos speaker's own control API is plain HTTP on your LAN — browsers block that combination outright, so something has to sit in between. That's the `sonos-proxy` service in `docker-compose.yml`.
+
+To enable it:
+
+1. Give your Sonos speaker(s) a static IP or DHCP reservation on your router (so the proxy's config doesn't go stale later).
+2. Set `SONOS_SPEAKER_UPSTAIRS_IP` and/or `SONOS_SPEAKER_DOWNSTAIRS_IP` in `docker-compose.yml`'s `sonos-proxy` service to those IPs. (Yes, the names are hardcoded — see [Known Limitations](#known-limitations).)
+3. `docker compose up -d` — this also starts the `sonos-proxy` service.
+4. In the app, open Settings → Chart / Sync, turn on "Sonos mode", and pick a speaker.
+
+If you don't want the `sonos-proxy` service running at all, delete that block from `docker-compose.yml` — the rest of the app is unaffected either way; the Sonos toggle in Settings just won't do anything useful without it.
 
 ## Adding Song Charts
 
@@ -294,6 +336,7 @@ Additional chords can be added by extending `Fretboard.CHORD_LOOKUP` in `web-roo
 - Timestamp accuracy depends on Song Chart authoring quality.
 - Spotify track naming variations may require manual Song Chart mapping.
 - Chord library is not yet exhaustive.
+- Sonos sync supports pre configured speakers (`upstairs`/`downstairs`, configured via env vars) — not general speaker discovery
 
 ## Roadmap
 
