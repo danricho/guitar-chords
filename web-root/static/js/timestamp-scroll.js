@@ -19,10 +19,18 @@ Scroll.toVirtualTimestamp = function (targetTimestamp) {
   const $container = $("#content");
   const points = [];
 
+  // .event replaces a ChordPro comment and lands in its own row, ahead of
+  // the chord+lyric row it tags (comment sits on its own source line, right
+  // before the lyric line it timestamps) — so offsetTop alone lands on top
+  // of the chord line, not the lyric. Nudge down by one chord line's actual
+  // rendered height (measured live so it tracks the font-scale setting)
+  // to land at chord-bottom/lyric-top instead.
+  const chordLineHeight = $container.find(".chord").first().outerHeight() || 0;
+
   $container.find(".event").each(function () {
     const timestamp = Number($(this).data("timestamp"));
     if (!isNaN(timestamp)) {
-      points.push({ timestamp, top: this.offsetTop });
+      points.push({ timestamp, top: this.offsetTop + chordLineHeight });
     }
   });
 
