@@ -118,6 +118,28 @@ body.panel-open #sync-line-indicator {
   right: calc(var(--menu-width) + var(--panel-width));
 }
 
+/* Same right-edge boundary as #sync-line-indicator above, pinned to
+   #song-info's bottom border instead of vertically centred. height is
+   deliberately thicker than #song-info's 1px border-b so it reads as a
+   distinct progress fill, not a border-colour change. */
+#song-progress-track {
+  right: var(--menu-width);
+  height: 2px;
+  opacity: 0.5;
+}
+
+body.panel-open #song-progress-track {
+  right: calc(var(--menu-width) + var(--panel-width));
+}
+
+#song-progress-fill {
+  height: 100%;
+  background: var(--primary);
+  /* matches the 500ms poll interval driving width, so updates read as
+     continuous motion instead of a visible jump each tick */
+  transition: width 995ms linear;
+}
+
 * {
   -ms-overflow-style: none;
   scrollbar-width: none;
@@ -300,6 +322,12 @@ dialog::backdrop {
      no horizontal space, so (unlike the base body.panel-open rule further
      up) the indicator shouldn't be pushed left by --panel-width at all. */
   body.panel-open #sync-line-indicator {
+    right: var(--menu-width);
+  }
+
+  /* Bottom sheet takes no horizontal space here — same reasoning as
+     #sync-line-indicator just above. */
+  body.panel-open #song-progress-track {
     right: var(--menu-width);
   }
 

@@ -920,6 +920,20 @@
         id="song-info"
         class="fixed top-0 left-0 p-4 z-30 bg-[var(--background)] border-b border-[var(--color-border)] w-full flex flex-col gap-4"
       >
+        <!-- Playback-percent bar, pinned to #song-info's own bottom border.
+             #song-info's right edge sits under the side menu/Fretboard panel
+             (its margin-right doesn't shrink the box — see #sync-line-indicator
+             above), so this can't be a plain percentage-of-parent width; it
+             uses the same explicit right: calc(--menu-width [+ --panel-width])
+             boundary, see app.css. #song-info is itself position:fixed, so it
+             is this div's containing block for the absolute positioning. -->
+        <div
+          id="song-progress-track"
+          class="absolute bottom-0 left-0 pointer-events-none"
+          style="display: none"
+        >
+          <div id="song-progress-fill" style="width: 0%"></div>
+        </div>
         <div class="flex gap-4 md:flex-col md:gap-2 items-baseline">
           <h1 id="song-title" class="text-2xl font-semibold"></h1>
           <div id="song-data" class="text-md flex gap-2">

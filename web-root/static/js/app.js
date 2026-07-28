@@ -140,6 +140,16 @@ App.updateSyncLineIndicatorVisibility = function () {
   $("#sync-line-indicator").toggle(
     enabled && (spotifyActive || sonosActive) && chartShowing,
   );
+
+  // Song percent progress bar: no setting to gate it, just active sync +
+  // a real chart on screen (same source data, same interval — see caller).
+  const percent = spotifyActive
+    ? Spotify.sync.percent
+    : sonosActive
+      ? Sonos.sync.percent
+      : 0;
+  $("#song-progress-track").toggle((spotifyActive || sonosActive) && chartShowing);
+  document.getElementById("song-progress-fill").style.width = percent + "%";
 };
 
 /** Measure the panel and sync --panel-width and --panel-height on :root. */
