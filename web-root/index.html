@@ -50,8 +50,8 @@
                 aria-selected="true"
                 tabindex="0"
               >
-                <span class="tab-full">Chart / Sync</span>
-                <span class="tab-short">Chart</span>
+                <span class="tab-full">Sync</span>
+                <span class="tab-short">Sync</span>
               </button>
               <button
                 type="button"
@@ -96,86 +96,6 @@
               aria-selected="true"
             >
               <div class="card gap-8">
-                <section class="flex flex-col gap-4">
-                  <h2 class="font-bold">Song Chart</h2>
-                  <label class="label">
-                    <input
-                      id="kidSwitch"
-                      type="checkbox"
-                      name="switch"
-                      role="switch"
-                      class="input"
-                    />
-                    3 String Fret Cover
-                  </label>
-                  <label class="label">
-                    <input
-                      id="syncLineIndicatorSwitch"
-                      type="checkbox"
-                      name="switch"
-                      role="switch"
-                      class="input"
-                    />
-                    Current Line Indicator
-                  </label>
-                  <div>
-                    <button id="copy-chart-btn" class="btn-outline h-9 p-3">
-                      <svg
-                        aria-hidden="true"
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="24"
-                        height="24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="1.5"
-                        viewBox="0 0 24 24"
-                        class="iconoir"
-                      >
-                        <path
-                          d="M19.4 20H9.6C9.26863 20 9 19.7314 9 19.4V9.6C9 9.26863 9.26863 9 9.6 9H19.4C19.7314 9 20 9.26863 20 9.6V19.4C20 19.7314 19.7314 20 19.4 20Z"
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                        ></path>
-                        <path
-                          d="M15 9V4.6C15 4.26863 14.7314 4 14.4 4H4.6C4.26863 4 4 4.26863 4 4.6V14.4C4 14.7314 4.26863 15 4.6 15H9"
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                        ></path>
-                      </svg>
-                      Copy Current Song Chart ChordPro Markdown
-                    </button>
-                  </div>
-                  <div>
-                    <button
-                      id="reset-capos-btn"
-                      class="btn-destructive h-9 p-3"
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="1.5"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        class="iconoir"
-                      >
-                        <path
-                          d="M20 9L18.005 20.3463C17.8369 21.3026 17.0062 22 16.0353 22H7.96474C6.99379 22 6.1631 21.3026 5.99496 20.3463L4 9"
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                        ></path>
-                        <path
-                          d="M21 6L15.375 6M3 6L8.625 6M8.625 6V4C8.625 2.89543 9.52043 2 10.625 2H13.375C14.4796 2 15.375 2.89543 15.375 4V6M8.625 6L15.375 6"
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                        ></path>
-                      </svg>
-                      Reset All Saved Song Capo Settings
-                    </button>
-                  </div>
-                </section>
-
                 <section class="flex flex-col gap-4">
                   <h2 class="font-bold">Spotify</h2>
                   <label class="label">
@@ -467,6 +387,86 @@
                       >Current Viewport<br />Width: <span id="width">0</span>px
                       | Height: <span id="height">0</span>px</small
                     >
+                  </div>
+                </section>
+
+                <section class="flex flex-col gap-4">
+                  <h2 class="font-bold">Song Chart</h2>
+                  <label class="label">
+                    <input
+                      id="kidSwitch"
+                      type="checkbox"
+                      name="switch"
+                      role="switch"
+                      class="input"
+                    />
+                    3 String Fret Cover
+                  </label>
+                  <label class="label">
+                    <input
+                      id="syncLineIndicatorSwitch"
+                      type="checkbox"
+                      name="switch"
+                      role="switch"
+                      class="input"
+                    />
+                    Current Line Indicator
+                  </label>
+                  <div>
+                    <button id="copy-chart-btn" class="btn-outline h-9 p-3">
+                      <svg
+                        aria-hidden="true"
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="24"
+                        height="24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.5"
+                        viewBox="0 0 24 24"
+                        class="iconoir"
+                      >
+                        <path
+                          d="M19.4 20H9.6C9.26863 20 9 19.7314 9 19.4V9.6C9 9.26863 9.26863 9 9.6 9H19.4C19.7314 9 20 9.26863 20 9.6V19.4C20 19.7314 19.7314 20 19.4 20Z"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        ></path>
+                        <path
+                          d="M15 9V4.6C15 4.26863 14.7314 4 14.4 4H4.6C4.26863 4 4 4.26863 4 4.6V14.4C4 14.7314 4.26863 15 4.6 15H9"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        ></path>
+                      </svg>
+                      Copy Current Song Chart ChordPro Markdown
+                    </button>
+                  </div>
+                  <div>
+                    <button
+                      id="reset-capos-btn"
+                      class="btn-destructive h-9 p-3"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="iconoir"
+                      >
+                        <path
+                          d="M20 9L18.005 20.3463C17.8369 21.3026 17.0062 22 16.0353 22H7.96474C6.99379 22 6.1631 21.3026 5.99496 20.3463L4 9"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        ></path>
+                        <path
+                          d="M21 6L15.375 6M3 6L8.625 6M8.625 6V4C8.625 2.89543 9.52043 2 10.625 2H13.375C14.4796 2 15.375 2.89543 15.375 4V6M8.625 6L15.375 6"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        ></path>
+                      </svg>
+                      Reset All Saved Song Capo Settings
+                    </button>
                   </div>
                 </section>
               </div>

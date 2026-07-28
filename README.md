@@ -179,7 +179,7 @@ To enable it:
 1. Give your Sonos speaker(s) a static IP or DHCP reservation on your router (so the proxy's config doesn't go stale later).
 2. Set `SONOS_SPEAKER_UPSTAIRS_IP` and/or `SONOS_SPEAKER_DOWNSTAIRS_IP` in `docker-compose.yml`'s `sonos-proxy` service to those IPs. (Yes, the names are hardcoded — see [Known Limitations](#known-limitations).)
 3. `docker compose up -d` — this also starts the `sonos-proxy` service.
-4. In the app, open Settings → Chart / Sync, turn on "Sonos mode", and pick a speaker.
+4. In the app, open Settings → Sync, turn on "Sonos mode", and pick a speaker.
 
 If you don't want the `sonos-proxy` service running at all, delete that block from `docker-compose.yml` — the rest of the app is unaffected either way; the Sonos toggle in Settings just won't do anything useful without it.
 
