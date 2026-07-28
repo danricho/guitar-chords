@@ -96,6 +96,28 @@ body.panel-open #song-info {
   margin-right: var(--menu-width);
 }
 
+/* Vertically centred to match where spotify.js/sonos.js scroll the current
+   line to (their 50vh top/bottom padding trick on #song) — 50% of the
+   viewport lands on the same spot regardless of viewport height. Horizontal
+   offset mirrors #song-info/#content above: stay left of the side menu
+   always, and left of the Fretboard panel too whenever it's actually taking
+   up horizontal space (not true in the portrait bottom-sheet layout — see
+   the portrait media query further down, which overrides this back to just
+   --menu-width). pointer-events is set here *and* via the pointer-events-
+   none class on the element — redundant, deliberately, so it's inert no
+   matter which one a future edit accidentally drops. */
+#sync-line-indicator {
+  top: 50%;
+  left: 0;
+  right: var(--menu-width);
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+body.panel-open #sync-line-indicator {
+  right: calc(var(--menu-width) + var(--panel-width));
+}
+
 * {
   -ms-overflow-style: none;
   scrollbar-width: none;
@@ -272,6 +294,13 @@ dialog::backdrop {
   body.panel-open #content {
     padding-right: 0;
     padding-bottom: var(--panel-height);
+  }
+
+  /* The Fretboard panel is a bottom sheet here, not a side panel — it takes
+     no horizontal space, so (unlike the base body.panel-open rule further
+     up) the indicator shouldn't be pushed left by --panel-width at all. */
+  body.panel-open #sync-line-indicator {
+    right: var(--menu-width);
   }
 
   body.panel-open #spotify-album-art,

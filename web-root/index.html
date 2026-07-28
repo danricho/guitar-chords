@@ -108,6 +108,16 @@
                     />
                     3 String Fret Cover
                   </label>
+                  <label class="label">
+                    <input
+                      id="syncLineIndicatorSwitch"
+                      type="checkbox"
+                      name="switch"
+                      role="switch"
+                      class="input"
+                    />
+                    Current Line Indicator
+                  </label>
                   <div>
                     <button id="copy-chart-btn" class="btn-outline h-9 p-3">
                       <svg
@@ -844,6 +854,64 @@
         </button>
       </div>
     </dialog>
+
+    <!-- CURRENT LINE INDICATOR — shown (per syncLineIndicatorSwitch setting)
+         only while sync (Spotify or Sonos) is actively playing (toggled via
+         JS, see App.updateSyncLineIndicatorVisibility). All positioning is
+         in app.css (search "#sync-line-indicator") — it deliberately mirrors
+         #content's own rules (base / body.panel-open / portrait-bottom-sheet
+         variants) rather than duplicating the layout logic inline, since
+         #content's own conditional right-offset is exactly what this needs
+         to match. One flex row (not two separate fixed elements) so a
+         future connecting line between the two arrows is just another flex
+         child away. -->
+    <div
+      id="sync-line-indicator"
+      class="fixed flex items-center justify-between pointer-events-none z-20 opacity-70"
+      style="display: none"
+    >
+      <svg
+        class="size-8"
+        viewBox="0 0 24 24"
+        stroke-width="3"
+        stroke="var(--primary)"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          d="M9 6l6 6-6 6"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        ></path>
+      </svg>
+      <svg
+        class="w-[95%] h-8 opacity-15"
+        viewBox="0 0 24 24"
+        preserveAspectRatio="none"
+        stroke-width="3"
+        stroke="var(--primary)"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <!-- style="filter: blur(3.5px)" -->
+        <line x1="24" y1="12" x2="0" y2="12" />
+      </svg>
+
+      <svg
+        class="size-8"
+        viewBox="0 0 24 24"
+        stroke-width="3"
+        stroke="var(--primary)"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          d="M15 6l-6 6 6 6"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        ></path>
+      </svg>
+    </div>
 
     <!-- CONTENT -->
     <main id="content" class="relative h-full overflow-auto">

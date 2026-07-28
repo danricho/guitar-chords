@@ -16,6 +16,7 @@ App.dom = {
   themeSwitch: null,
   kidSwitch: null,
   spotifyAutoConnect: null,
+  syncLineIndicatorSwitch: null,
 };
 
 /** Cross-module runtime state. */
@@ -109,6 +110,36 @@ App.toggleSpotifyAutoConnect = function () {
   const enabled = Store.get("spotify_autoconnect") !== "on";
   Store.set("spotify_autoconnect", enabled ? "on" : "off");
   App.dom.spotifyAutoConnect.checked = enabled;
+};
+
+/** Toggle the current-line indicator preference and persist it. */
+App.toggleSyncLineIndicator = function () {
+  const enabled = Store.get("sync_line_indicator") !== "on";
+  Store.set("sync_line_indicator", enabled ? "on" : "off");
+  App.dom.syncLineIndicatorSwitch.checked = enabled;
+  App.updateSyncLineIndicatorVisibility();
+};
+
+/**
+ * Show/hide #sync-line-indicator: only when the setting is on, a sync
+ * source (Spotify or Sonos) is actively playing, AND an actual Song Chart
+ * is on screen — not the capo-change or no-chart placeholder screens, where
+ * there's no "current line" to point at. Neither sync module exposes a
+ * "sync started/stopped" event, so this just re-reads their public
+ * Xxx.sync.stopXxxMode flags — called on a light interval below rather than
+ * hooked into either module directly, keeping this decoupled from both.
+ * Chart-vs-placeholder is read off #song's own "hidden" class (removed by
+ * Charts.renderSongChart() whenever a real chart renders) rather than
+ * checking the two placeholder screens separately — one source of truth.
+ */
+App.updateSyncLineIndicatorVisibility = function () {
+  const enabled = Store.get("sync_line_indicator") === "on";
+  const spotifyActive = window.Spotify && !Spotify.sync.stopSpotifyMode;
+  const sonosActive = window.Sonos && !Sonos.sync.stopSonosMode;
+  const chartShowing = !document.getElementById("song").classList.contains("hidden");
+  $("#sync-line-indicator").toggle(
+    enabled && (spotifyActive || sonosActive) && chartShowing,
+  );
 };
 
 /** Measure the panel and sync --panel-width and --panel-height on :root. */
@@ -281,6 +312,7 @@ App.bindEvents = function () {
   // Settings toggles
   $("#kidSwitch").on("change", App.toggleKidFretCover);
   $("#spotifyAutoConnect").on("change", App.toggleSpotifyAutoConnect);
+  $("#syncLineIndicatorSwitch").on("change", App.toggleSyncLineIndicator);
   $("#themeSwitch").on("change", () =>
     document.dispatchEvent(new CustomEvent("basecoat:theme")),
   );
@@ -416,6 +448,9 @@ App.init = function () {
   App.dom.themeSwitch = document.getElementById("themeSwitch");
   App.dom.kidSwitch = document.getElementById("kidSwitch");
   App.dom.spotifyAutoConnect = document.getElementById("spotifyAutoConnect");
+  App.dom.syncLineIndicatorSwitch = document.getElementById(
+    "syncLineIndicatorSwitch",
+  );
 
   App.themeChanger();
   App.scaleChanger();
@@ -423,6 +458,12 @@ App.init = function () {
   Spotify.updateUserDisplay();
   App.dom.spotifyAutoConnect.checked =
     Store.get("spotify_autoconnect") === "on";
+  App.dom.syncLineIndicatorSwitch.checked =
+    Store.get("sync_line_indicator") === "on";
+  // Neither Spotify nor Sonos exposes a "sync started/stopped" event, so
+  // this just periodically re-checks their public state — see
+  // App.updateSyncLineIndicatorVisibility.
+  setInterval(App.updateSyncLineIndicatorVisibility, 500);
 
   App.createSongList();
   Charts.bindControls();
