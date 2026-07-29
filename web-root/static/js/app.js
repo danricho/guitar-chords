@@ -425,9 +425,26 @@ App.bindEvents = function () {
 App.bindWindowEvents = function () {
   window.addEventListener("resize", App.updateViewportSize);
 
-  // iOS Safari leaves touch hit-test targets offset after a rotation; only a
-  // full reload recomputes them.
-  window.addEventListener("orientationchange", () => location.reload());
+  // iOS Safari dispatches touches against the visual viewport, which can stay
+  // desynced from the layout viewport after a rotation — buttons visually
+  // relocate but their touch hit-test area lags behind by the same offset.
+  // A tiny scroll nudge once the URL bar show/hide animation has settled
+  // forces iOS to resync the two. Alternative if this ever regresses: a full
+  // reload also fixes it (blunter, loses scroll position/state):
+  // window.addEventListener("orientationchange", () => location.reload());
+  window.addEventListener("orientationchange", () => {
+    setTimeout(() => {
+      window.scrollBy(0, 1);
+      window.scrollBy(0, -1);
+      // --panel-width/--panel-height (which #logo-pane's corner position is
+      // computed from) are only ever remeasured on panel toggle or a
+      // Fretboard Chord Diagram mutation — never on rotation. The panel's
+      // actual footprint changes shape between landscape (side panel) and
+      // portrait (bottom sheet), so without this the vars stay stale from
+      // the previous orientation until the panel happens to be toggled.
+      App.syncPanelSize();
+    }, 250);
+  });
 
   // Safety net: always reveal the page on full load even if init() throws.
   window.addEventListener("load", () =>
