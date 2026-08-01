@@ -1272,11 +1272,17 @@
       id="fretboard-panel"
       class="bg-[var(--background)] border-l border-[var(--color-border)] w-fit fixed top-0 right-[var(--menu-width)] z-30 h-full"
     >
-      <div class="h-full overflow-auto py-4">
+      <!-- overflow-y-scroll (not auto): the panel is width: fit-content, and an
+           `auto` scrollbar's width is excluded from that intrinsic width — on
+           classic-scrollbar browsers (Windows) it would steal width from the
+           diagrams once the list scrolls. A permanent scrollbar is included in
+           the intrinsic width; overlay scrollbars (iOS/macOS) are zero-width
+           either way. -->
+      <div class="h-full overflow-y-scroll py-4">
         <!-- FRETBOARD HOLDER -->
         <div
           id="fretboards"
-          class="p-3 flex flex-col items-end gap-2 lg:gap-4"
+          class="p-3 flex flex-col items-end gap-2 lg:gap-3"
         ></div>
         <!-- FRETBOARD TEMPLATE -->
         <div
@@ -1289,7 +1295,7 @@
               xmlns="http://www.w3.org/2000/svg"
               xmlns:xlink="http://www.w3.org/1999/xlink"
               viewBox="0 0 121.19 120"
-              class="w-20 lg:w-24"
+              class="w-15 lg:w-18"
               stroke-width="2px"
               stroke="currentColor"
             >
@@ -1882,7 +1888,7 @@
             </svg>
           </div>
           <div
-            class="chord-name self-center text-center text-xl primary tracking-tight"
+            class="chord-name self-center text-center text-base primary tracking-tight"
             style="color: var(--primary)"
           ></div>
         </div>

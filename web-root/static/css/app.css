@@ -1,10 +1,14 @@
 :root {
+  /* --menu-width/--panel-width/--panel-height are pre-boot estimates only:
+     App.syncPanelSize() replaces all three with measured px values at boot
+     and keeps them synced on resize, scale change, rotation, panel toggle
+     and diagram changes. */
   --menu-width: calc(
     var(--spacing) * (9 + 4)
   ); /* 9 is the button width, 4 allows for padding */
   --panel-width: calc(
-    var(--spacing) * (25 + 20)
-  ); /* 25 is the width of the svg, 10 allows for most labels */
+    var(--spacing) * (18 + 20)
+  ); /* 18 is the width of the svg, 20 allows for most labels */
   --panel-height: 0px;
   --primary: #ff9900;
   --currentScale: 100;
@@ -305,7 +309,15 @@ dialog::backdrop {
 
   #fretboard-panel > div {
     height: auto;
-    overflow-x: auto;
+    /* py-4 on this div is for the side-panel layout; as a bottom sheet it
+       would just add dead height above/below the diagrams. */
+    padding-block: 0;
+    /* scroll (not auto): same intrinsic-size reasoning as the base panel's
+       overflow-y-scroll in index.html — the bottom sheet is height:
+       fit-content, and only a permanent scrollbar's height is counted in
+       that, so an `auto` horizontal scrollbar would clip the diagrams'
+       bottom edge on classic-scrollbar browsers. */
+    overflow-x: scroll;
     overflow-y: hidden;
   }
 

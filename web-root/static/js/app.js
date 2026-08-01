@@ -75,6 +75,9 @@ App.scaleChanger = function () {
     document.documentElement.style.setProperty("--current-scale", value);
     $("#scaling-display").text(value + "%");
     Store.set("ui_scale", String(value));
+    // Everything is rem-sized, so a scale change resizes the menu and panel;
+    // remeasure once the new font-size has taken effect.
+    requestAnimationFrame(App.syncPanelSize);
   };
 
   apply(readStored());
@@ -152,9 +155,21 @@ App.updateSyncLineIndicatorVisibility = function () {
   document.getElementById("song-progress-fill").style.width = percent + "%";
 };
 
-/** Measure the panel and sync --panel-width and --panel-height on :root. */
+/** Measure the panel and side menu, and sync --panel-width, --panel-height
+ * and --menu-width on :root. The side menu is content-sized (buttons +
+ * padding + border), so the static --menu-width calc in app.css is only a
+ * pre-boot estimate — everything positioned against the menu's left edge
+ * (the panel, indicators, #song-info) needs the measured width. */
 App.syncPanelSize = function () {
   const panel = document.getElementById("fretboard-panel");
+  const menu = document.getElementById("side-menu");
+  // Menu first: the portrait bottom sheet spans left: 0 to
+  // right: var(--menu-width), so its own width depends on this var being
+  // current before the panel is measured.
+  document.documentElement.style.setProperty(
+    "--menu-width",
+    menu.offsetWidth + "px",
+  );
   document.documentElement.style.setProperty(
     "--panel-width",
     panel.offsetWidth + "px",
@@ -423,7 +438,12 @@ App.bindEvents = function () {
 
 /** Wire window/document-level listeners (no DOM-ready needed). */
 App.bindWindowEvents = function () {
-  window.addEventListener("resize", App.updateViewportSize);
+  window.addEventListener("resize", () => {
+    App.updateViewportSize();
+    // Breakpoint crossings (lg:, portrait:) resize the menu buttons and
+    // diagram gaps, so the measured --menu-width/--panel-* need refreshing.
+    App.syncPanelSize();
+  });
 
   // iOS Safari dispatches touches against the visual viewport, which can stay
   // desynced from the layout viewport after a rotation — buttons visually
