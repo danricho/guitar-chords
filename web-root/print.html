@@ -1,0 +1,537 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Print Song Chart | Guitar Charts</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <link rel="stylesheet" href="static/css/font-cairo-online.css" />
+    <style>
+      :root {
+        --paper: #ffffff;
+        --paper-edge: #f3ede4;
+        --ink: #26221c;
+        --ink-soft: #6b6455;
+        --accent: #e07d00; /* the app's --primary (#ff9900), darkened for paper */
+        --rule: #e0d8c8;
+        --background: #ffffff; /* the fretboard template's SVG fills use this */
+        --primary: #e07d00; /* …and this */
+        --radius-md: 0.375rem;
+        /* Section accents — the app's light-mode values (app.css) */
+        --section-verse: oklch(0.55 0.08 237.3);
+        --section-chorus: oklch(0.55 0.1 16.4);
+        --section-bridge: oklch(0.55 0.09 292.7);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        background: var(--paper-edge);
+        color: var(--ink);
+        font-family: "Cairo", -apple-system, "Segoe UI", system-ui, sans-serif;
+        font-size: 14px;
+        line-height: 1.5;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+
+      .page {
+        max-width: 780px;
+        margin: 0 auto;
+        background: var(--paper);
+        padding: 2.5rem 3rem 3rem;
+      }
+
+      .sheet {
+        box-shadow:
+          0 1px 3px rgba(38, 34, 28, 0.08),
+          0 12px 32px rgba(38, 34, 28, 0.1);
+        margin: 2.5rem auto;
+        border-radius: 2px;
+      }
+
+      /* ---------- masthead ---------- */
+
+      .masthead {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        gap: 1.5rem;
+        border-bottom: 3px solid var(--ink);
+        padding-bottom: 0.4rem;
+      }
+      .wordmark-row {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+      .masthead-logo {
+        height: 1.3rem;
+        width: auto;
+        flex-shrink: 0;
+        color: var(--accent);
+      }
+      .wordmark {
+        font-weight: 800;
+        font-size: 1.5rem;
+        letter-spacing: 0.01em;
+        line-height: 1.1;
+      }
+      .wordmark em {
+        font-style: normal;
+        color: var(--accent);
+      }
+      .masthead .tagline {
+        display: none; /* space is better spent on the chart */
+      }
+      .masthead-right {
+        text-align: right;
+        font-size: 0.78rem;
+        color: var(--ink-soft);
+        line-height: 1.45;
+      }
+
+      .print-btn {
+        font-size: 0.8rem;
+        font-weight: 600;
+        letter-spacing: 0.03em;
+        font-family: inherit;
+        border: 1.5px solid var(--accent);
+        color: var(--accent);
+        background: #fff;
+        padding: 0.5rem 1rem;
+        border-radius: 3px;
+        cursor: pointer;
+        position: fixed;
+        top: 1.5rem;
+        right: max(1.5rem, calc((100vw - 780px) / 2 - 3rem));
+      }
+      .print-btn:hover {
+        background: #fdf2e2;
+      }
+
+      /* ---------- song head + facts ---------- */
+
+      .song-head {
+        display: flex;
+        align-items: baseline;
+        gap: 0.5rem;
+        margin: 0.8rem 0 0.1rem;
+      }
+      .song-head h1 {
+        font-size: 1.35rem;
+        font-weight: 800;
+        margin: 0;
+        line-height: 1.2;
+      }
+      .song-head .artist {
+        font-size: 0.9rem;
+        color: var(--ink-soft);
+      }
+
+      /* One compact key/value line instead of a card grid */
+      .facts {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.2rem 1.4rem;
+        margin: 0.2rem 0 0.3rem;
+        border-bottom: 1px solid var(--rule);
+        padding-bottom: 0.4rem;
+      }
+      .fact {
+        display: flex;
+        flex-direction: column;
+        gap: 0.05rem;
+      }
+      .fact .k {
+        font-size: 0.66rem;
+        text-transform: uppercase;
+        letter-spacing: 0.07em;
+        color: var(--accent);
+        font-weight: 700;
+      }
+      .fact .v {
+        font-size: 0.82rem;
+        font-weight: 600;
+        text-transform: capitalize;
+      }
+
+      /* ---------- fretboard chord diagrams ---------- */
+
+      .chords-head {
+        display: none; /* the diagrams speak for themselves */
+      }
+      #fretboards {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: flex-end;
+        gap: 0.3rem 0.9rem;
+        color: var(--ink);
+        border-bottom: 1px solid var(--rule);
+        padding: 0.3rem 0 0.5rem;
+      }
+      #fretboards .fretboard {
+        width: 3.6rem;
+      }
+      #fretboards .fretboard > div:first-child {
+        width: 100%;
+      }
+      #fretboards .fretboard svg {
+        width: 100%;
+        height: auto;
+        display: block;
+      }
+      #fretboards .chord-name {
+        text-align: center;
+        font-weight: 700;
+        font-size: 0.78rem;
+        color: var(--accent);
+        margin-top: 0;
+      }
+
+      /* ---------- Song Chart (mirrors app.css .song-sheet, light theme) --- */
+
+      .song-sheet {
+        margin: 1rem 0;
+        /* Chart at 75% of the page's base size; every internal size below is
+           in em (not rem) so spacing scales down with it. */
+        font-size: 75%;
+      }
+      .song-sheet .title,
+      .song-sheet .subtitle {
+        display: none;
+      }
+      .song-sheet .paragraph {
+        margin: 1em 0;
+      }
+      .song-sheet .row:first-of-type {
+        margin-top: 1.5em;
+      }
+      .song-sheet .row {
+        line-height: 1em;
+        white-space: pre;
+        display: flex;
+        flex-wrap: nowrap;
+        align-items: flex-start;
+        margin: 0.5em 0;
+      }
+      .song-sheet .row .column div {
+        min-height: 1.25em;
+        display: block;
+      }
+      /* Chords overflow their zero-width column so long chords never stretch
+         the lyric beneath — same trick as app.css. */
+      .song-sheet .row .column .chord {
+        width: 0;
+        padding-right: 0.75ch;
+        white-space: nowrap;
+        overflow: visible;
+      }
+      /* Chord-only rows (e.g. an Intro's [G][C][D]): the empty lyric divs are
+         removed in cleanup, so nothing sizes the columns and the zero-width
+         trick squashes the chords onto each other — give them natural width
+         instead. */
+      .song-sheet .row .column .chord:only-child {
+        width: auto;
+      }
+      .song-sheet .column {
+        display: inline-block;
+        vertical-align: top;
+      }
+      .song-sheet .chord {
+        color: var(--accent);
+        font-weight: 700;
+        letter-spacing: -0.025em;
+      }
+      .song-sheet .comment {
+        font-style: italic;
+        opacity: 0.5;
+        min-height: 1.25em;
+      }
+      .song-sheet .label {
+        font-weight: 700;
+        text-transform: uppercase;
+        margin-top: 1em;
+        margin-bottom: 0.5em;
+        opacity: 50%;
+      }
+      .song-sheet .paragraph.verse {
+        --section-color: var(--section-verse);
+      }
+      .song-sheet .paragraph.chorus {
+        --section-color: var(--section-chorus);
+      }
+      .song-sheet .paragraph.bridge {
+        --section-color: var(--section-bridge);
+      }
+      .song-sheet .paragraph:is(.verse, .chorus, .bridge) {
+        border-left: 2px solid
+          color-mix(in oklab, var(--section-color) 65%, transparent);
+        background: color-mix(in oklab, var(--section-color) 5%, transparent);
+        border-radius: 0 var(--radius-md) var(--radius-md) 0;
+        padding: 0.375em 0.75em 0.625em;
+        margin: 1.25em 0;
+      }
+      .song-sheet .paragraph:is(.verse, .chorus, .bridge) .row:first-of-type {
+        margin-top: 0;
+      }
+      .song-sheet .paragraph:is(.verse, .chorus, .bridge) .label {
+        color: var(--section-color);
+        opacity: 1;
+        margin-top: 0;
+        letter-spacing: 0.05em;
+      }
+
+      .load-error {
+        color: #8a2e2e;
+        font-weight: 600;
+        margin: 2rem 0;
+      }
+
+      /* ---------- page-break control ---------- */
+
+      /* Each Song Chart section moves to the next page whole rather than
+         breaking mid-section; ditto the facts/diagrams blocks. */
+      .song-sheet .paragraph,
+      .facts,
+      #fretboards,
+      .fretboard {
+        break-inside: avoid;
+      }
+      .masthead,
+      .song-head,
+      .chords-head,
+      .song-sheet .label {
+        break-after: avoid;
+      }
+
+      @media (max-width: 700px) {
+        .page {
+          padding: 1.75rem 1.25rem 2.5rem;
+        }
+        .facts {
+          grid-template-columns: 1fr 1fr;
+        }
+        .print-btn {
+          position: static;
+          margin: 1rem 0 0 1rem;
+        }
+      }
+
+      @media print {
+        body {
+          background: var(--paper);
+        }
+        .sheet {
+          box-shadow: none;
+          margin: 0;
+          border-radius: 0;
+        }
+        .page {
+          max-width: none;
+          padding: 0;
+        }
+        .print-btn {
+          display: none;
+        }
+      }
+
+      @page {
+        size: A4;
+        margin: 14mm 13mm;
+      }
+    </style>
+  </head>
+  <body>
+    <button class="print-btn" onclick="window.print()">
+      Print this page ↗
+    </button>
+
+    <div class="sheet">
+      <div class="page">
+        <div class="masthead">
+          <div>
+            <div class="wordmark-row">
+              <!-- The app's logo (same path as #logo in index.html) -->
+              <svg
+                class="masthead-logo"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 50 50"
+                fill="currentColor"
+              >
+                <path
+                  d="M15.94,49.85C8.48,47.85,1.59,21.4,5.07,8.47c2.52-9.39,15-9.38,23.86-7s19.66,8.64,17.14,18C42.6,32.41,23.39,51.85,15.94,49.85Z"
+                ></path>
+              </svg>
+              <span class="wordmark">Guitar <em>Charts</em></span>
+            </div>
+            <div class="tagline">Printable Song Chart</div>
+          </div>
+          <div class="masthead-right" id="masthead-right"></div>
+        </div>
+
+        <div class="song-head">
+          <h1 id="song-title"></h1>
+          <div class="artist" id="song-artist"></div>
+        </div>
+
+        <div class="facts">
+          <div class="fact">
+            <div class="k">Key</div>
+            <div class="v" id="song-key"></div>
+          </div>
+          <div class="fact">
+            <div class="k">Capo</div>
+            <div class="v" id="song-capo"></div>
+          </div>
+          <div class="fact">
+            <div class="k">Tempo</div>
+            <div class="v" id="song-tempo"></div>
+          </div>
+          <div class="fact">
+            <div class="k">Difficulty</div>
+            <div class="v" id="song-difficulty"></div>
+          </div>
+        </div>
+
+        <div class="chords-head">Chords</div>
+        <!-- FRETBOARD HOLDER — Fretboard.showChord() appends here; the SVG
+             template is imported from index.html at boot (single source of
+             truth for fingering markup). -->
+        <div id="fretboards"></div>
+
+        <div id="song" class="song-sheet"></div>
+      </div>
+    </div>
+
+    <script src="static/js/jquery-3.7.1.min.js"></script>
+    <script src="static/js/ChordSheetJS-bundle.js"></script>
+    <script src="static/js/fretboard.js"></script>
+    <script src="static/js/load-charts.js"></script>
+    <script>
+      // Standalone printable render of one Song Chart. Mirrors the parts of
+      // Charts.renderSongChart (charts.js) that shape the output — capo
+      // transposition, empty-row cleanup, timestamp handling — without the
+      // app's DOM/state wiring. URL: print.html?chart=<slug>[&capo=<fret>].
+      (async function () {
+        const fail = (msg) => {
+          document.getElementById("song").innerHTML =
+            `<p class="load-error">${msg}</p>`;
+        };
+
+        const params = new URLSearchParams(window.location.search);
+        const slug = (params.get("chart") || "").toLowerCase();
+        const chartIndex = charts.findIndex((c) => {
+          const file = (c.path || "").split("/").pop() || "";
+          return file.replace(/\.md$/i, "").toLowerCase() === slug;
+        });
+        if (chartIndex === -1) {
+          fail("Chart not found — open this page via the app's print button.");
+          return;
+        }
+        const chart = charts[chartIndex];
+
+        // Import the Fretboard Chord Diagram SVG template from index.html so
+        // the fingering markup has a single source of truth.
+        try {
+          const indexHtml = await (await fetch("index.html")).text();
+          const doc = new DOMParser().parseFromString(indexHtml, "text/html");
+          const template = doc.getElementById("fretboard-template");
+          document.body.appendChild(document.importNode(template, true));
+        } catch (_) {
+          // Diagrams just won't render; the chart itself still will.
+        }
+
+        let source = "";
+        try {
+          const res = await fetch(chart.path);
+          source = res.ok ? await res.text() : "";
+        } catch (_) {}
+        if (!source) {
+          fail("Could not load the chart file.");
+          return;
+        }
+
+        // Capo: explicit param, else the app's saved per-song override
+        // (localStorage song_capo, keyed by title), else the chart default.
+        const defaultCapo = Number.isFinite(Number(chart.defaultCapo))
+          ? Number(chart.defaultCapo)
+          : 0;
+        const capoParam = params.get("capo");
+        let capo = capoParam ? Number(capoParam) : NaN; // Number(null|"") is 0
+        if (!Number.isFinite(capo)) {
+          let saved = null;
+          try {
+            saved = JSON.parse(Store.get("song_capo") || "{}")[chart.title];
+          } catch (_) {}
+          capo = Number.isFinite(Number(saved)) ? Number(saved) : defaultCapo;
+        }
+
+        let song = new ChordSheetJS.ChordProParser().parse(source.trim());
+        // Skip the no-op transpose — same respelling gotcha as charts.js.
+        const capoDelta = defaultCapo - capo;
+        if (capoDelta !== 0) song = song.transpose(capoDelta);
+
+        const formatter = new ChordSheetJS.HtmlDivFormatter({
+          normalizeChordSuffix: false,
+        });
+        document.getElementById("song").innerHTML = formatter.format(song);
+
+        // Same cleanup as the app: drop all-empty lyric rows…
+        $("#song .row").each(function () {
+          const $lyrics = $(this).find(".lyrics");
+          if (
+            $lyrics.filter(function () {
+              return $.trim($(this).text()) !== "";
+            }).length === 0
+          ) {
+            $lyrics.remove();
+          }
+        });
+        $("#song .row").each(function () {
+          if ($.trim($(this).text()) === "") $(this).remove();
+        });
+
+        // …but timestamps mean nothing on paper: remove MM:SS comments.
+        $("#song .comment").each(function () {
+          if (/^\d{2}:\d{2}$/.test($(this).text().trim())) $(this).remove();
+        });
+
+        // Song info — registry-sourced, like the app's song info panel.
+        const title = chart.title || "";
+        const artist = chart.artist || "";
+        $("#song-title").text(title);
+        $("#song-artist").text(artist ? `by ${artist}` : "");
+        $("#song-key").text(chart.heardKey || "—");
+        $("#song-capo").text(capo === 0 ? "None" : `Fret ${capo}`);
+        $("#song-tempo").text(
+          song.metadata.get("tempo") ? `${song.metadata.get("tempo")} BPM` : "—",
+        );
+        $("#song-difficulty").text(chart.difficulty || "TBD");
+        $("#masthead-right").html(
+          `${chart.category || ""}<br />guitar-charts printout`,
+        );
+        document.title = `${title}${artist ? " by " + artist : ""} | Guitar Charts`;
+
+        // Fretboard Chord Diagrams — read chord names from the rendered
+        // chart DOM (not song.getChords()) so diagram spellings always match
+        // the chart, same as the app.
+        const seen = new Set();
+        $("#song .chord").each(function () {
+          const name = $(this).text().trim();
+          if (name && !seen.has(name)) {
+            seen.add(name);
+            Fretboard.showChord(name);
+          }
+        });
+
+        // Same localStorage-driven view state as the app (charts.js does
+        // this after every render): kid mode covers strings 1–3.
+        $(".fret-kid-cover").toggle(Store.get("fret_kidmode") === "on");
+      })();
+    </script>
+  </body>
+</html>

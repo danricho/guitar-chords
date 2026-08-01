@@ -204,6 +204,20 @@ Charts.shareCurrentChart = function () {
   navigator.share(data).catch(() => {});
 };
 
+/**
+ * Open the printable view (print.html) of the current chart in a new tab.
+ * The selected capo is passed explicitly; kid mode etc. are read from the
+ * shared localStorage by the print page itself.
+ */
+Charts.printCurrentChart = function () {
+  const slug = Charts.chartSlug(Charts.state.songIndex);
+  if (!slug) return;
+  const url = new URL("print.html", window.location.href);
+  url.searchParams.set(Charts.SHARE_PARAM, slug);
+  url.searchParams.set("capo", Charts.state.currentCapo);
+  window.open(url.toString(), "_blank");
+};
+
 /* ------------------------------------------------------------------ */
 /* Song loading + rendering                                            */
 /* ------------------------------------------------------------------ */

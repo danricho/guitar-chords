@@ -350,6 +350,7 @@ App.bindEvents = function () {
   } else {
     $("#share-chart").addClass("hidden");
   }
+  $("#print-chart").on("click", Charts.printCurrentChart);
   $("#reset-capos-btn").on("click", Charts.clearSavedCapos);
   $("#capo-reset").on("click", Charts.restoreDefaultCapo);
 
