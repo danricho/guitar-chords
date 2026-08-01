@@ -99,6 +99,7 @@ Fretboard.CHORD_LOOKUP = {
   Cadd9: "x32030",
   Cmaj7: "x32000",
   Csus2: "x30033",
+  "C/F": "xx3010",
   D: "xx0232",
   D5: "xx023x",
   D7: "xx0212",
