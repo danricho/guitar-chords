@@ -11,6 +11,18 @@ services:
       - ./web-root:/usr/share/nginx/html:ro
       - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro #"no-cache" configuration
 
+  auth-proxy:
+    image: node:alpine
+    restart: "unless-stopped"
+    working_dir: /app
+    command: node server.js
+    volumes:
+      # Not :ro — unlike sonos-proxy, this service writes data/auth.json and
+      # data/secret_key.txt on first boot (both git-ignored).
+      - ./auth-proxy:/app
+    # No ports: — only reachable from web-server over the Compose-internal
+    # network, via nginx's auth_request + /auth/ (see nginx.conf).
+
   sonos-proxy:
     image: node:alpine
     restart: "unless-stopped"

@@ -25,6 +25,8 @@ Designed for practising with real recordings, Guitar Chords can automatically lo
 - Song List grouped into category tabs (Favourites / Likes / Training / Creating, set per song in the registry).
 - Optional 'capo-change' track (works with either sync source), showing the next registered song and its capo setting.
 - Shareable deep links: the URL carries a `?chart=<slug>` argument for the loaded Song Chart, and the page title shows the song and artist. A share button (shown only where the browser supports the Web Share API) opens the native share sheet with a "Play along to &lt;song&gt; by &lt;artist&gt; on Guitar Chords!" message and the deep link.
+- Printable Song Charts: a print button next to the share button opens an A4-ready view (`print.html`) with the song metadata, Fretboard Chord Diagrams and the chart itself, rendered at the capo and kid-mode settings currently in use. Sections never break across pages.
+- Passcode-protected: a single shared passcode gates the whole site, with a 90-day session cookie per device. See [Passcode Login](#passcode-login).
 - Dark and light themes.
 - Kid-friendly three-string chord display mode.
 - Responsive tablet-friendly layout.
@@ -124,7 +126,26 @@ The included `docker-compose.yml` demonstrates a simple self-hosted deployment u
 docker compose up -d
 ```
 
-`docker-compose.yml` also defines a `sonos-proxy` service. It's entirely optional (see [Sonos Setup](#sonos-setup)) — ignore it if you're not using Sonos sync.
+`docker-compose.yml` also defines two sidecar services: `auth-proxy`, which puts the whole site behind a passcode (see [Passcode Login](#passcode-login)), and `sonos-proxy`, which is entirely optional (see [Sonos Setup](#sonos-setup)) — ignore the latter if you're not using Sonos sync.
+
+### Passcode Login
+
+The site is gated by a single shared passcode, so a self-hosted deployment isn't wide open to anyone who finds the URL. Nginx checks every request — pages, Song Charts, the print view, the Sonos API — against the `auth-proxy` service before serving anything.
+
+On first start, `auth-proxy` generates a random passcode, writes it to `auth-proxy/data/auth.json`, and prints it to its log:
+
+```bash
+docker compose logs auth-proxy
+```
+
+Edit that file to set your own passcode, then `docker compose restart auth-proxy`. The `auth-proxy/data/` directory is git-ignored; it also holds `secret_key.txt`, the cookie signing key — delete it to log every device out.
+
+Signing in sets a 90-day `HttpOnly` cookie, so it's a one-off per device. To sign out, use **Settings → Utilities → Sign Out** (or visit `/auth/logout` directly).
+
+Nginx also sets `X-Robots-Tag: noindex, nofollow, noarchive` on every response, alongside `robots.txt` and a `<meta name="robots">` tag on each page. The header is the part that matters: it's the only one of the three that covers the `.md` Song Chart files, which are plain fetchable URLs.
+
+> [!IMPORTANT]
+> This is a shared-passcode gate, not user accounts — everyone who knows the passcode is the same anonymous visitor, and it does nothing to separate one person's settings from another's. It also can't be removed by simply deleting the service: if `auth-proxy` isn't running, nginx's auth check fails and the site returns `500`. To run without any login, remove the `auth_request` / `error_page 401` lines and the `/auth/` and `/auth-verify` blocks from `nginx.conf`.
 
 ### Spotify Setup
 

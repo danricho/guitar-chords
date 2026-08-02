@@ -1,0 +1,6 @@
+# This is a private, passcode-gated app.
+# Nothing here is meant to be crawled or indexed. Enforced in nginx.conf too,
+# via an X-Robots-Tag header on every response — robots.txt is advisory only,
+# and it cannot cover the .md chart files the way that header does.
+User-agent: *
+Disallow: /
